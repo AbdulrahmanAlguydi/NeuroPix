@@ -65,3 +65,11 @@ def upload_processed_image(local_file_path):
     """
     print("[STORAGE] Initializing processed image upload sequence...")
     return _execute_s3_upload(local_file_path, folder_prefix="outputs")
+
+def get_full_s3_url(object_key):
+    """
+    Converts a database object key back into a live clickable public URL.
+    """
+    if not object_key:
+        return None
+    return f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{object_key}"
