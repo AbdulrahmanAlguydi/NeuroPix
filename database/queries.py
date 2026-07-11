@@ -35,8 +35,7 @@ def get_user_by_username(username):
     cursor = connection.cursor(dictionary=True)
     try:
         cursor.execute(query, (username,))
-        user = cursor.fetchone()
-        return user
+        return cursor.fetchone()
     except mysql.connector.Error as err:
         print(f"Database Error during user fetch: {err}")
         return None
@@ -80,41 +79,10 @@ def get_user_gallery(user_id):
     cursor = connection.cursor(dictionary=True)
     try:
         cursor.execute(query, (user_id,))
-        gallery = cursor.fetchall()
-        return gallery
+        return cursor.fetchall()
     except mysql.connector.Error as err:
         print(f"Database Error during gallery fetch: {err}")
         return []
     finally:
         cursor.close()
         connection.close()
-
-def update_image_record(image_id, user_id, modified_path, edit_type):
-    """
-    Directly updates the processing results for a specific image record.
-    """
-    query = """
-        UPDATE Images 
-        SET ModifiedFilePath = %s, EditType = %s 
-        WHERE ImageID = %s AND UserID = %s;
-    """
-    
-    connection = None
-    cursor = None
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor()
-        
-        cursor.execute(query, [modified_path, edit_type, image_id, user_id])
-        connection.commit()
-
-        return cursor.rowcount > 0
-
-    except Exception as err:
-        print(f"[DB ERROR] Failed to update image record: {err}")
-        if connection:
-            connection.rollback()
-        return False
-    finally:
-        if cursor: cursor.close()
-        if connection: connection.close()

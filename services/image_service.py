@@ -19,25 +19,25 @@ def save_image_transaction(user_id, local_raw_path, local_edited_path=None, edit
     """
     print(f"[SERVICE] Starting integrated image storage pipeline for UserID: {user_id}")
 
-    # 1. Transport the original image to S3 inputs folder
-    original_s3_url = upload_original_image(local_raw_path)
-    if not original_s3_url:
+    # 1. Transport the original image to S3 inputs folder and get its object key
+    original_s3_key = upload_original_image(local_raw_path)
+    if not original_s3_key:
         print("[SERVICE ERROR] Pipeline aborted: S3 raw file transmission failed.")
         return None
 
-    # 2. Transport the processed image to S3 outputs folder (if one exists)
-    modified_s3_url = None
+    # 2. Transport the processed image to S3 outputs folder and get its object key (if one exists)
+    modified_s3_key = None
     if local_edited_path:
-        modified_s3_url = upload_processed_image(local_edited_path)
-        if not modified_s3_url:
+        modified_s3_key = upload_processed_image(local_edited_path)
+        if not modified_s3_key:
             print("[SERVICE ERROR] Pipeline aborted: S3 processed file transmission failed.")
             return None
 
     # 3. Write transaction metadata records to the MySQL Database
     db_success = log_image_edit(
         user_id=user_id,
-        original_path=original_s3_url,
-        modified_path=modified_s3_url,
+        original_path=original_s3_key,
+        modified_path=modified_s3_key,
         edit_type=edit_type
     )
 
@@ -45,11 +45,11 @@ def save_image_transaction(user_id, local_raw_path, local_edited_path=None, edit
         print("[SERVICE ERROR] Pipeline failed: Files uploaded to S3, but database registration failed.")
         return None
 
-    print("[SERVICE SUCCESS] Image pipeline completed cleanly. Data committed to cloud storage and DB.")
+    print("[SERVICE SUCCESS] Image pipeline completed cleanly. Data committed to S3 and DB.")
     
     # Return structured tracking details to the caller
     return {
-        "OriginalFilePath": original_s3_url,
-        "ModifiedFilePath": modified_s3_url,
+        "OriginalFilePath": original_s3_key,
+        "ModifiedFilePath": modified_s3_key,
         "EditType": edit_type
     }
