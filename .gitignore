@@ -1,0 +1,10 @@
+# Databases & Private Credentials
+.env
+
+# Python compilation files (auto-generated junk)
+__pycache__/
+*.pyc
+
+# Local IDE settings
+.vscode/
+.DS_Store
