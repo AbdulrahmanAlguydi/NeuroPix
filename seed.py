@@ -2,7 +2,7 @@ from database.database import get_db_connection
 from mysql.connector import Error
 
 def seed_database():
-    print("NEUROPIX: Seeding local database...")
+    print("NEUROPIX: Seeding local database with S3 object keys...")
     conn = get_db_connection()
     
     if not conn:
@@ -31,16 +31,15 @@ def seed_database():
         for username, pwd_hash in users_to_insert:
             query = "INSERT INTO Users (Username, PasswordHash) VALUES (%s, %s);"
             cursor.execute(query, (username, pwd_hash))
-            # Capture the auto-incremented ID MySQL just made for this user
             user_ids.append(cursor.lastrowid)
 
-        # 3. Insert Dummy Images linked to our new user IDs
-        print("Inserting mock image metadata...")
+        # 3. Insert Dummy Images linked using realistic S3 Object Keys
+        print("Inserting mock image metadata using S3 object keys...")
         images_to_insert = [
-            (user_ids[0], "/uploads/raw/sunset.jpg", "/uploads/edited/sunset_ai.jpg", "ai"),
-            (user_ids[0], "/uploads/raw/profile.png", None, None), # Not edited yet
-            (user_ids[1], "/uploads/raw/car.jpg", "/uploads/edited/car_crop.jpg", "standard"),
-            (user_ids[2], "/uploads/raw/nature.bmp", "/uploads/edited/nature_enhanced.bmp", "ai")
+            (user_ids[0], "inputs/mock_sunset.jpg", "outputs/mock_sunset_ai.jpg", "ai"),
+            (user_ids[0], "inputs/mock_profile.png", None, None), # Not edited yet
+            (user_ids[1], "inputs/mock_car.jpg", "outputs/mock_car_crop.jpg", "standard"),
+            (user_ids[2], "inputs/mock_nature.png", "outputs/mock_nature_enhanced.png", "ai")
         ]
 
         query_image = """
@@ -51,7 +50,7 @@ def seed_database():
 
         # 4. Save changes permanently
         conn.commit()
-        print("Database successfully seeded with 3 users and 4 images!")
+        print("Database successfully seeded with 3 users and 4 object-key images!")
 
     except Error as e:
         print(f"Error during seeding: {e}")
