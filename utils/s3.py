@@ -73,3 +73,18 @@ def get_full_s3_url(object_key):
     if not object_key:
         return None
     return f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{object_key}"
+
+def delete_s3_object(object_key):
+    """
+    Deletes a single file object from the S3 bucket using its key.
+    """
+    if not object_key:
+        return True  # Nothing to delete
+
+    try:
+        s3_client.delete_object(Bucket=AWS_BUCKET_NAME, Key=object_key)
+        print(f"[STORAGE] Successfully deleted from S3: {object_key}")
+        return True
+    except Exception as err:
+        print(f"[STORAGE ERROR] Failed to delete {object_key}: {err}")
+        return False

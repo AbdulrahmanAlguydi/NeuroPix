@@ -1,9 +1,9 @@
-from utils.s3 import upload_original_image, upload_processed_image
-from database.queries import log_image_edit
+from utils.s3 import upload_original_image, upload_processed_image, delete_s3_object
+from database.queries import log_image_edit, delete_image_record
 
 def save_image_transaction(user_id, local_raw_path, local_edited_path=None, edit_type=None):
     """
-    Handles the complete image storage lifecycle for NeuroPix.
+    Handles the complete image storage lifecycle.
     1. Uploads the raw image to the S3 'inputs' directory.
     2. Uploads the processed image to the S3 'outputs' directory (if provided).
     3. Commits the resulting cloud storage URLs to the MySQL database Images table.
@@ -53,3 +53,21 @@ def save_image_transaction(user_id, local_raw_path, local_edited_path=None, edit
         "ModifiedFilePath": modified_s3_key,
         "EditType": edit_type
     }
+
+def delete_image_transaction(image_id, user_id):
+    """
+    Removes DB record, then cleans up both raw and processed images from Amazon S3.
+    """
+    # 1. Delete from DB and retrieve keys
+    deleted_paths = delete_image_record(image_id, user_id)
+    if not deleted_paths:
+        return False
+
+    # 2. Delete corresponding objects from S3
+    if deleted_paths.get("OriginalFilePath"):
+        delete_s3_object(deleted_paths["OriginalFilePath"])
+        
+    if deleted_paths.get("ModifiedFilePath"):
+        delete_s3_object(deleted_paths["ModifiedFilePath"])
+
+    return True

@@ -86,3 +86,43 @@ def get_user_gallery(user_id):
     finally:
         cursor.close()
         connection.close()
+
+def delete_image_record(image_id, user_id):
+    """
+    Verifies ownership and deletes the database record.
+    Returns the file keys so the caller can clean up S3.
+    """
+    conn = get_db_connection()
+    if not conn:
+        return None
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        # 1. Fetch keys first to ensure ownership and get S3 paths
+        fetch_query = """
+            SELECT OriginalFilePath, ModifiedFilePath 
+            FROM Images 
+            WHERE ImageID = %s AND UserID = %s;
+        """
+        cursor.execute(fetch_query, (image_id, user_id))
+        record = cursor.fetchone()
+
+        if not record:
+            print(f"[DB WARN] Image {image_id} not found for User {user_id}")
+            return None
+
+        # 2. Delete the row
+        delete_query = "DELETE FROM Images WHERE ImageID = %s AND UserID = %s;"
+        cursor.execute(delete_query, (image_id, user_id))
+        conn.commit()
+
+        print(f"[DB] Image record {image_id} deleted successfully.")
+        return record  # Returns dict with OriginalFilePath and ModifiedFilePath
+
+    except Error as e:
+        print(f"[DB ERROR] Failed to delete image record: {e}")
+        conn.rollback()
+        return None
+    finally:
+        cursor.close()
+        conn.close()
