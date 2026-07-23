@@ -1,5 +1,5 @@
-from utils.s3 import upload_original_image, upload_processed_image, delete_s3_object
-from database.queries import log_image_edit, delete_image_record
+from utils.s3 import upload_original_image, upload_processed_image, delete_s3_object, get_full_s3_url
+from database.queries import log_image_edit, delete_image_record, get_user_gallery
 
 def save_image_transaction(user_id, local_raw_path, local_edited_path=None, edit_type=None):
     """
@@ -71,3 +71,24 @@ def delete_image_transaction(image_id, user_id):
         delete_s3_object(deleted_paths["ModifiedFilePath"])
 
     return True
+
+def fetch_formatted_user_gallery(user_id):
+    """
+    Retrieves a user's gallery records and converts all relative 
+    S3 keys into full, browser-ready HTTPS URLs.
+    """
+    raw_records = get_user_gallery(user_id)
+    if not raw_records:
+        return []
+
+    formatted_gallery = []
+    for record in raw_records:
+        formatted_gallery.append({
+            "image_id": record["ImageID"],
+            "edit_type": record["EditType"],
+            "upload_date": record["UploadDate"],
+            "original_url": get_full_s3_url(record["OriginalFilePath"]),
+            "modified_url": get_full_s3_url(record["ModifiedFilePath"]) if record["ModifiedFilePath"] else None
+        })
+
+    return formatted_gallery

@@ -119,7 +119,7 @@ def delete_image_record(image_id, user_id):
         print(f"[DB] Image record {image_id} deleted successfully.")
         return record  # Returns dict with OriginalFilePath and ModifiedFilePath
 
-    except Error as e:
+    except mysql.connector.Error as e:
         print(f"[DB ERROR] Failed to delete image record: {e}")
         conn.rollback()
         return None
