@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NeuroPix image processing frontend">
+  <title>NeuroPix</title>
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+
+  <!-- Landing page -->
+  <section id="landingView" class="view active">
+    <nav class="landing-nav">
+      <a class="brand" href="#" data-route="landing">
+        <span class="brand-mark">N</span>
+        <span>NeuroPix</span>
+      </a>
+
+      <div class="landing-links">
+        <a href="#features">Features</a>
+        <a href="#workflow">How it works</a>
+        <button class="btn btn-ghost" data-route="login">Log in</button>
+        <button class="btn btn-primary" data-route="register">Create account</button>
+      </div>
+    </nav>
+
+    <main class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">IMAGE PROCESSING WORKSPACE</span>
+        <h1>Upload, process and manage your images.</h1>
+        <p>The frontend collects user input and displays results returned by the backend.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" data-route="register">Create account</button>
+          <button class="btn btn-secondary" data-route="login">Log in</button>
+        </div>
+      </div>
+    </main>
