@@ -55,3 +55,22 @@
     </div>
   </section>
 
+ <!-- Main application -->
+ <section id="appView" class="view app-layout">
+   <aside class="sidebar">
+     <h2>NeuroPix</h2>
+     <button data-page="dashboard">Dashboard</button>
+     <button data-page="editor">Image Upload</button>
+     <button data-page="gallery">Gallery</button>
+     <button id="logoutBtn">Logout</button>
+   </aside>
+
+   <main class="content">
+     <!-- Dashboard -->
+     <section id="dashboardPage" class="app-page active">
+       <div class="card">
+         <h1>Welcome, <span id="usernameText">User</span></h1>
+         <p>This frontend will connect to the project backend later.</p>
+         <button class="primary" data-page="editor">Upload Image</button>
+       </div>
+     </section>
