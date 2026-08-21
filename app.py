@@ -50,7 +50,9 @@ def login():
         session["username"] = user["Username"]
         return {"message": "Login successful"}, 200
 
-    return {"error": "Login failed"}, 401
+    # Same generic message whether the username doesn't exist or the
+    # password is wrong, so we never reveal which usernames are registered.
+    return {"error": "Invalid username or password"}, 401
 
 
 if __name__ == "__main__":
