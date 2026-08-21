@@ -1,9 +1,9 @@
 import os
-from flask import Flask, request
+from flask import Flask, request, session
 from dotenv import load_dotenv
 
 from database.queries import register_user, get_user_by_username
-from utils.security import hash_password
+from utils.security import hash_password, verify_password
 
 load_dotenv()
 
@@ -35,6 +35,22 @@ def register():
     register_user(username, password_hash)
 
     return {"message": "User registered successfully"}, 201
+
+
+@app.route("/api/auth/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    username = data["username"]
+    password = data["password"]
+
+    user = get_user_by_username(username)
+
+    if user and verify_password(password, user["PasswordHash"]):
+        session["user_id"] = user["UserID"]
+        session["username"] = user["Username"]
+        return {"message": "Login successful"}, 200
+
+    return {"error": "Login failed"}, 401
 
 
 if __name__ == "__main__":
