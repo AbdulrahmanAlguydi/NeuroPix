@@ -4,6 +4,7 @@ import tempfile
 from functools import wraps
 from flask import Flask, request, session
 from dotenv import load_dotenv
+from PIL import Image
 
 from database.queries import register_user, get_user_by_username
 from utils.security import hash_password, verify_password
@@ -19,6 +20,11 @@ UPLOAD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "neuropix_uploads")
 os.makedirs(UPLOAD_TEMP_DIR, exist_ok=True)
 
 ALLOWED_UPLOAD_EXTENSIONS = {".jpg", ".jpeg", ".png"}
+
+# The 1080p limit is orientation-aware: a landscape image may be as wide
+# as 1920x1080, while a portrait image may be as tall as 1080x1920.
+MAX_LANDSCAPE_SIZE = (1920, 1080)
+MAX_PORTRAIT_SIZE = (1080, 1920)
 
 
 def login_required(f):
@@ -97,6 +103,12 @@ def upload():
     file_extension = os.path.splitext(file.filename)[1].lower()
     if file_extension not in ALLOWED_UPLOAD_EXTENSIONS:
         return {"error": "Unsupported file format. Only JPG and PNG images are allowed."}, 400
+
+    width, height = Image.open(file.stream).size
+    max_width, max_height = MAX_LANDSCAPE_SIZE if width >= height else MAX_PORTRAIT_SIZE
+    if width > max_width or height > max_height:
+        return {"error": "Image resolution exceeds the 1080p limit (1920x1080 landscape or 1080x1920 portrait)."}, 400
+    file.seek(0)  # Image.open advanced the stream; rewind before saving the full file
 
     temp_filename = f"{uuid.uuid4().hex}_{file.filename}"
     temp_path = os.path.join(UPLOAD_TEMP_DIR, temp_filename)
