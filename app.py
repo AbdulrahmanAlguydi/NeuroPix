@@ -75,5 +75,11 @@ def logout():
     return {"message": "Logged out successfully"}, 200
 
 
+@app.route("/api/auth/me")
+@login_required
+def me():
+    return {"user_id": session["user_id"], "username": session["username"]}, 200
+
+
 if __name__ == "__main__":
     app.run(debug=True)
