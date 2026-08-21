@@ -2,7 +2,7 @@ import os
 from flask import Flask, request
 from dotenv import load_dotenv
 
-from database.queries import register_user
+from database.queries import register_user, get_user_by_username
 from utils.security import hash_password
 
 load_dotenv()
@@ -27,6 +27,9 @@ def register():
 
     if len(password) < 8:
         return {"error": "Password must be at least 8 characters long"}, 400
+
+    if get_user_by_username(username):
+        return {"error": "Username is already taken"}, 409
 
     password_hash = hash_password(password)
     register_user(username, password_hash)
