@@ -18,6 +18,8 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 UPLOAD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "neuropix_uploads")
 os.makedirs(UPLOAD_TEMP_DIR, exist_ok=True)
 
+ALLOWED_UPLOAD_EXTENSIONS = {".jpg", ".jpeg", ".png"}
+
 
 def login_required(f):
     """
@@ -91,6 +93,10 @@ def me():
 @app.route("/api/upload", methods=["POST"])
 def upload():
     file = request.files["image"]
+
+    file_extension = os.path.splitext(file.filename)[1].lower()
+    if file_extension not in ALLOWED_UPLOAD_EXTENSIONS:
+        return {"error": "Unsupported file format. Only JPG and PNG images are allowed."}, 400
 
     temp_filename = f"{uuid.uuid4().hex}_{file.filename}"
     temp_path = os.path.join(UPLOAD_TEMP_DIR, temp_filename)
