@@ -1,4 +1,6 @@
 import os
+import uuid
+import tempfile
 from functools import wraps
 from flask import Flask, request, session
 from dotenv import load_dotenv
@@ -10,6 +12,11 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+
+# Folder used to hold uploaded images temporarily, before any edit
+# decides whether they need to be saved permanently to S3/MySQL.
+UPLOAD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "neuropix_uploads")
+os.makedirs(UPLOAD_TEMP_DIR, exist_ok=True)
 
 
 def login_required(f):
@@ -79,6 +86,19 @@ def logout():
 @login_required
 def me():
     return {"user_id": session["user_id"], "username": session["username"]}, 200
+
+
+@app.route("/api/upload", methods=["POST"])
+def upload():
+    file = request.files["image"]
+
+    temp_filename = f"{uuid.uuid4().hex}_{file.filename}"
+    temp_path = os.path.join(UPLOAD_TEMP_DIR, temp_filename)
+    file.save(temp_path)
+
+    session["uploaded_image_path"] = temp_path
+
+    return {"message": "Image uploaded successfully"}, 200
 
 
 if __name__ == "__main__":
