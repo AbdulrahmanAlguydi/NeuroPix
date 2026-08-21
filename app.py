@@ -1,4 +1,5 @@
 import os
+from functools import wraps
 from flask import Flask, request, session
 from dotenv import load_dotenv
 
@@ -9,6 +10,19 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+
+
+def login_required(f):
+    """
+    Route decorator that blocks access unless the current session
+    belongs to a logged-in user.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user_id" not in session:
+            return {"error": "Authentication required"}, 401
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 @app.route("/health")
