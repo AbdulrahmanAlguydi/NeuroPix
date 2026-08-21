@@ -1,0 +1,60 @@
+/* NeuroPix frontend styles */
+/* This file only controls how the website looks. */
+/* Makes element sizes easier to control. */
+* {
+  box-sizing: border-box;
+}
+/* Main page style. */
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f4f4;
+  color: #222;
+}
+/* Makes form elements use the same font as the page. */
+button,
+input,
+select {
+  font: inherit;
+}
+/* Basic button style used around the website. */
+button {
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+}
+/* Main dark button. */
+.primary {
+  background: #222;
+  color: white;
+  border-color: #222;
+}
+/* Used by JavaScript to hide elements. */
+.hidden {
+  display: none !important;
+}
+/* Pages are hidden until JavaScript makes one active. */
+.view,
+.app-page {
+  display: none;
+}
+.view.active,
+.app-page.active {
+  display: block;
+}
+/* Top navigation bar. */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 6%;
+  background: white;
+  border-bottom: 1px solid #ddd;
+}
+/* Keeps navigation buttons next to each other. */
+.navbar div {
+  display: flex;
+  gap: 8px;
+}
