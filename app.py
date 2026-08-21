@@ -55,5 +55,11 @@ def login():
     return {"error": "Invalid username or password"}, 401
 
 
+@app.route("/api/auth/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return {"message": "Logged out successfully"}, 200
+
+
 if __name__ == "__main__":
     app.run(debug=True)
