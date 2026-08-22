@@ -52,8 +52,38 @@ button {
   background: white;
   border-bottom: 1px solid #ddd;
 }
+
 /* Keeps navigation buttons next to each other. */
 .navbar div {
   display: flex;
   gap: 8px;
+}
+
+/* Main section shown on the landing page. */
+.hero {
+  min-height: 70vh;
+  padding: 120px 20px;
+  text-align: center;
+  background: white;
+}
+.hero h1 {
+  margin-bottom: 10px;
+  font-size: 42px;
+}
+.hero p {
+  margin-bottom: 25px;
+  color: #666;
+}
+
+/* Adds space around normal pages. */
+.page-center {
+  padding: 60px 20px;
+}
+
+/* Reusable white box for page content. */
+.card {
+  padding: 22px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 7px;
 }
