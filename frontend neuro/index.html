@@ -80,3 +80,15 @@
    <div class="editor-grid">
      <div class="card">
        <h2>Image Upload</h2>
+
+       <div id="uploadArea" class="upload-area">
+         <p>Choose a JPG or PNG image.</p>
+         <input id="fileInput" type="file" accept="image/jpeg,image/png" hidden>
+         <button id="chooseFileBtn" class="primary">Choose Image</button>
+        </div>
+   
+        <!-- Only the original image is shown after upload. -->
+        <div id="originalArea" class="hidden">
+           <img id="originalPreview" class="preview" alt="Original image">
+           <p id="imageInfo"></p>
+        </div>     
