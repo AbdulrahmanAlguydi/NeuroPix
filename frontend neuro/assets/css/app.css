@@ -87,3 +87,28 @@ button {
   border: 1px solid #ddd;
   border-radius: 7px;
 }
+
+/* Keeps login and register forms from becoming too wide. */
+.auth-card {
+  max-width: 430px;
+  margin: auto;
+}
+
+.auth-card form {
+  display: grid;
+  gap: 10px;
+}
+
+/* Input fields used in forms and tools. */
+.auth-card input,
+.tools select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.link-button {
+  margin-bottom: 15px;
+  border: 0;
+}
