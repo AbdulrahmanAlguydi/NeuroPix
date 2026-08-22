@@ -92,3 +92,42 @@
            <img id="originalPreview" class="preview" alt="Original image">
            <p id="imageInfo"></p>
         </div>     
+
+         <!-- This stays hidden until the backend returns an edited image. -->
+  <div id="comparisonArea" class="comparison hidden">
+    <img id="compareOriginal" class="compare-image" alt="Original image">
+    <img id="compareEdited" class="compare-image edited" alt="Edited image">
+    <div id="sliderLine" class="slider-line"></div>
+    <input id="compareSlider" type="range" min="0" max="100" value="50">
+    <span class="left-label">Original</span>
+    <span class="right-label">Edited</span>
+  </div>
+</div>
+     
+<div class="card tools">
+      <h2>Processing</h2>
+      <p>Select what the backend should do.</p>
+      <select id="toolSelect">
+        <option value="standard">Standard processing</option>
+        <option value="ai_upscale">AI upscale</option>
+        <option value="ai_color">AI color correction</option>
+      </select>
+      <button id="processBtn" class="primary">Send for Processing</button>
+      <p class="note">Image processing is not done in the frontend.</p>
+    </div>
+  </div>
+  </section>  
+  <!-- Gallery page -->
+  <section id="galleryPage" class="app-page">
+    <div class="card">
+          <h2>Gallery</h2>
+          <p id="galleryMessage">Images will be loaded from the backend for the logged-in user.</p>
+          <div id="galleryGrid" class="gallery-grid"></div>
+      </div>
+    </section>
+  </main>
+</section>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
