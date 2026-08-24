@@ -188,3 +188,9 @@ button {
 .toast.show {
   display: block;
 }
+
+/* Makes editor fit smaller screens. */
+@media (max-width: 800px) {
+  .sidebar {
+    width: 170px;
+  }
