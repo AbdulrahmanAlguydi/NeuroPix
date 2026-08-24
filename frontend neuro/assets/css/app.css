@@ -184,3 +184,7 @@ button {
   overflow: hidden;
   background: #111;
 }
+
+.toast.show {
+  display: block;
+}
