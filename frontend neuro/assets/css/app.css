@@ -194,3 +194,23 @@ button {
   .sidebar {
     width: 170px;
   }
+
+  .editor-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile layout. */
+@media (max-width: 600px) {
+  .app-layout.active {
+    display: block;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .hero h1 {
+    font-size: 32px;
+  }
+}
