@@ -100,3 +100,62 @@ function handleImage(file) {
 
   image.src = imageUrl;
 }
+// Placeholder for sending the selected image to the backend later.
+function processImage() {
+  if (!state.imageFile) {
+    showToast("Choose an image first.");
+    return;
+  }
+
+  const tool = getElement("#toolSelect").value;
+  console.log("Selected backend tool:", tool);
+  showToast("Backend processing is not connected yet.");
+}
+
+// Displays an edited image after the backend returns its URL.
+function showProcessedImage(editedUrl) {
+  if (!editedUrl || !state.originalUrl) return;
+
+  state.editedUrl = editedUrl;
+  getElement("#compareOriginal").src = state.originalUrl;
+  getElement("#compareEdited").src = editedUrl;
+  getElement("#originalArea").classList.add("hidden");
+  getElement("#comparisonArea").classList.remove("hidden");
+  updateComparison(50);
+}
+
+// Reveals more or less of the edited image without moving either image.
+function updateComparison(value) {
+  const hiddenPercent = 100 - Number(value);
+  getElement("#compareEdited").style.clipPath = `inset(0 ${hiddenPercent}% 0 0)`;
+  getElement("#sliderLine").style.left = value + "%";
+}
+
+// Connects the HTML buttons and forms to the functions above.
+function setupEvents() {
+  getElements("[data-route]").forEach((button) => {
+    button.addEventListener("click", () => changeView(button.dataset.route));
+  });
+
+  getElements("[data-auth-mode]").forEach((button) => {
+    button.addEventListener("click", () => changeAuthForm(button.dataset.authMode));
+  });
+
+  getElements("[data-page]").forEach((button) => {
+    button.addEventListener("click", () => openPage(button.dataset.page));
+  });
+
+  getElement("#loginForm").addEventListener("submit", loginUser);
+  getElement("#registerForm").addEventListener("submit", registerUser);
+  getElement("#logoutBtn").addEventListener("click", logoutUser);
+  getElement("#processBtn").addEventListener("click", processImage);
+  getElement("#chooseFileBtn").addEventListener("click", () => getElement("#fileInput").click());
+
+  getElement("#fileInput").addEventListener("change", (event) => {
+    handleImage(event.target.files[0]);
+  });
+
+  getElement("#compareSlider").addEventListener("input", (event) => {
+    updateComparison(event.target.value);
+  });
+}
