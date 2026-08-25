@@ -159,3 +159,10 @@ function setupEvents() {
     updateComparison(event.target.value);
   });
 }
+// Starts the frontend after the page has loaded.
+function startApp() {
+  setupEvents();
+  changeView("landing");
+}
+
+startApp();
