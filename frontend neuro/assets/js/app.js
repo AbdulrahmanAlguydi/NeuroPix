@@ -79,3 +79,24 @@ function handleImage(file) {
   }
 
   const imageUrl = URL.createObjectURL(file);
+  const image = new Image();
+
+  image.onload = function () {
+    if (image.width > 1920 || image.height > 1080) {
+      URL.revokeObjectURL(imageUrl);
+      showToast("Maximum resolution is 1920 x 1080.");
+      return;
+    }
+
+    state.imageFile = file;
+    state.originalUrl = imageUrl;
+    state.editedUrl = "";
+    getElement("#originalPreview").src = imageUrl;
+    getElement("#imageInfo").textContent = image.width + " x " + image.height;
+    getElement("#originalArea").classList.remove("hidden");
+    getElement("#comparisonArea").classList.add("hidden");
+    showToast("Image selected.");
+  };
+
+  image.src = imageUrl;
+}
