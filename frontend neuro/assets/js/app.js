@@ -7,6 +7,8 @@ const state = {
 
 // Finds one HTML element using a CSS selector.
 function getElement(selector) {
+  return document.querySelector(selector);
+}
 
 // Finds all HTML elements using a CSS selector.
 function getElements(selector) {
