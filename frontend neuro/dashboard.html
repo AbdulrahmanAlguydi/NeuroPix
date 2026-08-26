@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="assets/css/app.css">
+<title>Dashboard | NeuroPix</title>
+</head>
+<body class="app-body">
+<aside class="sidebar">
+  <a class="brand side-brand" href="dashboard.html">
+    <span class="logo-mark light">N</span>
+    <span class="brand-name">NeuroPix</span>
+  </a>
+
+  <nav class="side-nav">
+    <a href="dashboard.html"><span>⌂</span>Dashboard</a>
+    <a href="workspace.html"><span>▣</span>Studio</a>
+    <a href="gallery.html"><span>▦</span>Gallery</a>
+    <a href="about.html"><span>ⓘ</span>About</a>
+  </nav>
+
+  <a class="logout-link" href="index.html"><span>↪</span>Logout</a>
+</aside>
+
+<main class="app-main">
+  <header class="app-header">
+    <div>
+      <span class="eyebrow">OVERVIEW</span>
+      <h1>Dashboard</h1>
+    </div>
+  </header>
+
+  <section class="dashboard-hero">
+    <div>
+      <span class="eyebrow">NEUROPIX STUDIO</span>
+      <h2>Ready to process an image?</h2>
+      <p>Open the studio to upload an image and configure your processing options.</p>
+      <a class="btn btn-primary" href="workspace.html">Open Studio</a>
+    </div>
+    <div class="dashboard-logo">N</div>
+  </section>
+
+  <section class="stats-grid">
+    <article><span>✎</span><div><small>Standard Edits</small><strong>Available</strong></div></article>
+    <article><span>✦</span><div><small>AI Edits</small><strong>Available</strong></div></article>
+    <article><span>▦</span><div><small>Gallery</small><strong>Backend Data</strong></div></article>
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="panel">
+      <span class="eyebrow">WORKFLOW</span>
+      <h2>How the studio works</h2>
+      <ol>
+        <li>Upload an image.</li>
+        <li>Select Standard or AI mode.</li>
+        <li>Configure parameters.</li>
+        <li>Send the request to the backend.</li>
+        <li>Compare the returned result.</li>
+      </ol>
+    </article>
+
+    <article class="panel">
+      <span class="eyebrow">RECENT ACTIVITY</span>
+      <h2>No activity yet</h2>
+      <p>Recent images will be loaded from the backend when integration is complete.</p>
+    </article>
+  </section>
+</main>
+</body>
+</html>
