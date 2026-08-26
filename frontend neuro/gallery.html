@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="assets/css/app.css">
+<title>Gallery | NeuroPix</title>
+</head>
+<body class="app-body">
+<aside class="sidebar">
+  <a class="brand side-brand" href="dashboard.html">
+    <span class="logo-mark light">N</span>
+    <span class="brand-name">NeuroPix</span>
+  </a>
+
+  <nav class="side-nav">
+    <a href="dashboard.html"><span>⌂</span>Dashboard</a>
+    <a href="workspace.html"><span>▣</span>Studio</a>
+    <a href="gallery.html"><span>▦</span>Gallery</a>
+    <a href="about.html"><span>ⓘ</span>About</a>
+  </nav>
+
+  <a class="logout-link" href="index.html"><span>↪</span>Logout</a>
+</aside>
+
+<main class="app-main">
+  <header class="app-header">
+    <div>
+      <span class="eyebrow">PRIVATE LIBRARY</span>
+      <h1>Gallery</h1>
+    </div>
+    <a class="btn btn-primary" href="workspace.html">New Image</a>
+  </header>
+
+  <p class="page-note">Edited images and metadata will be loaded from the backend/database when connected.</p>
+
+  <section class="gallery-grid">
+    <button class="gallery-card" data-title="Example AI Edit">
+      <div class="gallery-thumb ai-thumb">
+        <span class="ai-star">✦</span>
+      </div>
+      <div class="gallery-info">
+        <strong>Example AI Edit</strong>
+        <div>
+          <span class="chip">AI Edit ✦</span>
+          <span class="chip">Example Date</span>
+        </div>
+      </div>
+    </button>
+
+    <button class="gallery-card" data-title="Example Standard Edit">
+      <div class="gallery-thumb standard-thumb"></div>
+      <div class="gallery-info">
+        <strong>Example Standard Edit</strong>
+        <div>
+          <span class="chip">Standard</span>
+          <span class="chip">Example Date</span>
+        </div>
+      </div>
+    </button>
+  </section>
+</main>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-card">
+    <button id="closeModal" class="modal-close">×</button>
+
+    <span class="eyebrow">BEFORE / AFTER</span>
+    <h2 id="modalTitle">Image Comparison</h2>
+
+    <div class="comparison-box">
+      <div class="before-layer"></div>
+      <div id="editedLayer" class="edited-layer"></div>
+      <div id="compareLine" class="compare-line"></div>
+    </div>
+
+    <div class="comparison-labels">
+      <span>Before</span>
+      <span>Edited</span>
+    </div>
+
+    <input id="compareRange" type="range" min="0" max="100" value="80">
+  </div>
+</div>
+
+<script src="assets/js/gallery.js"></script>
+</body>
+</html>
