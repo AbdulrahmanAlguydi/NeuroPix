@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="assets/css/app.css">
+<title>Login | NeuroPix</title>
+</head>
+<body class="auth-body">
+<header class="public-nav auth-nav">
+  <a class="brand" href="index.html">
+  <span class="logo-mark">N</span>
+  <span class="brand-name">NeuroPix</span>
+</a>
+  <a href="index.html">Back Home</a>
+</header>
+
+<main class="auth-center">
+  <section class="auth-card">
+    <span class="eyebrow">WELCOME BACK</span>
+    <h1>Log in to NeuroPix</h1>
+    <p>Continue to your image processing workspace.</p>
+
+    <form id="loginForm">
+      <label>Username
+        <input id="loginUsername" type="text" required>
+      </label>
+
+      <label>Password
+        <input id="loginPassword" type="password" required>
+      </label>
+
+      <button class="btn btn-primary full" type="submit">Login</button>
+    </form>
+
+    <p class="auth-switch">Don't have an account? <a href="register.html">Create one</a></p>
+  </section>
+</main>
+
+<script src="assets/js/auth.js"></script>
+</body>
+</html>
