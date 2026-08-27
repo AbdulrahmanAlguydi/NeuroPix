@@ -1,133 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NeuroPix</title>
-  <link rel="stylesheet" href="assets/css/app.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="assets/css/app.css">
+<title>NeuroPix</title>
 </head>
 <body>
-  <div id="toast" class="toast"></div>
+<header class="public-nav">
+  <a class="brand" href="index.html">
+  <span class="logo-mark">N</span>
+  <span class="brand-name">NeuroPix</span>
+</a>
+  <nav>
+    <a href="#features">Features</a>
+    <a href="about.html">About Us</a>
+    <a href="login.html">Login</a>
+    <a class="btn btn-primary" href="login.html">Get Started</a>
+  </nav>
+</header>
 
-  <!-- Landing page -->
-  <section id="landingView" class="view active">
-    <nav class="navbar">
-      <h2>NeuroPix</h2>
-      <div>
-        <button data-route="login">Login</button>
-        <button data-route="register">Register</button>
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">IMAGE PROCESSING WORKSPACE</span>
+      <h1>Transform images with clarity and control.</h1>
+      <p>Upload images, choose Standard or AI processing options, and compare the results returned by the backend.</p>
+
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="login.html">Get Started</a>
+        <a class="btn btn-secondary" href="about.html">About NeuroPix</a>
       </div>
-    </nav>
+    </div>
 
-    <main class="hero">
-      <h1>Image Processing Workspace</h1>
-      <p>Upload images and view results returned by the backend.</p>
-      <button class="primary" data-route="register">Get Started</button>
-    </main>
-  </section>
-
-  <!-- Login and register page -->
-  <section id="authView" class="view page-center">
-    <div class="card auth-card">
-      <button class="link-button" data-route="landing">← Back</button>
-
-      <form id="loginForm">
-        <h2>Login</h2>
-        <label>Username</label>
-        <input id="loginUsername" type="text" required>
-        <label>Password</label>
-        <input id="loginPassword" type="password" required>
-        <button class="primary" type="submit">Login</button>
-        <button type="button" data-auth-mode="register">Create account</button>
-      </form>
-
-      <form id="registerForm" class="hidden">
-        <h2>Register</h2>
-        <label>Username</label>
-        <input id="registerUsername" type="text" required>
-        <label>Email</label>
-        <input id="registerEmail" type="email" required>
-        <label>Password</label>
-        <input id="registerPassword" type="password" minlength="8" required>
-        <button class="primary" type="submit">Create account</button>
-        <button type="button" data-auth-mode="login">Back to login</button>
-      </form>
+    <div class="hero-card">
+      <div class="hero-image">
+        <span class="before-tag">Before</span>
+        <span class="after-tag">After</span>
+        <div class="hero-divider"></div>
+      </div>
     </div>
   </section>
-
- <!-- Main application -->
- <section id="appView" class="view app-layout">
-   <aside class="sidebar">
-     <h2>NeuroPix</h2>
-     <button data-page="dashboard">Dashboard</button>
-     <button data-page="editor">Image Upload</button>
-     <button data-page="gallery">Gallery</button>
-     <button id="logoutBtn">Logout</button>
-   </aside>
-
-   <main class="content">
-     <!-- Dashboard -->
-     <section id="dashboardPage" class="app-page active">
-       <div class="card">
-         <h1>Welcome, <span id="usernameText">User</span></h1>
-         <p>This frontend will connect to the project backend later.</p>
-         <button class="primary" data-page="editor">Upload Image</button>
-       </div>
-     </section>
-
-      <!-- Image upload page -->
- <section id="editorPage" class="app-page">
-   <div class="editor-grid">
-     <div class="card">
-       <h2>Image Upload</h2>
-
-       <div id="uploadArea" class="upload-area">
-         <p>Choose a JPG or PNG image.</p>
-         <input id="fileInput" type="file" accept="image/jpeg,image/png" hidden>
-         <button id="chooseFileBtn" class="primary">Choose Image</button>
-        </div>
-   
-        <!-- Only the original image is shown after upload. -->
-        <div id="originalArea" class="hidden">
-           <img id="originalPreview" class="preview" alt="Original image">
-           <p id="imageInfo"></p>
-        </div>     
-
-         <!-- This stays hidden until the backend returns an edited image. -->
-  <div id="comparisonArea" class="comparison hidden">
-    <img id="compareOriginal" class="compare-image" alt="Original image">
-    <img id="compareEdited" class="compare-image edited" alt="Edited image">
-    <div id="sliderLine" class="slider-line"></div>
-    <input id="compareSlider" type="range" min="0" max="100" value="50">
-    <span class="left-label">Original</span>
-    <span class="right-label">Edited</span>
-  </div>
-</div>
-     
-<div class="card tools">
-      <h2>Processing</h2>
-      <p>Select what the backend should do.</p>
-      <select id="toolSelect">
-        <option value="standard">Standard processing</option>
-        <option value="ai_upscale">AI upscale</option>
-        <option value="ai_color">AI color correction</option>
-      </select>
-      <button id="processBtn" class="primary">Send for Processing</button>
-      <p class="note">Image processing is not done in the frontend.</p>
-    </div>
-  </div>
-  </section>  
-  <!-- Gallery page -->
-  <section id="galleryPage" class="app-page">
-    <div class="card">
-          <h2>Gallery</h2>
-          <p id="galleryMessage">Images will be loaded from the backend for the logged-in user.</p>
-          <div id="galleryGrid" class="gallery-grid"></div>
-      </div>
-    </section>
-  </main>
-</section>
-
-  <script src="assets/js/app.js"></script>
-</body>
-</html>
