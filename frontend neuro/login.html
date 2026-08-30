@@ -7,36 +7,29 @@
 <title>Login | NeuroPix</title>
 </head>
 <body class="auth-body">
-<header class="public-nav auth-nav">
-  <a class="brand" href="index.html">
-  <span class="logo-mark">N</span>
-  <span class="brand-name">NeuroPix</span>
-</a>
-  <a href="index.html">Back Home</a>
+<header class="public-nav">
+  <a class="brand" href="index.html"><span class="logo-mark">N</span><span class="brand-name">NeuroPix</span></a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="about.html">About Us</a>
+    <a class="active-link" href="login.html">Login</a>
+    <a class="btn btn-accent" href="login.html">Get Started</a>
+  </nav>
 </header>
 
 <main class="auth-center">
   <section class="auth-card">
-    <span class="eyebrow">WELCOME BACK</span>
+    <span class="eyebrow large-eyebrow">WELCOME BACK</span>
     <h1>Log in to NeuroPix</h1>
     <p>Continue to your image processing workspace.</p>
-
     <form id="loginForm">
-      <label>Username
-        <input id="loginUsername" type="text" required>
-      </label>
-
-      <label>Password
-        <input id="loginPassword" type="password" required>
-      </label>
-
-      <button class="btn btn-primary full" type="submit">Login</button>
+      <label>Username<input id="loginUsername" type="text" placeholder="Enter your username" required></label>
+      <label>Password<input id="loginPassword" type="password" placeholder="Enter your password" required></label>
+      <button class="btn btn-accent full" type="submit">Login</button>
     </form>
-
     <p class="auth-switch">Don't have an account? <a href="register.html">Create one</a></p>
   </section>
 </main>
-
 <script src="assets/js/auth.js"></script>
 </body>
 </html>
