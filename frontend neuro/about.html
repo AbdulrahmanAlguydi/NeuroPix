@@ -4,52 +4,113 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="assets/css/app.css">
-<title>About Us | NeuroPix</title>
+<title>NeuroPix</title>
 </head>
 <body>
 <header class="public-nav">
   <a class="brand" href="index.html">
-  <span class="logo-mark">N</span>
-  <span class="brand-name">NeuroPix</span>
-</a>
+    <span class="logo-mark">N</span>
+    <span class="brand-name">NeuroPix</span>
+  </a>
   <nav>
-    <a href="index.html">Home</a>
+    <a class="active-link" href="index.html">Home</a>
+    <a href="#features">Features</a>
+    <a href="about.html">About Us</a>
     <a href="login.html">Login</a>
-    <a class="btn btn-primary" href="login.html">Get Started</a>
+    <a class="btn btn-accent" href="login.html">Get Started</a>
   </nav>
 </header>
 
-<main class="about-page">
-  <section class="about-hero">
-    <span class="eyebrow">ABOUT US</span>
-    <h1>About NeuroPix</h1>
-    <p>NeuroPix is a senior project that focuses on providing a clear frontend for uploading, configuring, processing, and comparing images.</p>
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow large-eyebrow">IMAGE PROCESSING WORKSPACE</span>
+      <h1>Transform images with clarity and control.</h1>
+      <p>Upload images, choose Standard or AI processing options, and compare the results returned by the backend.</p>
+      <div class="hero-actions">
+        <a class="btn btn-accent" href="login.html">Get Started</a>
+      </div>
+    </div>
+
+    <div class="hero-card" aria-label="Before and after image example">
+      <div class="hero-image logo-comparison">
+        <div class="hero-logo-demo">N</div>
+        <span class="before-tag">Before</span>
+        <span class="after-tag">After</span>
+        <div class="hero-divider"><span class="hero-handle" aria-hidden="true"><span class="hero-arrow">‹</span><span class="hero-arrow">›</span></span></div>
+      </div>
+    </div>
   </section>
 
-  <section class="card-grid three about-grid">
-    <article class="info-card">
-      <h2>Our Goal</h2>
-      <p>Create a simple interface that works with the project's backend image processing services.</p>
-    </article>
+  <section class="section transformation">
+    <div class="section-heading">
+      <span class="eyebrow large-eyebrow">IMAGE TRANSFORMATION</span>
+      <h2>From upload to processed result</h2>
+      <p>The frontend collects the settings. The backend performs the real image processing.</p>
+    </div>
 
-    <article class="info-card">
-      <h2>Frontend Role</h2>
-      <p>Collect input, validate uploads, show processing options, and display returned results.</p>
-    </article>
+    <div class="card-grid three">
+      <article class="info-card process-card">
+        <div class="process-visual upload-visual"><span>↥</span></div>
+        <h3>1. Upload</h3>
+        <p>Choose or drag a JPG/PNG image into the studio.</p>
+      </article>
+      <article class="info-card process-card">
+        <div class="process-visual configure-visual"><span>☷</span><i></i><i></i><i></i></div>
+        <h3>2. Configure</h3>
+        <p>Select either Standard or AI mode and choose the needed parameters.</p>
+      </article>
+      <article class="info-card process-card">
+        <div class="process-visual compare-visual"><span>◐</span></div>
+        <h3>3. Compare</h3>
+        <p>View the original and edited result using the comparison slider.</p>
+      </article>
+    </div>
+  </section>
 
-    <article class="info-card">
-      <h2>Processing</h2>
-      <p>Standard and AI image processing are handled by the backend, not directly in browser JavaScript.</p>
-    </article>
+  <section class="section" id="features">
+    <div class="section-heading">
+      <span class="eyebrow large-eyebrow">FEATURES</span>
+      <h2>Built around the NeuroPix workflow</h2>
+    </div>
+
+    <div class="card-grid four">
+      <article class="feature-card"><span>↥</span><h3>Drag & Drop</h3><p>Native image upload interaction.</p></article>
+      <article class="feature-card"><span>✎</span><h3>Standard Edits</h3><p>Crop, rotate, adjust and filter settings.</p></article>
+      <article class="feature-card"><span>✦</span><h3>AI Edits</h3><p>Prompts, enhancement and upscaling options.</p></article>
+      <article class="feature-card"><span>◐</span><h3>Before / After</h3><p>Interactive result comparison.</p></article>
+    </div>
   </section>
 </main>
 
-<footer class="public-footer">
-  <a class="brand" href="index.html">
-  <span class="logo-mark">N</span>
-  <span class="brand-name">NeuroPix</span>
-</a>
-  <p>Senior Project Frontend</p>
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="index.html"><span class="logo-mark">N</span><span class="brand-name">NeuroPix</span></a>
+      <p>Image processing workspace for Standard and AI editing.</p>
+    </div>
+    <div class="footer-column">
+      <h3>Contact</h3>
+      <!-- Email to be added -->
+      <a href="#">Project Contact</a>
+    </div>
+    <div class="footer-column">
+      <h3>Services</h3>
+      <a href="login.html">Standard Editing</a>
+      <a href="login.html">AI Editing</a>
+      <a href="login.html">Image Comparison</a>
+      <a href="login.html">Gallery</a>
+    </div>
+    <div class="footer-column">
+      <h3>About</h3>
+      <a href="about.html">About NeuroPix</a>
+      <a href="https://github.com/AbdulrahmanAlguydi/NeuroPix" target="_blank" rel="noopener">GitHub Repository</a>
+      <a href="https://github.com/AbdulrahmanAlguydi" target="_blank" rel="noopener">Abdulrahman Alguydi</a>
+      <a href="https://github.com/Artig3nce" target="_blank" rel="noopener">Saud Al-mansour</a>
+      <a href="https://github.com/M123731" target="_blank" rel="noopener">Mohammed Dafterdar</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 NeuroPix · Senior Project</div>
 </footer>
 </body>
 </html>
