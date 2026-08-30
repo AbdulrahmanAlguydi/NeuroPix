@@ -1,71 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="assets/css/app.css">
-<title>Dashboard | NeuroPix</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <title>Dashboard | NeuroPix</title>
 </head>
+
 <body class="app-body">
-<aside class="sidebar">
-  <a class="brand side-brand" href="dashboard.html">
-    <span class="logo-mark light">N</span>
-    <span class="brand-name">NeuroPix</span>
-  </a>
 
-  <nav class="side-nav">
-    <a href="dashboard.html"><span>⌂</span>Dashboard</a>
-    <a href="workspace.html"><span>▣</span>Studio</a>
-    <a href="gallery.html"><span>▦</span>Gallery</a>
-    <a href="about.html"><span>ⓘ</span>About</a>
-  </nav>
+  <aside class="sidebar">
+    <a class="brand side-brand" href="dashboard.html">
+      <span class="logo-mark">N</span>
+      <span class="brand-name">NeuroPix</span>
+    </a>
 
-  <a class="logout-link" href="index.html"><span>↪</span>Logout</a>
-</aside>
+    <nav class="side-nav">
+      <a class="active" href="dashboard.html">
+        <span>⌂</span>
+        Dashboard
+      </a>
 
-<main class="app-main">
-  <header class="app-header">
-    <div>
-      <span class="eyebrow">OVERVIEW</span>
-      <h1>Dashboard</h1>
+      <a href="workspace.html">
+        <span>▣</span>
+        Studio
+      </a>
+
+      <a href="gallery.html">
+        <span>▦</span>
+        Gallery
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a class="logout-link" href="index.html">
+        <span>↪</span>
+        Logout
+      </a>
     </div>
-  </header>
+  </aside>
 
-  <section class="dashboard-hero">
-    <div>
-      <span class="eyebrow">NEUROPIX STUDIO</span>
-      <h2>Ready to process an image?</h2>
-      <p>Open the studio to upload an image and configure your processing options.</p>
-      <a class="btn btn-primary" href="workspace.html">Open Studio</a>
-    </div>
-    <div class="dashboard-logo">N</div>
-  </section>
+  <main class="app-main">
 
-  <section class="stats-grid">
-    <article><span>✎</span><div><small>Standard Edits</small><strong>Available</strong></div></article>
-    <article><span>✦</span><div><small>AI Edits</small><strong>Available</strong></div></article>
-    <article><span>▦</span><div><small>Gallery</small><strong>Backend Data</strong></div></article>
-  </section>
+    <header class="app-header">
+      <div>
+        <span class="eyebrow large-eyebrow">OVERVIEW</span>
+        <h1>Dashboard</h1>
+      </div>
+    </header>
 
-  <section class="dashboard-grid">
-    <article class="panel">
-      <span class="eyebrow">WORKFLOW</span>
-      <h2>How the studio works</h2>
-      <ol>
-        <li>Upload an image.</li>
-        <li>Select Standard or AI mode.</li>
-        <li>Configure parameters.</li>
-        <li>Send the request to the backend.</li>
-        <li>Compare the returned result.</li>
-      </ol>
-    </article>
+    <section class="dashboard-hero">
+      <div>
+        <span class="eyebrow">NEUROPIX STUDIO</span>
+        <h2>Ready to process an image?</h2>
 
-    <article class="panel">
-      <span class="eyebrow">RECENT ACTIVITY</span>
-      <h2>No activity yet</h2>
-      <p>Recent images will be loaded from the backend when integration is complete.</p>
-    </article>
-  </section>
-</main>
+        <p>
+          Upload an image, choose an editing mode, and prepare the
+          settings for backend processing.
+        </p>
+
+        <a class="btn btn-accent" href="workspace.html">
+          Open Studio
+        </a>
+      </div>
+
+      <div class="dashboard-logo">N</div>
+    </section>
+
+    <section class="stats-grid">
+      <article>
+        <span>✎</span>
+        <div>
+          <small>Standard Edits</small>
+          <strong>Available</strong>
+        </div>
+      </article>
+
+      <article>
+        <span>✦</span>
+        <div>
+          <small>AI Edits</small>
+          <strong>Available</strong>
+        </div>
+      </article>
+    </section>
+
+    <section class="dashboard-grid">
+
+      <article class="panel dashboard-panel">
+        <span class="eyebrow">WORKFLOW</span>
+        <h2>How the studio works</h2>
+
+        <div class="workflow-steps">
+          <span>1</span>
+          <p>Upload an image.</p>
+
+          <span>2</span>
+          <p>Select Standard or AI mode.</p>
+
+          <span>3</span>
+          <p>Configure parameters.</p>
+
+          <span>4</span>
+          <p>Send the request to the backend.</p>
+
+          <span>5</span>
+          <p>Compare the returned result.</p>
+        </div>
+      </article>
+
+      <article class="panel dashboard-panel">
+        <span class="eyebrow">RECENT ACTIVITY</span>
+        <h2>No activity yet</h2>
+
+        <p>
+          When backend integration is complete, your latest processed
+          images can appear here for quick access.
+        </p>
+
+        <a class="text-link" href="gallery.html">
+          Open Gallery →
+        </a>
+      </article>
+
+    </section>
+
+  </main>
+
 </body>
 </html>
