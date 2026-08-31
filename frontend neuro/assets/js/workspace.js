@@ -1,9 +1,11 @@
+// Stores the selected image and current editing mode.
 const state = {
   imageFile: null,
   originalUrl: "",
   editMode: "standard"
 };
 
+// Finds an element on the page using a CSS selector.
 function getElement(selector) {
   return document.querySelector(selector);
 }
@@ -13,12 +15,14 @@ function handleImage(file) {
   if (!file) return;
 
   if (file.type !== "image/jpeg" && file.type !== "image/png") {
-    getElement("#status").textContent = "Only JPG and PNG images are allowed.";
+    getElement("#status").textContent =
+      "Only JPG and PNG images are allowed.";
     return;
   }
 
   if (file.size > 5 * 1024 * 1024) {
-    getElement("#status").textContent = "Maximum file size is 5 MB.";
+    getElement("#status").textContent =
+      "Maximum file size is 5 MB.";
     return;
   }
 
@@ -28,7 +32,8 @@ function handleImage(file) {
   image.onload = function () {
     if (image.width > 1920 || image.height > 1080) {
       URL.revokeObjectURL(imageUrl);
-      getElement("#status").textContent = "Maximum resolution is 1920 x 1080.";
+      getElement("#status").textContent =
+        "Maximum resolution is 1920 x 1080.";
       return;
     }
 
@@ -41,7 +46,8 @@ function handleImage(file) {
 
     getElement("#originalPreview").src = imageUrl;
     getElement("#fileName").textContent = file.name;
-    getElement("#imageInfo").textContent = image.width + " x " + image.height;
+    getElement("#imageInfo").textContent =
+      image.width + " x " + image.height;
 
     getElement("#uploadZone").classList.add("hidden");
     getElement("#previewArea").classList.remove("hidden");
@@ -51,23 +57,34 @@ function handleImage(file) {
   image.src = imageUrl;
 }
 
-// Changes between Standard and AI edit settings.
+// Switches between Standard and AI controls.
 function setEditMode(mode) {
   state.editMode = mode;
 
   const standardMode = mode === "standard";
 
-  getElement("#standardControls").classList.toggle("hidden", !standardMode);
-  getElement("#aiControls").classList.toggle("hidden", standardMode);
+  getElement("#standardControls").classList.toggle(
+    "hidden",
+    !standardMode
+  );
 
-  getElement("#standardBtn").classList.toggle("active", standardMode);
-  getElement("#aiBtn").classList.toggle("active", !standardMode);
+  getElement("#aiControls").classList.toggle(
+    "hidden",
+    standardMode
+  );
 
-  getElement("#modeText").textContent =
-    standardMode ? "Standard Edits" : "AI Edits";
+  getElement("#standardBtn").classList.toggle(
+    "active",
+    standardMode
+  );
+
+  getElement("#aiBtn").classList.toggle(
+    "active",
+    !standardMode
+  );
 }
 
-// Collects Standard parameters for the future backend request.
+// Collects Standard parameters for a future backend request.
 function getStandardSettings() {
   return {
     cropWidth: getElement("#cropWidth").value,
@@ -76,33 +93,45 @@ function getStandardSettings() {
     brightness: getElement("#brightness").value,
     contrast: getElement("#contrast").value,
     exposure: getElement("#exposure").value,
+    saturation: getElement("#saturation").value,
     blur: getElement("#blur").value,
     sharpness: getElement("#sharpness").value,
-    grayscale: getElement("#grayscale").checked
+    grayscale: getElement("#grayscale").value
   };
 }
 
-// Collects AI parameters for the future backend request.
+// Collects AI parameters for a future backend request.
 function getAiSettings() {
   return {
-    generativeModification: getElement("#generatePrompt").value.trim(),
-    backgroundManipulation: getElement("#backgroundPrompt").value.trim(),
-    enhancement: getElement("#enhancePrompt").value.trim(),
-    upscaling: getElement("#upscale").value
+    generativeModification:
+      getElement("#generatePrompt").value.trim(),
+
+    backgroundManipulation:
+      getElement("#backgroundPrompt").value.trim(),
+
+    enhancement:
+      getElement("#enhancePrompt").value.trim(),
+
+    upscaling:
+      getElement("#upscale").value
   };
 }
 
-// Prepares the selected settings without processing the image in the browser.
+// Prepares the settings that will later be sent to the backend.
 function processImage() {
   if (!state.imageFile) {
-    getElement("#status").textContent = "Choose an image first.";
+    getElement("#status").textContent =
+      "Choose an image first.";
     return;
   }
 
-  const settings =
-    state.editMode === "standard"
-      ? getStandardSettings()
-      : getAiSettings();
+  let settings;
+
+  if (state.editMode === "standard") {
+    settings = getStandardSettings();
+  } else {
+    settings = getAiSettings();
+  }
 
   console.log("Edit mode:", state.editMode);
   console.log("Settings for backend:", settings);
@@ -111,42 +140,104 @@ function processImage() {
     "Settings are ready. Backend processing is not connected yet.";
 }
 
+// Shows the current value beside a slider.
+function connectRange(inputId, valueId, suffix) {
+  const input = getElement(inputId);
+  const output = getElement(valueId);
+
+  function updateValue() {
+    output.textContent = input.value + suffix;
+  }
+
+  input.addEventListener("input", updateValue);
+  updateValue();
+}
+
+// Gets the main upload elements.
 const uploadZone = getElement("#uploadZone");
 const fileInput = getElement("#fileInput");
 
-getElement("#chooseFileBtn").addEventListener("click", function () {
-  fileInput.click();
-});
+// Opens the file picker when Choose Image is clicked.
+getElement("#chooseFileBtn").addEventListener(
+  "click",
+  function () {
+    fileInput.click();
+  }
+);
 
-getElement("#replaceBtn").addEventListener("click", function () {
-  fileInput.click();
-});
+// Opens the file picker when Replace Image is clicked.
+getElement("#replaceBtn").addEventListener(
+  "click",
+  function () {
+    fileInput.click();
+  }
+);
 
-fileInput.addEventListener("change", function (event) {
-  handleImage(event.target.files[0]);
-});
+// Handles an image selected from the file picker.
+fileInput.addEventListener(
+  "change",
+  function (event) {
+    handleImage(event.target.files[0]);
+  }
+);
 
-uploadZone.addEventListener("dragover", function (event) {
-  event.preventDefault();
-  uploadZone.classList.add("dragging");
-});
+// Allows an image to be dragged over the upload area.
+uploadZone.addEventListener(
+  "dragover",
+  function (event) {
+    event.preventDefault();
+    uploadZone.classList.add("dragging");
+  }
+);
 
-uploadZone.addEventListener("dragleave", function () {
-  uploadZone.classList.remove("dragging");
-});
+// Removes the drag effect when the image leaves the area.
+uploadZone.addEventListener(
+  "dragleave",
+  function () {
+    uploadZone.classList.remove("dragging");
+  }
+);
 
-uploadZone.addEventListener("drop", function (event) {
-  event.preventDefault();
-  uploadZone.classList.remove("dragging");
-  handleImage(event.dataTransfer.files[0]);
-});
+// Handles an image dropped into the upload area.
+uploadZone.addEventListener(
+  "drop",
+  function (event) {
+    event.preventDefault();
 
-getElement("#standardBtn").addEventListener("click", function () {
-  setEditMode("standard");
-});
+    uploadZone.classList.remove("dragging");
+    handleImage(event.dataTransfer.files[0]);
+  }
+);
 
-getElement("#aiBtn").addEventListener("click", function () {
-  setEditMode("ai");
-});
+// Switches to Standard editing mode.
+getElement("#standardBtn").addEventListener(
+  "click",
+  function () {
+    setEditMode("standard");
+  }
+);
 
-getElement("#processBtn").addEventListener("click", processImage);
+// Switches to AI editing mode.
+getElement("#aiBtn").addEventListener(
+  "click",
+  function () {
+    setEditMode("ai");
+  }
+);
+
+// Prepares the selected settings for processing.
+getElement("#processBtn").addEventListener(
+  "click",
+  processImage
+);
+
+// Connects each slider to the value shown beside it.
+connectRange("#cropWidth", "#cropWidthValue", "%");
+connectRange("#cropHeight", "#cropHeightValue", "%");
+connectRange("#brightness", "#brightnessValue", "%");
+connectRange("#contrast", "#contrastValue", "%");
+connectRange("#exposure", "#exposureValue", "%");
+connectRange("#saturation", "#saturationValue", "%");
+connectRange("#blur", "#blurValue", "");
+connectRange("#sharpness", "#sharpnessValue", "%");
+connectRange("#grayscale", "#grayscaleValue", "%");
