@@ -8,35 +8,17 @@
 </head>
 <body class="app-body">
 <aside class="sidebar">
-    <a class="brand side-brand" href="dashboard.html">
-      <span class="logo-mark">N</span>
-      <span class="brand-name">NeuroPix</span>
-    </a>
-
-    <nav class="side-nav">
-      <a href="dashboard.html">
-        <span>⌂</span>
-        Dashboard
-      </a>
-
-      <a href="workspace.html">
-        <span>▣</span>
-        Studio
-      </a>
-
-      <a class="active" href="gallery.html">
-        <span>▦</span>
-        Gallery
-      </a>
-    </nav>
-
-    <div class="sidebar-bottom">
-      <a class="logout-link" href="index.html">
-        <span>↪</span>
-        Logout
-      </a>
-    </div>
-  </aside>
+  <a class="brand side-brand" href="dashboard.html"><span class="logo-mark">N</span><span class="brand-name">NeuroPix</span></a>
+  <nav class="side-nav">
+    <a href="dashboard.html"><span>⌂</span>Dashboard</a>
+    <a href="workspace.html"><span>▣</span>Studio</a>
+    <a class="active" href="gallery.html"><span>▦</span>Gallery</a>
+  </nav>
+  <div class="sidebar-bottom">
+    
+    <a class="logout-link" href="index.html"><span>↪</span>Logout</a>
+  </div>
+</aside>
 
 <main class="app-main">
   <header class="app-header">
@@ -46,16 +28,16 @@
   <p class="page-note">Edited images and metadata will be loaded from the backend/database when connected.</p>
 
   <section class="gallery-grid gallery-grid-two">
-    <button class="gallery-card" data-title="Forest Path" data-type="ai" data-image="images/forest-path.png">
-      <div class="gallery-thumb"><img src="images/forest-path.png" alt="Forest Path"></div>
+    <button class="gallery-card" data-title="Forest Path" data-type="ai" data-before="assets/images/forest-path.png" data-after="assets/images/forest-path-after-ai.jpg">
+      <div class="gallery-thumb"><img src="assets/images/forest-path.png" alt="Forest Path"></div>
       <div class="gallery-info">
         <strong>Forest Path</strong>
-        <div><span class="chip ai-chip">AI Edit ✦</span><span class="chip">Example Date</span></div>
+        <div><span class="ai-sign" title="AI edit" aria-label="AI edit">✦</span><span class="chip">Example Date</span></div>
       </div>
     </button>
 
-    <button class="gallery-card" data-title="City Lights" data-type="standard" data-image="images/city-lights.png">
-      <div class="gallery-thumb"><img src="images/city-lights.png" alt="City Lights"></div>
+    <button class="gallery-card" data-title="City Lights" data-type="standard" data-before="assets/images/city-lights.png" data-after="assets/images/city-lights-after-standard.jpg">
+      <div class="gallery-thumb"><img src="assets/images/city-lights.png" alt="City Lights"></div>
       <div class="gallery-info">
         <strong>City Lights</strong>
         <div><span class="chip">Standard Edit</span><span class="chip">Example Date</span></div>
@@ -68,17 +50,20 @@
   <div class="modal-card">
     <button id="closeModal" class="modal-close" aria-label="Close">×</button>
     <span class="eyebrow large-eyebrow">BEFORE / AFTER</span>
-    <h2 id="modalTitle">Image Comparison</h2>
+    <div class="modal-title-row">
+      <h2 id="modalTitle">Image Comparison</h2>
+      <span id="modalAiSign" class="modal-ai-sign hidden" title="AI edit" aria-label="AI edit">✦</span>
+    </div>
     <div id="comparisonBox" class="comparison-box">
-      <img id="beforeLayer" class="before-layer comparison-image" src="images/forest-path.png" alt="Original image">
-      <div id="editedLayer" class="edited-layer">
-        <img id="editedImage" class="comparison-image" src="images/forest-path.png" alt="Edited image">
+      <img id="beforeLayer" class="before-layer comparison-image" src="assets/images/forest-path.png" alt="Original image" draggable="false">
+      <div id="afterLayer" class="after-layer">
+        <img id="afterImage" class="comparison-image" src="assets/images/forest-path-after-ai.jpg" alt="After image" draggable="false">
       </div>
       <div id="compareLine" class="compare-line"><span class="compare-handle" aria-hidden="true"><span class="handle-arrow">‹</span><span class="handle-arrow">›</span></span></div>
       <span class="compare-tag compare-before">Before</span>
-      <span class="compare-tag compare-edited">Edited</span>
+      <span class="compare-tag compare-after">After</span>
     </div>
-    <p class="comparison-help">Drag across the image to compare the original and edited result.</p>
+    <p class="comparison-help">Drag across the image to compare the before and after result.</p>
   </div>
 </div>
 <script src="assets/js/gallery.js"></script>
