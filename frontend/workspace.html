@@ -2,365 +2,253 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-  <link rel="stylesheet" href="assets/css/app.css">
-  <title>Studio | NeuroPix</title>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="assets/css/app.css">
+   <title>Studio | NeuroPix</title>
 </head>
 
 <body class="app-body">
 
-  <aside class="sidebar">
-    <a class="brand side-brand" href="dashboard.html">
-      <span class="logo-mark">N</span>
-      <span class="brand-name">NeuroPix</span>
-    </a>
-
-    <nav class="side-nav">
-      <a href="dashboard.html">
-        <span>⌂</span>
-        Dashboard
+   <aside class="sidebar">
+      <a class="brand side-brand" href="dashboard.html">
+         <span class="logo-mark">N</span>
+         <span class="brand-name">NeuroPix</span>
       </a>
 
-      <a class="active" href="workspace.html">
-        <span>▣</span>
-        Studio
-      </a>
+      <nav class="side-nav">
+         <a href="dashboard.html">
+            <span>⌂</span>
+            Dashboard
+         </a>
 
-      <a href="gallery.html">
-        <span>▦</span>
-        Gallery
-      </a>
-    </nav>
+         <a class="active" href="workspace.html">
+            <span>▣</span>
+            Studio
+         </a>
 
-    <div class="sidebar-bottom">
-      <a class="logout-link" href="index.html">
-        <span>↪</span>
-        Logout
-      </a>
-    </div>
-  </aside>
+         <a href="gallery.html">
+            <span>▦</span>
+            Gallery
+         </a>
+      </nav>
 
-  <main class="app-main workspace-main">
-
-    <header class="app-header workspace-header">
-      <div>
-        <span class="eyebrow large-eyebrow">
-          IMAGE PROCESSING WORKSPACE
-        </span>
-        <h1>Workspace</h1>
-        <p>Upload an image and configure one processing mode.</p>
+      <div class="sidebar-bottom">
+         <a class="logout-link" href="index.html">
+            <span>↪</span>
+            Logout
+         </a>
       </div>
-    </header>
+   </aside>
 
-    <section class="studio-section">
-      <div class="studio-heading">
-        <span>01</span>
-        <div>
-          <h2>Upload Zone</h2>
-          <p>Select or drag a JPG/PNG image into the upload area.</p>
-        </div>
-      </div>
+   <main class="app-main workspace-main">
 
-      <div id="uploadZone" class="upload-zone">
-        <input
-          id="fileInput"
-          type="file"
-          accept="image/jpeg,image/png"
-          hidden
-        >
+      <header class="app-header workspace-header">
+         <div>
+            <span class="eyebrow large-eyebrow">
+               IMAGE PROCESSING WORKSPACE
+            </span>
+            <h1>Workspace</h1>
+            <p>Upload an image and configure one processing mode.</p>
+         </div>
+      </header>
 
-        <div class="upload-icon">↥</div>
-        <h3>Drag and drop your image here</h3>
+      <section class="studio-section">
+         <div class="studio-heading">
+            <span>01</span>
+            <div>
+               <h2>Upload Zone</h2>
+               <p>Select or drag a JPG/PNG image into the upload area.</p>
+            </div>
+         </div>
 
-        <p>
-          JPG or PNG • Maximum 5 MB • Maximum 1920 × 1080
-        </p>
+         <div id="uploadZone" class="upload-zone">
+            <input id="fileInput" type="file" accept="image/jpeg,image/png" hidden>
 
-        <button
-          id="chooseFileBtn"
-          class="btn btn-accent"
-        >
-          Choose Image
-        </button>
-      </div>
+            <div class="upload-icon">↥</div>
+            <h3>Drag and drop your image here</h3>
 
-      <div id="previewArea" class="preview-area hidden">
-        <img
-          id="originalPreview"
-          alt="Selected image"
-        >
+            <p>
+               JPG or PNG • Maximum 5 MB • Maximum 1920 × 1080
+            </p>
 
-        <div>
-          <strong id="fileName">Selected image</strong>
-          <p id="imageInfo"></p>
+            <button id="chooseFileBtn" class="btn btn-accent">
+               Choose Image
+            </button>
+         </div>
 
-          <button
-            id="replaceBtn"
-            class="btn btn-secondary"
-          >
-            Replace Image
-          </button>
-        </div>
-      </div>
-    </section>
+         <div id="previewArea" class="preview-area hidden">
+            <img id="originalPreview" alt="Selected image">
 
-    <section class="studio-section">
-      <div class="studio-heading">
-        <span>02</span>
-        <div>
-          <h2>Editing Controls</h2>
-          <p>
-            Standard and AI edits are separate. They cannot be mixed
-            in one request.
-          </p>
-        </div>
-      </div>
+            <div>
+               <strong id="fileName">Selected image</strong>
+               <p id="imageInfo"></p>
 
-      <div class="mode-toggle">
-        <button
-          id="standardBtn"
-          class="active"
-        >
-          ✎ Standard Edits
-        </button>
+               <button id="replaceBtn" class="btn btn-secondary">
+                  Replace Image
+               </button>
+            </div>
+         </div>
+      </section>
 
-        <button id="aiBtn">
-          ✦ AI Edits
-        </button>
-      </div>
+      <section class="studio-section">
+         <div class="studio-heading">
+            <span>02</span>
+            <div>
+               <h2>Editing Controls</h2>
+               <p>
+                  Standard and AI edits are separate. They cannot be mixed
+                  in one request.
+               </p>
+            </div>
+         </div>
 
-      <div id="standardControls" class="controls-grid">
+         <div class="mode-toggle">
+            <button id="standardBtn" class="active">
+               ✎ Standard Edits
+            </button>
 
-        <label>
-          Crop Width
-          <span
-            class="control-value"
-            id="cropWidthValue"
-          >100%</span>
-          <input
-            id="cropWidth"
-            type="range"
-            min="1"
-            max="100"
-            value="100"
-          >
-        </label>
+            <button id="aiBtn">
+               ✦ AI Edits
+            </button>
+         </div>
 
-        <label>
-          Crop Height
-          <span
-            class="control-value"
-            id="cropHeightValue"
-          >100%</span>
-          <input
-            id="cropHeight"
-            type="range"
-            min="1"
-            max="100"
-            value="100"
-          >
-        </label>
+         <div id="standardControls" class="controls-grid">
 
-        <label>
-          Rotation
-          <select id="rotation">
-            <option value="0">0°</option>
-            <option value="90">90°</option>
-            <option value="180">180°</option>
-            <option value="270">270°</option>
-          </select>
-        </label>
+            <label>
+               Crop Width
+               <span class="control-value" id="cropWidthValue">100%</span>
+               <input id="cropWidth" type="range" min="1" max="100" value="100">
+            </label>
 
-        <label>
-          Brightness
-          <span
-            class="control-value"
-            id="brightnessValue"
-          >100%</span>
-          <input
-            id="brightness"
-            type="range"
-            min="0"
-            max="200"
-            value="100"
-          >
-        </label>
+            <label>
+               Crop Height
+               <span class="control-value" id="cropHeightValue">100%</span>
+               <input id="cropHeight" type="range" min="1" max="100" value="100">
+            </label>
 
-        <label>
-          Contrast
-          <span
-            class="control-value"
-            id="contrastValue"
-          >100%</span>
-          <input
-            id="contrast"
-            type="range"
-            min="0"
-            max="200"
-            value="100"
-          >
-        </label>
+            <label>
+               Rotation
+               <select id="rotation">
+                  <option value="0">0°</option>
+                  <option value="90">90°</option>
+                  <option value="180">180°</option>
+                  <option value="270">270°</option>
+               </select>
+            </label>
 
-        <label>
-          Exposure
-          <span
-            class="control-value"
-            id="exposureValue"
-          >0%</span>
-          <input
-            id="exposure"
-            type="range"
-            min="-100"
-            max="100"
-            value="0"
-          >
-        </label>
+            <label>
+               Brightness
+               <span class="control-value" id="brightnessValue">100%</span>
+               <input id="brightness" type="range" min="0" max="200" value="100">
+            </label>
 
-        <label>
-          Saturation
-          <span
-            class="control-value"
-            id="saturationValue"
-          >100%</span>
-          <input
-            id="saturation"
-            type="range"
-            min="0"
-            max="200"
-            value="100"
-          >
-        </label>
+            <label>
+               Contrast
+               <span class="control-value" id="contrastValue">100%</span>
+               <input id="contrast" type="range" min="0" max="200" value="100">
+            </label>
 
-        <label>
-          Blur
-          <span
-            class="control-value"
-            id="blurValue"
-          >0</span>
-          <input
-            id="blur"
-            type="range"
-            min="0"
-            max="20"
-            value="0"
-          >
-        </label>
+            <label>
+               Exposure
+               <span class="control-value" id="exposureValue">0%</span>
+               <input id="exposure" type="range" min="-100" max="100" value="0">
+            </label>
 
-        <label>
-          Sharpness
-          <span
-            class="control-value"
-            id="sharpnessValue"
-          >0%</span>
-          <input
-            id="sharpness"
-            type="range"
-            min="0"
-            max="100"
-            value="0"
-          >
-        </label>
+            <label>
+               Saturation
+               <span class="control-value" id="saturationValue">100%</span>
+               <input id="saturation" type="range" min="0" max="200" value="100">
+            </label>
 
-        <label>
-          Grayscale
-          <span
-            class="control-value"
-            id="grayscaleValue"
-          >0%</span>
-          <input
-            id="grayscale"
-            type="range"
-            min="0"
-            max="100"
-            value="0"
-          >
-        </label>
+            <label>
+               Blur
+               <span class="control-value" id="blurValue">0</span>
+               <input id="blur" type="range" min="0" max="20" value="0">
+            </label>
 
-      </div>
+            <label>
+               Sharpness
+               <span class="control-value" id="sharpnessValue">0%</span>
+               <input id="sharpness" type="range" min="0" max="100" value="0">
+            </label>
 
-      <div id="aiControls" class="ai-controls hidden">
+            <label>
+               Grayscale
+               <span class="control-value" id="grayscaleValue">0%</span>
+               <input id="grayscale" type="range" min="0" max="100" value="0">
+            </label>
 
-        <label>
-          <span>Generative Modifications</span>
-          <small>
-            Describe what should change in the image.
-          </small>
-          <textarea
-            id="generatePrompt"
-            placeholder="Example: add soft evening lighting"
-          ></textarea>
-        </label>
+         </div>
 
-        <label>
-          <span>Background Manipulation</span>
-          <small>
-            Describe the background you want.
-          </small>
-          <textarea
-            id="backgroundPrompt"
-            placeholder="Example: replace the background with a beach"
-          ></textarea>
-        </label>
+         <div id="aiControls" class="ai-controls hidden">
 
-        <label>
-          <span>Enhancement</span>
-          <small>
-            Describe the quality or detail improvement.
-          </small>
-          <textarea
-            id="enhancePrompt"
-            placeholder="Example: improve clarity and reduce noise"
-          ></textarea>
-        </label>
+            <label>
+               <span>Generative Modifications</span>
+               <small>
+                  Describe what should change in the image.
+               </small>
+               <textarea id="generatePrompt" placeholder="Example: add soft evening lighting"></textarea>
+            </label>
 
-        <label class="upscale-control">
-          <span>Upscaling</span>
-          <small>Choose an enlargement level.</small>
+            <label>
+               <span>Background Manipulation</span>
+               <small>
+                  Describe the background you want.
+               </small>
+               <textarea id="backgroundPrompt" placeholder="Example: replace the background with a beach"></textarea>
+            </label>
 
-          <select id="upscale">
-            <option value="1">1×</option>
-            <option value="2" selected>2×</option>
-            <option value="3">3×</option>
-            <option value="4">4×</option>
-          </select>
-        </label>
+            <label>
+               <span>Enhancement</span>
+               <small>
+                  Describe the quality or detail improvement.
+               </small>
+               <textarea id="enhancePrompt" placeholder="Example: improve clarity and reduce noise"></textarea>
+            </label>
 
-      </div>
-    </section>
+            <label class="upscale-control">
+               <span>Upscaling</span>
+               <small>Choose an enlargement level.</small>
 
-    <section class="studio-section processing-section">
-      <div class="studio-heading">
-        <span>03</span>
-        <div>
-          <h2>Processing</h2>
-          <p>
-            The frontend prepares the settings. The backend performs
-            the actual processing.
-          </p>
-        </div>
-      </div>
+               <select id="upscale">
+                  <option value="1">1×</option>
+                  <option value="2" selected>2×</option>
+                  <option value="3">3×</option>
+                  <option value="4">4×</option>
+               </select>
+            </label>
 
-      <div class="processing-action">
-        <button
-          id="processBtn"
-          class="btn btn-accent process-button"
-        >
-          Process Image
-        </button>
+         </div>
+      </section>
 
-        <p>Maximum resolution is 1920 × 1080.</p>
-      </div>
+      <section class="studio-section processing-section">
+         <div class="studio-heading">
+            <span>03</span>
+            <div>
+               <h2>Processing</h2>
+               <p>
+                  The frontend prepares the settings. The backend performs
+                  the actual processing.
+               </p>
+            </div>
+         </div>
 
-      <p id="status" class="status-text"></p>
-    </section>
+         <div class="processing-action">
+            <button id="processBtn" class="btn btn-accent process-button">
+               Process Image
+            </button>
 
-  </main>
+            <p>Maximum resolution is 1920 × 1080.</p>
+         </div>
 
-  <script src="assets/js/workspace.js"></script>
+         <p id="status" class="status-text"></p>
+      </section>
+
+   </main>
+
+   <script src="assets/js/workspace.js"></script>
 
 </body>
+
 </html>

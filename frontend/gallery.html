@@ -1,74 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="assets/css/app.css">
-<title>Gallery | NeuroPix</title>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="assets/css/app.css">
+   <title>Gallery | NeuroPix</title>
 </head>
+
 <body class="app-body">
-<aside class="sidebar">
-  <a class="brand side-brand" href="dashboard.html"><span class="logo-mark">N</span><span class="brand-name">NeuroPix</span></a>
-  <nav class="side-nav">
-    <a href="dashboard.html"><span>⌂</span>Dashboard</a>
-    <a href="workspace.html"><span>▣</span>Studio</a>
-    <a class="active" href="gallery.html"><span>▦</span>Gallery</a>
-  </nav>
-  <div class="sidebar-bottom">
-    
-    <a class="logout-link" href="index.html"><span>↪</span>Logout</a>
-  </div>
-</aside>
+   <aside class="sidebar">
+      <a class="brand side-brand" href="dashboard.html"><span class="logo-mark">N</span><span
+            class="brand-name">NeuroPix</span></a>
+      <nav class="side-nav">
+         <a href="dashboard.html"><span>⌂</span>Dashboard</a>
+         <a href="workspace.html"><span>▣</span>Studio</a>
+         <a class="active" href="gallery.html"><span>▦</span>Gallery</a>
+      </nav>
+      <div class="sidebar-bottom">
 
-<main class="app-main">
-  <header class="app-header">
-    <div><span class="eyebrow large-eyebrow">PRIVATE LIBRARY</span><h1>Gallery</h1></div>
-    <a class="btn btn-accent" href="workspace.html">New Image</a>
-  </header>
-  <p class="page-note">Edited images and metadata will be loaded from the backend/database when connected.</p>
+         <a class="logout-link" href="index.html"><span>↪</span>Logout</a>
+      </div>
+   </aside>
 
-  <section class="gallery-grid gallery-grid-two">
-    <button class="gallery-card" data-title="Forest Path" data-type="ai" data-before="assets/images/forest-path.png" data-after="assets/images/forest-path-after-ai.jpg">
-      <div class="gallery-thumb">
-        <img src="assets/images/forest-path.png" alt="Forest Path">
-        <span class="gallery-ai-icon" title="AI edited" aria-label="AI edited">✦</span>
-      </div>
-      <div class="gallery-info">
-        <strong>Forest Path</strong>
-        <div><span class="chip ai-chip">AI Edited</span><span class="chip">Example Date</span></div>
-      </div>
-    </button>
+   <main class="app-main">
+      <header class="app-header">
+         <div><span class="eyebrow large-eyebrow">PRIVATE LIBRARY</span>
+            <h1>Gallery</h1>
+         </div>
+         <a class="btn btn-accent" href="workspace.html">New Image</a>
+      </header>
+      <p class="page-note">Edited images and metadata will be loaded from the backend/database when connected.</p>
 
-    <button class="gallery-card" data-title="City Lights" data-type="standard" data-before="assets/images/city-lights.png" data-after="assets/images/city-lights-after-standard.jpg">
-      <div class="gallery-thumb"><img src="assets/images/city-lights.png" alt="City Lights"></div>
-      <div class="gallery-info">
-        <strong>City Lights</strong>
-        <div><span class="chip">Standard Edit</span><span class="chip">Example Date</span></div>
-      </div>
-    </button>
-  </section>
-</main>
+      <section class="gallery-grid gallery-grid-two">
+         <button class="gallery-card" data-title="Forest Path" data-type="ai"
+            data-before="assets/images/forest-path.png" data-after="assets/images/forest-path-after-ai.jpg">
+            <div class="gallery-thumb">
+               <img src="assets/images/forest-path.png" alt="Forest Path">
+               <span class="gallery-ai-icon" title="AI edited" aria-label="AI edited">✦</span>
+            </div>
+            <div class="gallery-info">
+               <strong>Forest Path</strong>
+               <div><span class="chip ai-chip">AI Edited</span><span class="chip">Example Date</span></div>
+            </div>
+         </button>
 
-<div id="modal" class="modal hidden">
-  <div class="modal-card">
-    <button id="closeModal" class="modal-close" aria-label="Close">×</button>
-    <span class="eyebrow large-eyebrow">BEFORE / AFTER</span>
-    <div class="modal-title-row">
-      <h2 id="modalTitle">Image Comparison</h2>
-      <span id="modalAiSign" class="modal-ai-sign hidden" title="AI edit" aria-label="AI edit">✦</span>
-    </div>
-    <div id="comparisonBox" class="comparison-box">
-      <img id="beforeLayer" class="before-layer comparison-image" src="assets/images/forest-path.png" alt="Original image" draggable="false">
-      <div id="afterLayer" class="after-layer">
-        <img id="afterImage" class="comparison-image" src="assets/images/forest-path-after-ai.jpg" alt="After image" draggable="false">
+         <button class="gallery-card" data-title="City Lights" data-type="standard"
+            data-before="assets/images/city-lights.png" data-after="assets/images/city-lights-after-standard.jpg">
+            <div class="gallery-thumb"><img src="assets/images/city-lights.png" alt="City Lights"></div>
+            <div class="gallery-info">
+               <strong>City Lights</strong>
+               <div><span class="chip">Standard Edit</span><span class="chip">Example Date</span></div>
+            </div>
+         </button>
+      </section>
+   </main>
+
+   <div id="modal" class="modal hidden">
+      <div class="modal-card">
+         <button id="closeModal" class="modal-close" aria-label="Close">×</button>
+         <span class="eyebrow large-eyebrow">BEFORE / AFTER</span>
+         <div class="modal-title-row">
+            <h2 id="modalTitle">Image Comparison</h2>
+            <span id="modalAiSign" class="modal-ai-sign hidden" title="AI edit" aria-label="AI edit">✦</span>
+         </div>
+         <div id="comparisonBox" class="comparison-box">
+            <img id="beforeLayer" class="before-layer comparison-image" src="assets/images/forest-path.png"
+               alt="Original image" draggable="false">
+            <div id="afterLayer" class="after-layer">
+               <img id="afterImage" class="comparison-image" src="assets/images/forest-path-after-ai.jpg"
+                  alt="After image" draggable="false">
+            </div>
+            <div id="compareLine" class="compare-line"><span class="compare-handle" aria-hidden="true"><span
+                     class="handle-arrow">‹</span><span class="handle-arrow">›</span></span></div>
+            <span class="compare-tag compare-before">Before</span>
+            <span class="compare-tag compare-after">After</span>
+         </div>
+         <p class="comparison-help">Drag across the image to compare the before and after result.</p>
       </div>
-      <div id="compareLine" class="compare-line"><span class="compare-handle" aria-hidden="true"><span class="handle-arrow">‹</span><span class="handle-arrow">›</span></span></div>
-      <span class="compare-tag compare-before">Before</span>
-      <span class="compare-tag compare-after">After</span>
-    </div>
-    <p class="comparison-help">Drag across the image to compare the before and after result.</p>
-  </div>
-</div>
-<script src="assets/js/gallery.js"></script>
+   </div>
+   <script src="assets/js/gallery.js"></script>
 </body>
+
 </html>

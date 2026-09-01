@@ -1,5 +1,6 @@
 import os
 import uuid  # Added for generating unique object keys
+
 import boto3
 from dotenv import load_dotenv
 
@@ -12,12 +13,13 @@ s3_client = boto3.client(
     "s3",
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    region_name=AWS_REGION
+    region_name=AWS_REGION,
 )
+
 
 def _execute_s3_upload(local_file_path, folder_prefix):
     """
-    Core private handler that uploads a local file to S3 
+    Core private handler that uploads a local file to S3
     and returns its unique, collision-safe object key location.
     """
     if not os.path.exists(local_file_path):
@@ -25,21 +27,25 @@ def _execute_s3_upload(local_file_path, folder_prefix):
         return None
 
     filename = os.path.basename(local_file_path)
-    
+
     # Generate a unique 8-character token (e.g., 'a1c2e3f4')
     unique_suffix = uuid.uuid4().hex[:8]
-    
+
     # Prepend the token to the filename to guarantee uniqueness in S3
     object_key = f"{folder_prefix}/{unique_suffix}_{filename}"
 
     try:
-        content_type = "image/jpeg" if filename.lower().endswith(('.jpg', '.jpeg')) else "image/png"
+        content_type = (
+            "image/jpeg"
+            if filename.lower().endswith((".jpg", ".jpeg"))
+            else "image/png"
+        )
 
         s3_client.upload_file(
             Filename=local_file_path,
             Bucket=AWS_BUCKET_NAME,
             Key=object_key,
-            ExtraArgs={"ContentType": content_type}
+            ExtraArgs={"ContentType": content_type},
         )
         print(f"[STORAGE] Upload complete. Unique key registered: {object_key}")
         return object_key  # Returns e.g., 'inputs/a1c2e3f4_avatar.png'
@@ -66,6 +72,7 @@ def upload_processed_image(local_file_path):
     print("[STORAGE] Initializing processed image upload sequence...")
     return _execute_s3_upload(local_file_path, folder_prefix="outputs")
 
+
 def get_full_s3_url(object_key):
     """
     Converts a database object key back into a live clickable public URL.
@@ -73,6 +80,7 @@ def get_full_s3_url(object_key):
     if not object_key:
         return None
     return f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{object_key}"
+
 
 def delete_s3_object(object_key):
     """

@@ -1,7 +1,9 @@
 import os
+
 import boto3
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from dotenv import load_dotenv
+
 
 def run_tests():
     # Load environment variables from .env
@@ -12,18 +14,18 @@ def run_tests():
     print("=========================================")
 
     # Retrieve keys from environment
-    aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
-    aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
-    bucket_name = os.getenv('AWS_BUCKET_NAME')
-    region_name = os.getenv('AWS_REGION')
+    aws_access_key = os.getenv("AWS_ACCESS_KEY_ID")
+    aws_secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+    bucket_name = os.getenv("AWS_BUCKET_NAME")
+    region_name = os.getenv("AWS_REGION")
 
     try:
         # Initialize the S3 client
         s3 = boto3.client(
-            's3',
+            "s3",
             aws_access_key_id=aws_access_key,
             aws_secret_access_key=aws_secret_key,
-            region_name=region_name
+            region_name=region_name,
         )
 
         # Test 1: Check bucket connection by listing its settings
@@ -38,7 +40,7 @@ def run_tests():
             Bucket=bucket_name,
             Key=test_file_name,
             Body="AWS S3 Connection test successful! The backend app can write to storage.",
-            ContentType="text/plain"
+            ContentType="text/plain",
         )
         print(f"Success: Uploaded '{test_file_name}' to S3.")
 

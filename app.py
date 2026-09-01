@@ -1,12 +1,13 @@
 import os
-import uuid
 import tempfile
+import uuid
 from functools import wraps
-from flask import Flask, request, session
+
 from dotenv import load_dotenv
+from flask import Flask, request, session
 from PIL import Image
 
-from database.queries import register_user, get_user_by_username
+from database.queries import get_user_by_username, register_user
 from utils.security import hash_password, verify_password
 
 load_dotenv()
@@ -32,11 +33,13 @@ def login_required(f):
     Route decorator that blocks access unless the current session
     belongs to a logged-in user.
     """
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "user_id" not in session:
             return {"error": "Authentication required"}, 401
         return f(*args, **kwargs)
+
     return decorated_function
 
 
@@ -102,12 +105,16 @@ def upload():
 
     file_extension = os.path.splitext(file.filename)[1].lower()
     if file_extension not in ALLOWED_UPLOAD_EXTENSIONS:
-        return {"error": "Unsupported file format. Only JPG and PNG images are allowed."}, 400
+        return {
+            "error": "Unsupported file format. Only JPG and PNG images are allowed."
+        }, 400
 
     width, height = Image.open(file.stream).size
     max_width, max_height = MAX_LANDSCAPE_SIZE if width >= height else MAX_PORTRAIT_SIZE
     if width > max_width or height > max_height:
-        return {"error": "Image resolution exceeds the 1080p limit (1920x1080 landscape or 1080x1920 portrait)."}, 400
+        return {
+            "error": "Image resolution exceeds the 1080p limit (1920x1080 landscape or 1080x1920 portrait)."
+        }, 400
     file.seek(0)  # Image.open advanced the stream; rewind before saving the full file
 
     temp_filename = f"{uuid.uuid4().hex}_{file.filename}"

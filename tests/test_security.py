@@ -6,6 +6,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from utils.security import hash_password, verify_password
 
+
 def run_tests():
     print("==================================================")
     print("STARTING PASSWORD HASHING VALIDATION TEST")
@@ -42,6 +43,7 @@ def run_tests():
     print("\n==================================================")
     print("ALL PASSWORD HASHING TESTS PASSED SUCCESSFULLY")
     print("==================================================")
+
 
 if __name__ == "__main__":
     run_tests()

@@ -1,13 +1,14 @@
 import os
-import time
 import sys
+import time
 from pathlib import Path
 
 # Add the project root so this file can be run directly.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from database.queries import get_user_by_username, get_user_gallery, register_user
 from services.image_service import save_image_transaction
-from database.queries import register_user, get_user_by_username, get_user_gallery
+
 
 def run_integrated_workflow():
     print("==================================================")
@@ -41,7 +42,7 @@ def run_integrated_workflow():
             user_id=user_id,
             local_raw_path=local_raw_path,
             local_edited_path=local_edited_path,
-            edit_type="ai"
+            edit_type="ai",
         )
 
         if not result:
@@ -54,7 +55,9 @@ def run_integrated_workflow():
             print("\n[SUCCESS] Integrated pipeline run completed clean.")
             print(f"Verified logged database row data: {gallery[0]}")
         else:
-            print("[ERROR] Verification failed: Logged item not returned in gallery query.")
+            print(
+                "[ERROR] Verification failed: Logged item not returned in gallery query."
+            )
             sys.exit(1)
 
     finally:
@@ -64,6 +67,7 @@ def run_integrated_workflow():
                 os.remove(file_path)
 
     print("==================================================")
+
 
 if __name__ == "__main__":
     run_integrated_workflow()
