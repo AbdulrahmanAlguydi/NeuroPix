@@ -458,6 +458,11 @@ input, select, textarea {
   color: #111;
 }
 
+.member-name {
+  margin: 7px 0 10px;
+  color: var(--accent);
+  font-weight: 600;
+}
 
 /* AI icon on AI edited gallery image */
 .gallery-ai-icon {
