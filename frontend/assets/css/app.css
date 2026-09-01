@@ -464,8 +464,10 @@ input, select, textarea {
   height: 34px;
   border: 1px solid var(--accent);
   border-radius: 10px;
-  background: #fff;
+  background: #ffffffe1;
   color: var(--accent);
-  font-size: 18px;
+  font-size: 30px;
   z-index: 2;
+  line-height: 1;
+  padding-top: 2px;
 }
