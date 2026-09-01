@@ -245,13 +245,19 @@ input, select, textarea {
 }
 .preview-area p { color: var(--muted); }
 .mode-toggle {
-  display: grid; grid-template-columns: 1fr 1fr; max-width: 620px; margin: 24px auto; padding: 5px;
+  position: relative; display: grid; grid-template-columns: 1fr 1fr; max-width: 620px; margin: 24px auto; padding: 5px;
   background: #f2f3f6; border-radius: 12px;
 }
-.mode-toggle button { padding: 12px; border: 0; border-radius: 9px; background: transparent; font-weight: 800; }
-.mode-toggle button.active {
-  background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff;
-  box-shadow: 0 3px 10px rgba(20, 24, 35, .08);
+.mode-toggle button { position: relative; z-index: 1; padding: 12px; border: 0; border-radius: 9px;
+   background: transparent; color: var(--text); font-weight: 800; transition: .5s ease;}
+.mode-toggle::before {
+  content: ""; position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc(50% - 5px); border-radius: 9px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 3px 10px rgba(20, 24, 35, .08); transition: transform .5s ease; pointer-events: none;
+}
+
+.mode-toggle button.active { color: #fff; }
+.mode-toggle.ai-selected::before {
+  transform: translateX(100%);
 }
 .controls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 22px; }
 .controls-grid label {

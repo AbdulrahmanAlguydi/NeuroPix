@@ -63,6 +63,11 @@ function setEditMode(mode) {
 
   const standardMode = mode === "standard";
 
+  getElement(".mode-toggle").classList.toggle(
+   "ai-selected",
+    !standardMode
+);
+
   getElement("#standardControls").classList.toggle(
     "hidden",
     !standardMode
