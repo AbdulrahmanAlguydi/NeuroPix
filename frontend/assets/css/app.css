@@ -193,7 +193,7 @@ input, select, textarea {
   place-items: center; background: linear-gradient(135deg, var(--dark), var(--accent)); color: #fff;
   font-size: 52px; font-weight: 800;
 }
-.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 18px 0; }
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 18px 0; }
 .stats-grid article {
   padding: 18px; background: #fff; border: 1px solid var(--line); border-radius: 15px; display: flex;
   gap: 13px; align-items: center;
@@ -301,14 +301,14 @@ input, select, textarea {
 .modal-close { position: absolute; right: 18px; top: 12px; border: 0; background: none; font-size: 30px; }
 .comparison-box {
   height: 500px; position: relative; overflow: hidden; border-radius: 14px; margin-top: 20px;
-  background: #d9dde5; cursor: ew-resize; user-select: none;
+  background: #d9dde5; cursor: ew-resize; user-select: none; touch-action: none;
 }
 .comparison-image { width: 100%; height: 100%; object-fit: cover; display: block; }
 .before-layer { position: absolute; inset: 0; z-index: 1; }
-.edited-layer { position: absolute; inset: 0; z-index: 3; overflow: hidden; clip-path: inset(0 0 0 75%); }
-.edited-layer .comparison-image { position: absolute; inset: 0; width: 100%; height: 100%; }
+.after-layer { position: absolute; inset: 0; z-index: 3; overflow: hidden; clip-path: inset(0 0 0 50%); }
+.after-layer .comparison-image { position: absolute; inset: 0; width: 100%; height: 100%; }
 .compare-line {
-  position: absolute; left: 75%; top: 0; bottom: 0; width: 3px;
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 3px;
   background: #fff; z-index: 6; pointer-events: none;
 }
 .compare-line .compare-handle {
@@ -326,7 +326,7 @@ input, select, textarea {
   background: rgba(255, 255, 255, .92); font-size: 12px; font-weight: 700;
 }
 .compare-before { left: 16px; }
-.compare-edited { right: 16px; }
+.compare-after { right: 16px; }
 .comparison-help { margin: 12px 0 0; color: var(--muted); text-align: center; font-size: 13px; }
 
 /* Tablet */
@@ -400,4 +400,53 @@ input, select, textarea {
 @media (max-width: 600px) {
   .footer-grid { grid-template-columns: 1fr; gap: 28px; }
   .site-footer { padding-top: 36px; }
+}
+
+
+/* Small AI symbol used for AI gallery examples */
+.ai-sign {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  background: #fff;
+  font-size: 16px;
+}
+
+.modal-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-title-row h2 {
+  margin: 0;
+}
+
+.modal-ai-sign {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  background: #fff;
+  font-size: 18px;
+}
+
+.modal-ai-sign.hidden {
+  display: none;
+}
+
+/* Before and After use the same label style */
+.compare-before,
+.compare-after {
+  background: #fff;
+  color: #111;
 }
