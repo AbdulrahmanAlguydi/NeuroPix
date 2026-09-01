@@ -9,7 +9,15 @@ const state = {
 function getElement(selector) {
 	return document.querySelector(selector);
 }
+function showUploadError(title, message) {
+  getElement("#uploadErrorTitle").textContent = title;
+  getElement("#uploadErrorMessage").textContent = message;
+  getElement("#uploadError").classList.remove("hidden");
+}
 
+function clearUploadError() {
+  getElement("#uploadError").classList.add("hidden");
+}
 // Validates and displays the selected image.
 function handleImage(file) {
 	if (!file) return;
