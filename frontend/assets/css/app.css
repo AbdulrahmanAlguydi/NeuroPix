@@ -450,3 +450,22 @@ input, select, textarea {
   background: #fff;
   color: #111;
 }
+
+
+/* AI icon on AI edited gallery image */
+.gallery-ai-icon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--accent);
+  font-size: 18px;
+  z-index: 2;
+}
