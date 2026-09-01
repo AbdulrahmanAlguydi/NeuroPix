@@ -1316,10 +1316,10 @@ textarea {
 	color: #111;
 }
 
-.member-name {
-	margin: 7px 0 10px;
-	color: var(--accent);
-	font-weight: 600;
+.responsibility-card .member-name {
+  margin: 7px 0 10px;
+  color: #6c5cff;
+  font-weight: 600;
 }
 
 /* AI icon on AI edited gallery image */
