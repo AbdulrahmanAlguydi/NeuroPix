@@ -1,5 +1,10 @@
 import time
 import sys
+from pathlib import Path
+
+# Add the project root so this file can be run directly from VS Code.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from database.database import get_db_connection
 from database.queries import register_user, get_user_by_username, log_image_edit, get_user_gallery
 
