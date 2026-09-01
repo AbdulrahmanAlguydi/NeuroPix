@@ -167,7 +167,7 @@ input, select, textarea {
 .side-brand { margin: 0 8px 30px; font-size: 21px; }
 .side-nav { display: flex; flex-direction: column; gap: 7px; }
 .side-nav a, .logout-link {
-  padding: 14px 15px; border-radius: 10px; color: #cbd0d9; transition: .2s; font-size: 16px;
+  padding: 14px 15px; border-radius: 10px; color: #cbd0d9; transition: .2s; font-size: 16px; display: flex;
 }
 .side-nav a:hover, .side-nav a.active, .logout-link:hover { background: #292d36; color: #fff; }
 .side-nav a.active { background: linear-gradient(135deg, #3d356b, #6d5dfc); }
