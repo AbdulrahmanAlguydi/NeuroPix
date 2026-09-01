@@ -20,47 +20,74 @@ function clearUploadError() {
 }
 // Validates and displays the selected image.
 function handleImage(file) {
-	if (!file) return;
+  if (!file) return;
 
-	if (file.type !== "image/jpeg" && file.type !== "image/png") {
-		getElement("#status").textContent = "Only JPG and PNG images are allowed.";
-		return;
-	}
+  clearUploadError();
 
-	if (file.size > 5 * 1024 * 1024) {
-		getElement("#status").textContent = "Maximum file size is 5 MB.";
-		return;
-	}
+  // Checks if the file is JPG or PNG.
+  if (file.type !== "image/jpeg" && file.type !== "image/png") {
+    showUploadError(
+      "File type is not supported.",
+      "Only JPG and PNG images are allowed."
+    );
 
-	const imageUrl = URL.createObjectURL(file);
-	const image = new Image();
+    getElement("#status").textContent = "";
+    return;
+  }
 
-	image.onload = function () {
-		if (image.width > 1920 || image.height > 1080) {
-			URL.revokeObjectURL(imageUrl);
-			getElement("#status").textContent = "Maximum resolution is 1920 x 1080.";
-			return;
-		}
+  // Checks if the file is larger than 5 MB.
+  if (file.size > 5 * 1024 * 1024) {
+    showUploadError(
+      "File is too large.",
+      "Maximum file size is 5 MB."
+    );
 
-		if (state.originalUrl) {
-			URL.revokeObjectURL(state.originalUrl);
-		}
+    getElement("#status").textContent = "";
+    return;
+  }
 
-		state.imageFile = file;
-		state.originalUrl = imageUrl;
+  const imageUrl = URL.createObjectURL(file);
+  const image = new Image();
 
-		getElement("#originalPreview").src = imageUrl;
-		getElement("#fileName").textContent = file.name;
-		getElement("#imageInfo").textContent = image.width + " x " + image.height;
+  image.onload = function () {
 
-		getElement("#uploadZone").classList.add("hidden");
-		getElement("#previewArea").classList.remove("hidden");
-		getElement("#status").textContent = "Image ready.";
-	};
+    // Checks if the image resolution is larger than 1920 x 1080.
+    if (image.width > 1920 || image.height > 1080) {
+      URL.revokeObjectURL(imageUrl);
 
-	image.src = imageUrl;
+      showUploadError(
+        "Image resolution is too large.",
+        "Maximum allowed resolution is 1920 × 1080 pixels."
+      );
+
+      getElement("#status").textContent = "";
+      return;
+    }
+
+    // Removes the old image URL if another image was selected before.
+    if (state.originalUrl) {
+      URL.revokeObjectURL(state.originalUrl);
+    }
+
+    state.imageFile = file;
+    state.originalUrl = imageUrl;
+
+    // Displays information about the selected image.
+    getElement("#originalPreview").src = imageUrl;
+    getElement("#fileName").textContent = file.name;
+    getElement("#imageInfo").textContent =
+      image.width + " x " + image.height;
+
+    // Hides the upload box and shows the image preview.
+    getElement("#uploadZone").classList.add("hidden");
+    getElement("#previewArea").classList.remove("hidden");
+
+    clearUploadError();
+    getElement("#status").textContent = "Image ready.";
+  };
+
+  image.src = imageUrl;
 }
-
 // Switches between Standard and AI controls.
 function setEditMode(mode) {
 	state.editMode = mode;
