@@ -57,7 +57,7 @@ def register():
     if not username or not password:
         return {"error": "Username and password are required"}, 400
 
-    if len(password) < 8:
+    if not isinstance(password, str) or len(password) < 8:
         return {"error": "Password must be at least 8 characters long"}, 400
 
     if get_user_by_username(username):
@@ -71,9 +71,12 @@ def register():
 
 @app.route("/api/auth/login", methods=["POST"])
 def login():
-    data = request.get_json()
-    username = data["username"]
-    password = data["password"]
+    data = request.get_json(silent=True) or {}
+    username = data.get("username")
+    password = data.get("password")
+
+    if not username or not password:
+        return {"error": "Username and password are required"}, 400
 
     user = get_user_by_username(username)
 
@@ -101,7 +104,12 @@ def me():
 
 @app.route("/api/upload", methods=["POST"])
 def upload():
+    if "image" not in request.files:
+        return {"error": "No image file provided"}, 400
+
     file = request.files["image"]
+    if not file or not file.filename:
+        return {"error": "No image file provided"}, 400
 
     file_extension = os.path.splitext(file.filename)[1].lower()
     if file_extension not in ALLOWED_UPLOAD_EXTENSIONS:
@@ -109,7 +117,11 @@ def upload():
             "error": "Unsupported file format. Only JPG and PNG images are allowed."
         }, 400
 
-    width, height = Image.open(file.stream).size
+    try:
+        width, height = Image.open(file.stream).size
+    except Exception:
+        return {"error": "Invalid or corrupted image file."}, 400
+
     max_width, max_height = MAX_LANDSCAPE_SIZE if width >= height else MAX_PORTRAIT_SIZE
     if width > max_width or height > max_height:
         return {
