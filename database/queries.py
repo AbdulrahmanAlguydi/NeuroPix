@@ -10,6 +10,8 @@ def register_user(username, password_hash):
         VALUES (%s, %s);
     """
     connection = get_db_connection()
+    if not connection:
+        return False
     cursor = connection.cursor()
     try:
         cursor.execute(query, (username, password_hash))
@@ -32,6 +34,8 @@ def get_user_by_username(username):
         WHERE Username = %s;
     """
     connection = get_db_connection()
+    if not connection:
+        return None
     cursor = connection.cursor(dictionary=True)
     try:
         cursor.execute(query, (username,))
@@ -53,6 +57,8 @@ def log_image_edit(user_id, original_path, modified_path, edit_type):
         VALUES (%s, %s, %s, %s);
     """
     connection = get_db_connection()
+    if not connection:
+        return False
     cursor = connection.cursor()
     try:
         cursor.execute(query, (user_id, original_path, modified_path, edit_type))
@@ -76,6 +82,8 @@ def get_user_gallery(user_id):
         ORDER BY UploadDate DESC;
     """
     connection = get_db_connection()
+    if not connection:
+        return []
     cursor = connection.cursor(dictionary=True)
     try:
         cursor.execute(query, (user_id,))

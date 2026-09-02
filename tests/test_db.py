@@ -25,13 +25,13 @@ def run_tests():
     print("\n[STAGE 1/2] Testing Core Database Connection...")
     try:
         connection = get_db_connection()
-        if connection.is_connected():
+        if connection and connection.is_connected():
             print(
                 "  [SUCCESS] Successfully established a network connection to the database server."
             )
             connection.close()
         else:
-            print("  [FAILED] Connection object created but reporting inactive status.")
+            print("  [FAILED] Connection object is inactive or server is offline.")
             sys.exit(1)
     except Exception as err:
         print(f"  [ERROR] Network handshake failed: {err}")

@@ -13,7 +13,7 @@ from utils.security import hash_password, verify_password
 load_dotenv()
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "neuropix_secret_key_123")
 
 # Folder used to hold uploaded images temporarily, before any edit
 # decides whether they need to be saved permanently to S3/MySQL.
