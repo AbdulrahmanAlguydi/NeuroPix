@@ -12,7 +12,10 @@ from utils.security import hash_password, verify_password
 
 load_dotenv()
 
-app = Flask(__name__)
+# static_folder points Flask at our frontend folder so it can serve the
+# HTML/CSS/JS files, and static_url_path="" means we don't need "/static"
+# in front of every file (so "login.html" works instead of "/static/login.html").
+app = Flask(__name__, static_folder="frontend", static_url_path="")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "neuropix_secret_key_123")
 
 # Folder used to hold uploaded images temporarily, before any edit
@@ -41,6 +44,12 @@ def login_required(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+@app.route("/")
+def home():
+    # Show the landing page when someone visits the site.
+    return app.send_static_file("index.html")
 
 
 @app.route("/health")
