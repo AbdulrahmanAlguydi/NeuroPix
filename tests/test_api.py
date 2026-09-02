@@ -301,7 +301,98 @@ def test_image_upload_resolution_validation(logged_in_client):
 
 
 # =====================================================================
-# 7. DATABASE AND S3 SERVICE MOCKS
+# 7. IMAGE PROCESSING TESTS
+# =====================================================================
+# Fake return value standing in for a real S3 + database save during tests.
+FAKE_PROCESSED_IMAGE = {
+    "OriginalFilePath": "inputs/fake_original.jpg",
+    "ModifiedFilePath": "outputs/fake_processed.jpg",
+    "EditType": "standard",
+}
+
+
+def upload_test_image(client, width=800, height=600):
+    """Helper that uploads a test image and returns the upload response."""
+    img_data = make_test_image(width, height, "JPEG")
+    return client.post(
+        "/api/upload",
+        content_type="multipart/form-data",
+        data={"image": (img_data, "test.jpg")},
+    )
+
+
+@patch("app.save_image_transaction", return_value=FAKE_PROCESSED_IMAGE)
+def test_process_standard_edit_success(mock_save, logged_in_client):
+    """Test processing an uploaded image with Standard Edits settings."""
+    upload_test_image(logged_in_client)
+
+    response = logged_in_client.post(
+        "/api/process",
+        json={
+            "editMode": "standard",
+            "settings": {
+                "cropWidth": 80,
+                "cropHeight": 80,
+                "rotation": 90,
+                "brightness": 110,
+                "contrast": 105,
+                "exposure": 5,
+                "saturation": 95,
+                "blur": 1,
+                "sharpness": 20,
+                "grayscale": 30,
+            },
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.get_json() == {
+        "message": "Image processed successfully",
+        "result": FAKE_PROCESSED_IMAGE,
+    }
+    mock_save.assert_called_once()
+
+
+def test_process_without_upload_first(logged_in_client):
+    """Test processing fails if no image was uploaded in this session yet."""
+    response = logged_in_client.post(
+        "/api/process", json={"editMode": "standard", "settings": {}}
+    )
+    assert response.status_code == 400
+    assert "No image has been uploaded" in response.get_json()["error"]
+
+
+def test_process_requires_login(client):
+    """Test that processing without being logged in is rejected."""
+    response = client.post(
+        "/api/process", json={"editMode": "standard", "settings": {}}
+    )
+    assert response.status_code == 401
+
+
+def test_process_ai_mode_not_implemented(logged_in_client):
+    """Test that AI Edits mode replies with 'not implemented' for now."""
+    upload_test_image(logged_in_client)
+
+    response = logged_in_client.post(
+        "/api/process", json={"editMode": "ai", "settings": {}}
+    )
+    assert response.status_code == 501
+
+
+@patch("app.save_image_transaction", return_value=None)
+def test_process_save_failure(mock_save, logged_in_client):
+    """Test that a failed S3/database save returns a clear error."""
+    upload_test_image(logged_in_client)
+
+    response = logged_in_client.post(
+        "/api/process", json={"editMode": "standard", "settings": {}}
+    )
+    assert response.status_code == 500
+
+
+# =====================================================================
+# 8. DATABASE AND S3 SERVICE MOCKS
 # =====================================================================
 @patch("services.image_service.upload_original_image", return_value="inputs/raw123.jpg")
 @patch("services.image_service.upload_processed_image", return_value="outputs/edit123.jpg")
