@@ -18,6 +18,33 @@ function showUploadError(title, message) {
 function clearUploadError() {
   getElement("#uploadError").classList.add("hidden");
 }
+
+// Sends the image file to the backend so it can be staged for processing.
+async function uploadToBackend(file) {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await response.json();
+
+  if (response.ok) {
+    return true;
+  }
+
+  if (response.status === 401) {
+    alert("Please log in first.");
+    window.location.href = "login.html";
+    return false;
+  }
+
+  showUploadError("Upload failed.", data.error || "Please try again.");
+  return false;
+}
+
 // Validates and displays the selected image.
 function handleImage(file) {
   if (!file) return;
@@ -49,7 +76,7 @@ function handleImage(file) {
   const imageUrl = URL.createObjectURL(file);
   const image = new Image();
 
-  image.onload = function () {
+  image.onload = async function () {
 
     // Checks if the image resolution is larger than 1920 x 1080.
     if (image.width > 1920 || image.height > 1080) {
@@ -83,7 +110,11 @@ function handleImage(file) {
     getElement("#previewArea").classList.remove("hidden");
 
     clearUploadError();
-    getElement("#status").textContent = "Image ready.";
+    getElement("#status").textContent = "Uploading...";
+
+    // Send the file to the backend so it's ready to be processed.
+    const uploaded = await uploadToBackend(file);
+    getElement("#status").textContent = uploaded ? "Image ready." : "";
   };
 
   image.src = imageUrl;
