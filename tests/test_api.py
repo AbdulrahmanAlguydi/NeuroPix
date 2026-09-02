@@ -321,8 +321,9 @@ def upload_test_image(client, width=800, height=600):
     )
 
 
+@patch("app.get_full_s3_url", side_effect=lambda key: f"https://fake-bucket.s3.amazonaws.com/{key}")
 @patch("app.save_image_transaction", return_value=FAKE_PROCESSED_IMAGE)
-def test_process_standard_edit_success(mock_save, logged_in_client):
+def test_process_standard_edit_success(mock_save, mock_url, logged_in_client):
     """Test processing an uploaded image with Standard Edits settings."""
     upload_test_image(logged_in_client)
 
@@ -348,7 +349,11 @@ def test_process_standard_edit_success(mock_save, logged_in_client):
     assert response.status_code == 200
     assert response.get_json() == {
         "message": "Image processed successfully",
-        "result": FAKE_PROCESSED_IMAGE,
+        "result": {
+            "originalUrl": "https://fake-bucket.s3.amazonaws.com/inputs/fake_original.jpg",
+            "processedUrl": "https://fake-bucket.s3.amazonaws.com/outputs/fake_processed.jpg",
+            "editType": "standard",
+        },
     }
     mock_save.assert_called_once()
 

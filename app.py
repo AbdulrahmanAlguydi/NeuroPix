@@ -10,6 +10,7 @@ from PIL import Image
 from database.queries import get_user_by_username, register_user
 from services.image_editor import apply_standard_edits
 from services.image_service import save_image_transaction
+from utils.s3 import get_full_s3_url
 from utils.security import hash_password, verify_password
 
 load_dotenv()
@@ -195,7 +196,14 @@ def process_image():
     if not saved_record:
         return {"error": "Could not save the processed image. Please try again."}, 500
 
-    return {"message": "Image processed successfully", "result": saved_record}, 200
+    # Turn the S3 keys into full URLs the frontend can put in an <img> tag.
+    result = {
+        "originalUrl": get_full_s3_url(saved_record["OriginalFilePath"]),
+        "processedUrl": get_full_s3_url(saved_record["ModifiedFilePath"]),
+        "editType": saved_record["EditType"],
+    }
+
+    return {"message": "Image processed successfully", "result": result}, 200
 
 
 if __name__ == "__main__":
