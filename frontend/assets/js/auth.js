@@ -33,7 +33,7 @@ if (loginForm) {
 }
 
 if (registerForm) {
-	registerForm.addEventListener("submit", function (event) {
+	registerForm.addEventListener("submit", async function (event) {
 		event.preventDefault();
 
 		const username = document.querySelector("#registerUsername").value.trim();
@@ -50,7 +50,21 @@ if (registerForm) {
 			return;
 		}
 
-		// Temporary navigation until backend registration is connected.
-		window.location.href = "dashboard.html";
+		// Send the new account info to the Flask backend.
+		const response = await fetch("/api/auth/register", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ username: username, password: password }),
+		});
+
+		const data = await response.json();
+
+		if (response.ok) {
+			// Account was created, send the user to log in with it.
+			alert("Account created! Please log in.");
+			window.location.href = "login.html";
+		} else {
+			alert(data.error || "Registration failed. Please try again.");
+		}
 	});
 }
