@@ -8,6 +8,7 @@ from flask import Flask, request, session
 from PIL import Image
 
 from database.queries import get_user_by_username, register_user
+from services.image_editor import apply_standard_edits
 from services.image_service import save_image_transaction
 from utils.security import hash_password, verify_password
 
@@ -154,6 +155,47 @@ def upload():
     session["uploaded_image_path"] = temp_path
 
     return {"message": "Image uploaded successfully"}, 200
+
+
+@app.route("/api/process", methods=["POST"])
+@login_required
+def process_image():
+    raw_image_path = session.get("uploaded_image_path")
+    if not raw_image_path or not os.path.exists(raw_image_path):
+        return {"error": "No image has been uploaded yet."}, 400
+
+    data = request.get_json(silent=True) or {}
+    edit_mode = data.get("editMode", "standard")
+
+    # AI Edits is a separate feature that isn't built yet.
+    if edit_mode != "standard":
+        return {"error": "AI editing is not implemented yet."}, 501
+
+    settings = data.get("settings", {})
+
+    try:
+        original_image = Image.open(raw_image_path)
+        edited_image = apply_standard_edits(original_image, settings)
+    except Exception:
+        return {"error": "Could not process this image."}, 400
+
+    processed_filename = f"{uuid.uuid4().hex}_processed.jpg"
+    processed_path = os.path.join(UPLOAD_TEMP_DIR, processed_filename)
+    edited_image.save(processed_path, "JPEG")
+
+    # Upload both the original and the processed image to S3, and log
+    # the edit as one row in the database.
+    saved_record = save_image_transaction(
+        user_id=session["user_id"],
+        local_raw_path=raw_image_path,
+        local_edited_path=processed_path,
+        edit_type="standard",
+    )
+
+    if not saved_record:
+        return {"error": "Could not save the processed image. Please try again."}, 500
+
+    return {"message": "Image processed successfully", "result": saved_record}, 200
 
 
 if __name__ == "__main__":
