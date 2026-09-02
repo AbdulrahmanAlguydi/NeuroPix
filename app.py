@@ -147,15 +147,10 @@ def upload():
     temp_path = os.path.join(UPLOAD_TEMP_DIR, temp_filename)
     file.save(temp_path)
 
-    # Send the raw image to S3 and record the upload in the database.
-    saved_record = save_image_transaction(
-        user_id=session["user_id"],
-        local_raw_path=temp_path,
-    )
-
-    if not saved_record:
-        return {"error": "Could not save the image. Please try again."}, 500
-
+    # Just stage the file locally for now. It only gets uploaded to S3 and
+    # logged in the database once it has actually been processed, in
+    # /api/process, since one Images row is meant to hold the original AND
+    # the processed result together.
     session["uploaded_image_path"] = temp_path
 
     return {"message": "Image uploaded successfully"}, 200

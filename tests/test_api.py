@@ -209,16 +209,7 @@ def logged_in_client(client):
     return client
 
 
-# Fake return value standing in for a real S3 + database save during tests.
-FAKE_SAVED_IMAGE = {
-    "OriginalFilePath": "inputs/fake_test_image.jpg",
-    "ModifiedFilePath": None,
-    "EditType": None,
-}
-
-
-@patch("app.save_image_transaction", return_value=FAKE_SAVED_IMAGE)
-def test_image_upload_valid_jpg(mock_save, logged_in_client):
+def test_image_upload_valid_jpg(logged_in_client):
     """Test uploading a valid JPG image."""
     img_data = make_test_image(800, 600, "JPEG")
     response = logged_in_client.post(
@@ -230,8 +221,7 @@ def test_image_upload_valid_jpg(mock_save, logged_in_client):
     assert response.get_json() == {"message": "Image uploaded successfully"}
 
 
-@patch("app.save_image_transaction", return_value=FAKE_SAVED_IMAGE)
-def test_image_upload_valid_png(mock_save, logged_in_client):
+def test_image_upload_valid_png(logged_in_client):
     """Test uploading a valid PNG image."""
     img_data = make_test_image(1000, 1000, "PNG")
     response = logged_in_client.post(
@@ -271,8 +261,7 @@ def test_image_upload_requires_login(client):
     assert response.status_code == 401
 
 
-@patch("app.save_image_transaction", return_value=FAKE_SAVED_IMAGE)
-def test_image_upload_resolution_validation(mock_save, logged_in_client):
+def test_image_upload_resolution_validation(logged_in_client):
     """Test 1080p resolution limits for landscape and portrait images."""
     # Landscape 1920x1080 -> Allowed
     ok_landscape = make_test_image(1920, 1080, "JPEG")
