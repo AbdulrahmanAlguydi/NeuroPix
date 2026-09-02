@@ -310,3 +310,7 @@ def test_image_service_pipeline_mock(mock_log, mock_up_proc, mock_up_raw):
         modified_path="outputs/edit123.jpg",
         edit_type="ai",
     )
+
+
+if __name__ == "__main__":
+    pytest.main(["-v", __file__])
