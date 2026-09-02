@@ -73,7 +73,10 @@ def register():
         return {"error": "Username is already taken"}, 409
 
     password_hash = hash_password(password)
-    register_user(username, password_hash)
+    was_saved = register_user(username, password_hash)
+
+    if not was_saved:
+        return {"error": "Could not save the new account. Please try again."}, 500
 
     return {"message": "User registered successfully"}, 201
 
