@@ -1,5 +1,4 @@
 import os
-import uuid  # Added for generating unique object keys
 
 import boto3
 from dotenv import load_dotenv
@@ -20,7 +19,7 @@ s3_client = boto3.client(
 def _execute_s3_upload(local_file_path, folder_prefix):
     """
     Core private handler that uploads a local file to S3
-    and returns its unique, collision-safe object key location.
+    and returns its object key location.
     """
     if not os.path.exists(local_file_path):
         print(f"[STORAGE ERROR] Local file not found: {local_file_path}")
@@ -28,11 +27,7 @@ def _execute_s3_upload(local_file_path, folder_prefix):
 
     filename = os.path.basename(local_file_path)
 
-    # Generate a unique 8-character token (e.g., 'a1c2e3f4')
-    unique_suffix = uuid.uuid4().hex[:8]
-
-    # Prepend the token to the filename to guarantee uniqueness in S3
-    object_key = f"{folder_prefix}/{unique_suffix}_{filename}"
+    object_key = f"{folder_prefix}/{filename}"
 
     try:
         content_type = (
@@ -47,8 +42,8 @@ def _execute_s3_upload(local_file_path, folder_prefix):
             Key=object_key,
             ExtraArgs={"ContentType": content_type},
         )
-        print(f"[STORAGE] Upload complete. Unique key registered: {object_key}")
-        return object_key  # Returns e.g., 'inputs/a1c2e3f4_avatar.png'
+        print(f"[STORAGE] Upload complete. Object key registered: {object_key}")
+        return object_key  # Returns e.g., 'inputs/unique_avatar.png'
 
     except Exception as err:
         print(f"[STORAGE ERROR] Upload failed: {err}")
