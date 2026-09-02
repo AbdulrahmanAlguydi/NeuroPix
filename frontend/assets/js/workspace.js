@@ -165,8 +165,8 @@ function getAiSettings() {
 	};
 }
 
-// Prepares the settings that will later be sent to the backend.
-function processImage() {
+// Sends the current settings to the backend and applies them to the image.
+async function processImage() {
 	if (!state.imageFile) {
 		getElement("#status").textContent = "Choose an image first.";
 		return;
@@ -180,11 +180,33 @@ function processImage() {
 		settings = getAiSettings();
 	}
 
-	console.log("Edit mode:", state.editMode);
-	console.log("Settings for backend:", settings);
+	getElement("#status").textContent = "Processing...";
 
-	getElement("#status").textContent =
-		"Settings are ready. Backend processing is not connected yet.";
+	const response = await fetch("/api/process", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ editMode: state.editMode, settings: settings }),
+	});
+
+	const data = await response.json();
+
+	if (!response.ok) {
+		if (response.status === 401) {
+			alert("Please log in first.");
+			window.location.href = "login.html";
+			return;
+		}
+
+		getElement("#status").textContent = data.error || "Processing failed.";
+		return;
+	}
+
+	// Show the processed image the backend sent back.
+	if (data.result && data.result.processedUrl) {
+		getElement("#originalPreview").src = data.result.processedUrl;
+	}
+
+	getElement("#status").textContent = "Image processed successfully!";
 }
 
 // Shows the current value beside a slider.
