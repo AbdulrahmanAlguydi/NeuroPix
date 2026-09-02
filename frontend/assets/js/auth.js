@@ -2,18 +2,33 @@ const loginForm = document.querySelector("#loginForm");
 const registerForm = document.querySelector("#registerForm");
 
 if (loginForm) {
-	loginForm.addEventListener("submit", function (event) {
+	loginForm.addEventListener("submit", async function (event) {
 		event.preventDefault();
 
 		const username = document.querySelector("#loginUsername").value.trim();
+		const password = document.querySelector("#loginPassword").value;
 
-		if (!username) {
-			alert("Please enter your username.");
+		if (!username || !password) {
+			alert("Please enter your username and password.");
 			return;
 		}
 
-		// Temporary navigation until backend authentication is connected.
-		window.location.href = "dashboard.html";
+		// Send the login info to the Flask backend and wait for the answer.
+		const response = await fetch("/api/auth/login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ username: username, password: password }),
+		});
+
+		const data = await response.json();
+
+		if (response.ok) {
+			// Backend says the login worked, go to the dashboard.
+			window.location.href = "dashboard.html";
+		} else {
+			// Backend rejected the login, show the error it sent back.
+			alert(data.error || "Login failed. Please try again.");
+		}
 	});
 }
 
