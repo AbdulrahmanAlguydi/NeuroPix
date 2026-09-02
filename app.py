@@ -8,6 +8,7 @@ from flask import Flask, request, session
 from PIL import Image
 
 from database.queries import get_user_by_username, register_user
+from services.image_service import save_image_transaction
 from utils.security import hash_password, verify_password
 
 load_dotenv()
@@ -115,6 +116,7 @@ def me():
 
 
 @app.route("/api/upload", methods=["POST"])
+@login_required
 def upload():
     if "image" not in request.files:
         return {"error": "No image file provided"}, 400
@@ -144,6 +146,15 @@ def upload():
     temp_filename = f"{uuid.uuid4().hex}_{file.filename}"
     temp_path = os.path.join(UPLOAD_TEMP_DIR, temp_filename)
     file.save(temp_path)
+
+    # Send the raw image to S3 and record the upload in the database.
+    saved_record = save_image_transaction(
+        user_id=session["user_id"],
+        local_raw_path=temp_path,
+    )
+
+    if not saved_record:
+        return {"error": "Could not save the image. Please try again."}, 500
 
     session["uploaded_image_path"] = temp_path
 

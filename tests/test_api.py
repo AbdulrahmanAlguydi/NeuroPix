@@ -200,10 +200,28 @@ def test_user_logout(client):
 # =====================================================================
 # 6. IMAGE UPLOAD TESTS
 # =====================================================================
-def test_image_upload_valid_jpg(client):
+@pytest.fixture
+def logged_in_client(client):
+    """A test client with a fake logged-in user, since /api/upload now requires login."""
+    with client.session_transaction() as session_data:
+        session_data["user_id"] = 1
+        session_data["username"] = "student_uploader"
+    return client
+
+
+# Fake return value standing in for a real S3 + database save during tests.
+FAKE_SAVED_IMAGE = {
+    "OriginalFilePath": "inputs/fake_test_image.jpg",
+    "ModifiedFilePath": None,
+    "EditType": None,
+}
+
+
+@patch("app.save_image_transaction", return_value=FAKE_SAVED_IMAGE)
+def test_image_upload_valid_jpg(mock_save, logged_in_client):
     """Test uploading a valid JPG image."""
     img_data = make_test_image(800, 600, "JPEG")
-    response = client.post(
+    response = logged_in_client.post(
         "/api/upload",
         content_type="multipart/form-data",
         data={"image": (img_data, "test.jpg")},
@@ -212,10 +230,11 @@ def test_image_upload_valid_jpg(client):
     assert response.get_json() == {"message": "Image uploaded successfully"}
 
 
-def test_image_upload_valid_png(client):
+@patch("app.save_image_transaction", return_value=FAKE_SAVED_IMAGE)
+def test_image_upload_valid_png(mock_save, logged_in_client):
     """Test uploading a valid PNG image."""
     img_data = make_test_image(1000, 1000, "PNG")
-    response = client.post(
+    response = logged_in_client.post(
         "/api/upload",
         content_type="multipart/form-data",
         data={"image": (img_data, "test.png")},
@@ -223,10 +242,10 @@ def test_image_upload_valid_png(client):
     assert response.status_code == 200
 
 
-def test_image_upload_unsupported_format(client):
+def test_image_upload_unsupported_format(logged_in_client):
     """Test rejecting unsupported file extensions like .txt or .gif."""
     file_bytes = io.BytesIO(b"not an image")
-    response = client.post(
+    response = logged_in_client.post(
         "/api/upload",
         content_type="multipart/form-data",
         data={"image": (file_bytes, "notes.txt")},
@@ -235,17 +254,29 @@ def test_image_upload_unsupported_format(client):
     assert "Unsupported file format" in response.get_json()["error"]
 
 
-def test_image_upload_missing_file(client):
+def test_image_upload_missing_file(logged_in_client):
     """Test upload endpoint with no file attached."""
-    response = client.post("/api/upload", content_type="multipart/form-data")
+    response = logged_in_client.post("/api/upload", content_type="multipart/form-data")
     assert response.status_code == 400
 
 
-def test_image_upload_resolution_validation(client):
+def test_image_upload_requires_login(client):
+    """Test that uploading without being logged in is rejected."""
+    img_data = make_test_image(800, 600, "JPEG")
+    response = client.post(
+        "/api/upload",
+        content_type="multipart/form-data",
+        data={"image": (img_data, "test.jpg")},
+    )
+    assert response.status_code == 401
+
+
+@patch("app.save_image_transaction", return_value=FAKE_SAVED_IMAGE)
+def test_image_upload_resolution_validation(mock_save, logged_in_client):
     """Test 1080p resolution limits for landscape and portrait images."""
     # Landscape 1920x1080 -> Allowed
     ok_landscape = make_test_image(1920, 1080, "JPEG")
-    r1 = client.post(
+    r1 = logged_in_client.post(
         "/api/upload",
         content_type="multipart/form-data",
         data={"image": (ok_landscape, "ls_ok.jpg")},
@@ -254,7 +285,7 @@ def test_image_upload_resolution_validation(client):
 
     # Landscape 1921x1080 -> Rejected
     bad_landscape = make_test_image(1921, 1080, "JPEG")
-    r2 = client.post(
+    r2 = logged_in_client.post(
         "/api/upload",
         content_type="multipart/form-data",
         data={"image": (bad_landscape, "ls_bad.jpg")},
@@ -263,7 +294,7 @@ def test_image_upload_resolution_validation(client):
 
     # Portrait 1080x1920 -> Allowed
     ok_portrait = make_test_image(1080, 1920, "JPEG")
-    r3 = client.post(
+    r3 = logged_in_client.post(
         "/api/upload",
         content_type="multipart/form-data",
         data={"image": (ok_portrait, "pt_ok.jpg")},
@@ -272,7 +303,7 @@ def test_image_upload_resolution_validation(client):
 
     # Portrait 1080x1921 -> Rejected
     bad_portrait = make_test_image(1080, 1921, "JPEG")
-    r4 = client.post(
+    r4 = logged_in_client.post(
         "/api/upload",
         content_type="multipart/form-data",
         data={"image": (bad_portrait, "pt_bad.jpg")},
