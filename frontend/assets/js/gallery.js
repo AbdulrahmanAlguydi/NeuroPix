@@ -9,6 +9,7 @@ const compareTags = document.querySelectorAll(".compare-tag");
 const comparisonHelp = document.querySelector(".comparison-help");
 const galleryGrid = document.querySelector("#galleryGrid");
 const galleryStatus = document.querySelector("#galleryStatus");
+const GALLERY_CACHE_KEY = "neuropixGallery";
 
 let dragging = false;
 
@@ -69,17 +70,23 @@ function formatGalleryDate(value) {
 	}
 
 	const date = new Date(value);
-	return Number.isNaN(date.getTime())
-		? value
-		: date.toLocaleDateString("en-GB", {
-				day: "2-digit",
-				month: "2-digit",
-				year: "numeric",
-		  });
+	if (Number.isNaN(date.getTime())) {
+		return value;
+	}
+
+	return date.toLocaleDateString("en-GB", {
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+	});
 }
 
 function getGalleryTitle(image) {
-	const fileName = image.file_name || "Image #" + image.image_id;
+	let fileName = image.file_name;
+	if (!fileName) {
+		fileName = "Image #" + image.image_id;
+	}
+
 	return fileName.replace(/\.(png|jpe?g)$/i, "");
 }
 
@@ -109,7 +116,11 @@ function createGalleryCard(image) {
 	thumb.className = "gallery-thumb";
 
 	const imageElement = document.createElement("img");
-	imageElement.src = image.modified_url || image.original_url;
+	let imageUrl = image.modified_url;
+	if (!imageUrl) {
+		imageUrl = image.original_url;
+	}
+	imageElement.src = imageUrl;
 	imageElement.alt = title;
 	thumb.appendChild(imageElement);
 
@@ -128,13 +139,20 @@ function createGalleryCard(image) {
 	const titleElement = document.createElement("strong");
 	titleElement.className = "gallery-title";
 	titleElement.textContent = title;
-	titleElement.title = image.file_name || title;
+	if (image.file_name) {
+		titleElement.title = image.file_name;
+	} else {
+		titleElement.title = title;
+	}
 	info.appendChild(titleElement);
 
 	const chips = document.createElement("div");
 	chips.className = "gallery-chips";
 	const typeChip = document.createElement("span");
-	typeChip.className = image.edit_type === "ai" ? "chip ai-chip" : "chip";
+	typeChip.className = "chip";
+	if (image.edit_type === "ai") {
+		typeChip.className = "chip ai-chip";
+	}
 	typeChip.textContent = getEditTypeLabel(image.edit_type);
 	chips.appendChild(typeChip);
 
@@ -201,9 +219,25 @@ async function deleteGalleryImage(imageId, card) {
 	}
 
 	card.remove();
+	localStorage.removeItem(GALLERY_CACHE_KEY);
+
 	if (galleryGrid && galleryGrid.children.length === 0 && galleryStatus) {
 		galleryStatus.textContent = "No images yet. Process an image in Studio to see it here.";
 	}
+}
+
+function renderGallery(images) {
+	galleryGrid.replaceChildren();
+
+	if (!images.length) {
+		galleryStatus.textContent = "No images yet. Process an image in Studio to see it here.";
+		return;
+	}
+
+	images.forEach(function (image) {
+		galleryGrid.appendChild(createGalleryCard(image));
+	});
+	galleryStatus.textContent = "Your saved images.";
 }
 
 async function loadGallery() {
@@ -211,10 +245,21 @@ async function loadGallery() {
 		return;
 	}
 
+	const cachedValue = localStorage.getItem(GALLERY_CACHE_KEY);
+	let cachedGallery = null;
+	if (cachedValue) {
+		cachedGallery = JSON.parse(cachedValue);
+	}
+
+	if (cachedGallery) {
+		renderGallery(cachedGallery);
+	}
+
 	try {
 		const response = await fetch("/api/gallery");
 
 		if (response.status === 401) {
+			localStorage.removeItem(GALLERY_CACHE_KEY);
 			window.location.href = "login.html";
 			return;
 		}
@@ -224,19 +269,12 @@ async function loadGallery() {
 		}
 
 		const images = await response.json();
-		galleryGrid.replaceChildren();
-
-		if (!images.length) {
-			galleryStatus.textContent = "No images yet. Process an image in Studio to see it here.";
-			return;
-		}
-
-		images.forEach(function (image) {
-			galleryGrid.appendChild(createGalleryCard(image));
-		});
-		galleryStatus.textContent = "Your saved images.";
+		localStorage.setItem(GALLERY_CACHE_KEY, JSON.stringify(images));
+		renderGallery(images);
 	} catch (error) {
-		galleryStatus.textContent = "Could not load the gallery.";
+		if (!cachedGallery) {
+			galleryStatus.textContent = "Could not load the gallery.";
+		}
 	}
 }
 

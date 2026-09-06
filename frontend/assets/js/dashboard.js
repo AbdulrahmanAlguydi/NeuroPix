@@ -3,6 +3,7 @@ const aiEditCount = document.querySelector("#aiEditCount");
 const recentActivityTitle = document.querySelector("#recentActivityTitle");
 const recentActivityMessage = document.querySelector("#recentActivityMessage");
 const recentActivityList = document.querySelector("#recentActivityList");
+const GALLERY_CACHE_KEY = "neuropixGallery";
 
 function formatDashboardDate(value) {
 	const date = new Date(value);
@@ -30,75 +31,103 @@ function getEditTypeLabel(editType) {
 	return "Original";
 }
 
+function createChip(text, className = "chip") {
+	const chip = document.createElement("span");
+	chip.className = className;
+	chip.textContent = text;
+	return chip;
+}
+
 function createRecentActivityItem(image) {
-	const fileName = image.file_name || "Edited image";
+	let fileName = image.file_name;
+	if (!fileName) {
+		fileName = "Edited image";
+	}
+
 	const item = document.createElement("a");
 	item.className = "recent-activity-item";
 	item.href = "gallery.html";
 	item.setAttribute("aria-label", "Open " + fileName + " in Gallery");
 
 	const thumbnail = document.createElement("img");
-	thumbnail.src = image.modified_url || image.original_url;
+	let thumbnailUrl = image.modified_url;
+	if (!thumbnailUrl) {
+		thumbnailUrl = image.original_url;
+	}
+	thumbnail.src = thumbnailUrl;
 	thumbnail.alt = fileName;
-	item.appendChild(thumbnail);
 
 	const metadata = document.createElement("div");
 	metadata.className = "gallery-chips recent-activity-meta";
 
-	const typeChip = document.createElement("span");
-	typeChip.className = image.edit_type === "ai" ? "chip ai-chip" : "chip";
-	typeChip.textContent = getEditTypeLabel(image.edit_type);
-	metadata.appendChild(typeChip);
+	let typeClass = "chip";
+	if (image.edit_type === "ai") {
+		typeClass = "chip ai-chip";
+	}
 
-	const dateChip = document.createElement("span");
-	dateChip.className = "chip";
-	dateChip.textContent = formatDashboardDate(image.upload_date);
-	metadata.appendChild(dateChip);
+	const typeChip = createChip(getEditTypeLabel(image.edit_type), typeClass);
+	const dateChip = createChip(formatDashboardDate(image.upload_date));
+	metadata.append(typeChip, dateChip);
 
-	item.appendChild(metadata);
+	item.append(thumbnail, metadata);
 	return item;
 }
 
+function renderDashboard(images) {
+	const standardImages = images.filter(function (image) {
+		return image.edit_type === "standard";
+	});
+	const aiImages = images.filter(function (image) {
+		return image.edit_type === "ai";
+	});
+
+	standardEditCount.textContent = standardImages.length;
+	aiEditCount.textContent = aiImages.length;
+	recentActivityList.replaceChildren();
+
+	if (!images.length) {
+		recentActivityTitle.textContent = "No activity yet";
+		recentActivityMessage.textContent = "Process an image in Studio to see it here.";
+		return;
+	}
+
+	recentActivityTitle.textContent = "Latest edits";
+	recentActivityMessage.textContent = "Your three most recent processed images.";
+	images.slice(0, 3).forEach(function (image) {
+		recentActivityList.appendChild(createRecentActivityItem(image));
+	});
+}
+
 async function loadDashboard() {
+	const cachedValue = localStorage.getItem(GALLERY_CACHE_KEY);
+	let cachedGallery = null;
+	if (cachedValue) {
+		cachedGallery = JSON.parse(cachedValue);
+	}
+
+	if (cachedGallery) {
+		renderDashboard(cachedGallery);
+	}
+
 	try {
 		const response = await fetch("/api/gallery");
-
 		if (response.status === 401) {
+			localStorage.removeItem(GALLERY_CACHE_KEY);
 			window.location.href = "login.html";
 			return;
 		}
-
 		if (!response.ok) {
 			throw new Error("Dashboard request failed");
 		}
 
 		const images = await response.json();
-		const standardImages = images.filter(function (image) {
-			return image.edit_type === "standard";
-		});
-		const aiImages = images.filter(function (image) {
-			return image.edit_type === "ai";
-		});
-
-		standardEditCount.textContent = standardImages.length;
-		aiEditCount.textContent = aiImages.length;
-		recentActivityList.replaceChildren();
-
-		if (!images.length) {
-			recentActivityTitle.textContent = "No activity yet";
-			recentActivityMessage.textContent =
-				"Process an image in Studio to see it here.";
-			return;
-		}
-
-		recentActivityTitle.textContent = "Latest edits";
-		recentActivityMessage.textContent = "Your three most recent processed images.";
-		images.slice(0, 3).forEach(function (image) {
-			recentActivityList.appendChild(createRecentActivityItem(image));
-		});
+		localStorage.setItem(GALLERY_CACHE_KEY, JSON.stringify(images));
+		renderDashboard(images);
 	} catch (error) {
-		recentActivityTitle.textContent = "Recent activity unavailable";
-		recentActivityMessage.textContent = "Could not load your gallery.";
+		if (!cachedGallery) {
+			recentActivityTitle.textContent = "Recent activity unavailable";
+			recentActivityMessage.textContent = "Could not load your gallery.";
+		}
 	}
 }
 
