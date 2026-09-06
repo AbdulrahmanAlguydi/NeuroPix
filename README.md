@@ -1,2 +1,7 @@
 # NeuroPix
-NeuroPix is an advanced web-based image editing application that bridges the gap between standard geometric transformations and modern artificial intelligence. The platform allows users to perform local, high-performance modifications (such as cropping, flipping, and swirling) driven by a custom Python processing engine, alongside sophisticated AI-powered image enhancements offloaded securely to the OpenAI API. The entire system is architected as a secure 3-tier application deployed fully on Amazon Web Services (AWS), utilizing EC2 for backend hosting, RDS MySQL for metadata persistence, and S3 for secure object storage.
+
+NeuroPix is a web-based image editing application for standard and AI-assisted image edits.
+
+Users can create an account, upload JPG or PNG images, apply Standard edits such as cropping, rotation, brightness, contrast, exposure, saturation, blur, sharpness, and grayscale, or send an image to the OpenAI image-editing API. Images are limited to 1080p, keep their aspect ratio during AI upscaling, and can be compared, downloaded, and managed from the Gallery.
+
+The project uses a Flask backend, MySQL for user and image metadata, and Amazon S3 for storing original and processed images.

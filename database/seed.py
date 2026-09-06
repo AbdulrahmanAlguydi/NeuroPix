@@ -25,7 +25,7 @@ def seed_database():
         cursor.execute("TRUNCATE TABLE Users;")
         cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
 
-        # 2. Insert Dummy Users (Passwords are placeholders; backend will hash real ones later)
+        # 2. Insert dummy users with development-only placeholder hashes
         print("Inserting mock users...")
         users_to_insert = [
             ("main_dev", "mock_hash_xyz123"),
