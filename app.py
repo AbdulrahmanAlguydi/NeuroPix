@@ -9,7 +9,11 @@ from PIL import Image
 
 from database.queries import get_user_by_username, register_user
 from services.image_editor import apply_standard_edits
-from services.image_service import save_image_transaction
+from services.image_service import (
+    delete_image_transaction,
+    fetch_formatted_user_gallery,
+    save_image_transaction,
+)
 from utils.s3 import get_full_s3_url
 from utils.security import hash_password, verify_password
 
@@ -115,6 +119,24 @@ def logout():
 @login_required
 def me():
     return {"user_id": session["user_id"], "username": session["username"]}, 200
+
+
+@app.route("/api/gallery", methods=["GET"])
+@login_required
+def gallery():
+    images = fetch_formatted_user_gallery(session["user_id"])
+    return images, 200
+
+
+@app.route("/api/gallery/<int:image_id>", methods=["DELETE"])
+@login_required
+def delete_gallery_image(image_id):
+    was_deleted = delete_image_transaction(image_id, session["user_id"])
+
+    if not was_deleted:
+        return {"error": "Image could not be found or deleted"}, 404
+
+    return {"message": "Image deleted successfully"}, 200
 
 
 @app.route("/api/upload", methods=["POST"])
