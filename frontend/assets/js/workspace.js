@@ -152,7 +152,7 @@ function getStandardSettings() {
 	};
 }
 
-// Collects AI parameters for a future backend request.
+// Collects AI parameters for the backend request.
 function getAiSettings() {
 	return {
 		generativeModification: getElement("#generatePrompt").value.trim(),

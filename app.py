@@ -8,6 +8,7 @@ from flask import Flask, request, session
 from PIL import Image
 
 from database.queries import get_user_by_username, register_user
+from services.ai_editor import apply_ai_edits
 from services.image_editor import apply_standard_edits
 from services.image_service import (
     delete_image_transaction,
@@ -190,21 +191,26 @@ def process_image():
     data = request.get_json(silent=True) or {}
     edit_mode = data.get("editMode", "standard")
 
-    # AI Edits is a separate feature that isn't built yet.
-    if edit_mode != "standard":
-        return {"error": "AI editing is not implemented yet."}, 501
+    if edit_mode not in {"standard", "ai"}:
+        return {"error": "Unknown editing mode"}, 400
 
     settings = data.get("settings", {})
 
     try:
-        original_image = Image.open(raw_image_path)
-        edited_image = apply_standard_edits(original_image, settings)
+        if edit_mode == "standard":
+            original_image = Image.open(raw_image_path)
+            edited_image = apply_standard_edits(original_image, settings)
+            processed_filename = f"{uuid.uuid4().hex}_processed.jpg"
+            processed_path = os.path.join(UPLOAD_TEMP_DIR, processed_filename)
+            edited_image.save(processed_path, "JPEG")
+        else:
+            edited_bytes = apply_ai_edits(raw_image_path, settings)
+            processed_filename = f"{uuid.uuid4().hex}_processed.png"
+            processed_path = os.path.join(UPLOAD_TEMP_DIR, processed_filename)
+            with open(processed_path, "wb") as processed_file:
+                processed_file.write(edited_bytes)
     except Exception:
         return {"error": "Could not process this image."}, 400
-
-    processed_filename = f"{uuid.uuid4().hex}_processed.jpg"
-    processed_path = os.path.join(UPLOAD_TEMP_DIR, processed_filename)
-    edited_image.save(processed_path, "JPEG")
 
     # Upload both the original and the processed image to S3, and log
     # the edit as one row in the database.
@@ -212,7 +218,7 @@ def process_image():
         user_id=session["user_id"],
         local_raw_path=raw_image_path,
         local_edited_path=processed_path,
-        edit_type="standard",
+        edit_type=edit_mode,
     )
 
     if not saved_record:

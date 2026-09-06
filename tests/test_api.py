@@ -375,14 +375,28 @@ def test_process_requires_login(client):
     assert response.status_code == 401
 
 
-def test_process_ai_mode_not_implemented(logged_in_client):
-    """Test that AI Edits mode replies with 'not implemented' for now."""
+@patch("app.get_full_s3_url", side_effect=lambda key: f"https://fake-bucket.s3.amazonaws.com/{key}")
+@patch(
+    "app.save_image_transaction",
+    return_value={
+        "OriginalFilePath": "inputs/fake_original.jpg",
+        "ModifiedFilePath": "outputs/fake_processed.png",
+        "EditType": "ai",
+    },
+)
+@patch("app.apply_ai_edits", return_value=b"mocked image bytes")
+def test_process_ai_mode_success(mock_ai, mock_save, mock_url, logged_in_client):
+    """Test processing an uploaded image with AI Edits settings."""
     upload_test_image(logged_in_client)
 
     response = logged_in_client.post(
         "/api/process", json={"editMode": "ai", "settings": {}}
     )
-    assert response.status_code == 501
+
+    assert response.status_code == 200
+    assert response.get_json()["result"]["editType"] == "ai"
+    mock_ai.assert_called_once()
+    mock_save.assert_called_once()
 
 
 @patch("app.save_image_transaction", return_value=None)
