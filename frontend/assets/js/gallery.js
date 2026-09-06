@@ -79,7 +79,8 @@ function formatGalleryDate(value) {
 }
 
 function getGalleryTitle(image) {
-	return image.file_name || "Image #" + image.image_id;
+	const fileName = image.file_name || "Image #" + image.image_id;
+	return fileName.replace(/\.(png|jpe?g)$/i, "");
 }
 
 function getEditTypeLabel(editType) {
