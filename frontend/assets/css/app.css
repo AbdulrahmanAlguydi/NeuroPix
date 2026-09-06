@@ -570,8 +570,10 @@ textarea {
 	color: #cbd0d9;
 	transition: 0.2s;
 	font-size: 16px;
+	line-height: 1.2;
 	display: flex;
 	align-items: center;
+	gap: 6px;
 }
 .side-nav a:hover,
 .side-nav a.active,
@@ -584,9 +586,13 @@ textarea {
 }
 .side-nav span,
 .logout-link span {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	width: 32px;
+	height: 19px;
 	font-size: 19px;
+	line-height: 1;
 }
 .sidebar-bottom {
 	margin-top: auto;
