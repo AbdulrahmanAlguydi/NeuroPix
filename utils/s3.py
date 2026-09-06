@@ -17,10 +17,7 @@ s3_client = boto3.client(
 
 
 def _execute_s3_upload(local_file_path, folder_prefix):
-    """
-    Core private handler that uploads a local file to S3
-    and returns its object key location.
-    """
+    """Upload a local image and return its S3 object key."""
     if not os.path.exists(local_file_path):
         print(f"[STORAGE ERROR] Local file not found: {local_file_path}")
         return None
@@ -30,11 +27,9 @@ def _execute_s3_upload(local_file_path, folder_prefix):
     object_key = f"{folder_prefix}/{filename}"
 
     try:
-        content_type = (
-            "image/jpeg"
-            if filename.lower().endswith((".jpg", ".jpeg"))
-            else "image/png"
-        )
+        content_type = "image/png"
+        if filename.lower().endswith((".jpg", ".jpeg")):
+            content_type = "image/jpeg"
 
         s3_client.upload_file(
             Filename=local_file_path,
@@ -43,7 +38,7 @@ def _execute_s3_upload(local_file_path, folder_prefix):
             ExtraArgs={"ContentType": content_type},
         )
         print(f"[STORAGE] Upload complete. Object key registered: {object_key}")
-        return object_key  # Returns e.g., 'inputs/unique_avatar.png'
+        return object_key
 
     except Exception as err:
         print(f"[STORAGE ERROR] Upload failed: {err}")
@@ -51,36 +46,24 @@ def _execute_s3_upload(local_file_path, folder_prefix):
 
 
 def upload_original_image(local_file_path):
-    """
-    Uploads a raw user-uploaded file into the 'inputs' folder prefix.
-    Maps to OriginalFilePath in the database schema.
-    """
-    print("[STORAGE] Initializing raw image upload sequence...")
+    """Upload an original image to the inputs folder."""
     return _execute_s3_upload(local_file_path, folder_prefix="inputs")
 
 
 def upload_processed_image(local_file_path):
-    """
-    Uploads an already edited file into the 'outputs' folder prefix.
-    Maps to ModifiedFilePath in the database schema.
-    """
-    print("[STORAGE] Initializing processed image upload sequence...")
+    """Upload a processed image to the outputs folder."""
     return _execute_s3_upload(local_file_path, folder_prefix="outputs")
 
 
 def get_full_s3_url(object_key):
-    """
-    Converts a database object key back into a live clickable public URL.
-    """
+    """Convert an S3 object key into a public URL."""
     if not object_key:
         return None
     return f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{object_key}"
 
 
 def delete_s3_object(object_key):
-    """
-    Deletes a single file object from the S3 bucket using its key.
-    """
+    """Delete one object from S3."""
     if not object_key:
         return True  # Nothing to delete
 

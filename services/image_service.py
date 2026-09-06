@@ -1,114 +1,99 @@
 import os
 
-from utils.s3 import upload_original_image, upload_processed_image, delete_s3_object, get_full_s3_url
-from database.queries import log_image_edit, delete_image_record, get_user_gallery
+from database.queries import delete_image_record, get_user_gallery, log_image_edit
+from utils.s3 import (
+    delete_s3_object,
+    get_full_s3_url,
+    upload_original_image,
+    upload_processed_image,
+)
+
 
 def save_image_transaction(user_id, local_raw_path, local_edited_path=None, edit_type=None):
-    """
-    Handles the complete image storage lifecycle.
-    1. Uploads the raw image to the S3 'inputs' directory.
-    2. Uploads the processed image to the S3 'outputs' directory (if provided).
-    3. Commits the resulting cloud storage URLs to the MySQL database Images table.
-
-    Args:
-        user_id (int): The primary key ID of the user owning the asset.
-        local_raw_path (str): File system path to the original uploaded image.
-        local_edited_path (str, optional): File system path to the processed output.
-        edit_type (str, optional): The type of modification applied ('standard' or 'ai').
-
-    Returns:
-        dict: A dictionary containing the logged file paths if successful, None otherwise.
-    """
-    print(f"[SERVICE] Starting integrated image storage pipeline for UserID: {user_id}")
-
-    # 1. Transport the original image to S3 inputs folder and get its object key
-    original_s3_key = upload_original_image(local_raw_path)
-    if not original_s3_key:
-        print("[SERVICE ERROR] Pipeline aborted: S3 raw file transmission failed.")
+    """Upload the image files and record their paths in the database."""
+    original_key = upload_original_image(local_raw_path)
+    if not original_key:
+        print("[SERVICE ERROR] Original image upload failed.")
         return None
 
-    # 2. Transport the processed image to S3 outputs folder and get its object key (if one exists)
-    modified_s3_key = None
+    modified_key = None
     if local_edited_path:
-        modified_s3_key = upload_processed_image(local_edited_path)
-        if not modified_s3_key:
-            print("[SERVICE ERROR] Pipeline aborted: S3 processed file transmission failed.")
+        modified_key = upload_processed_image(local_edited_path)
+        if not modified_key:
+            print("[SERVICE ERROR] Processed image upload failed.")
             return None
 
-    # 3. Write transaction metadata records to the MySQL Database
-    db_success = log_image_edit(
+    if not log_image_edit(
         user_id=user_id,
-        original_path=original_s3_key,
-        modified_path=modified_s3_key,
-        edit_type=edit_type
-    )
-
-    if not db_success:
-        print("[SERVICE ERROR] Pipeline failed: Files uploaded to S3, but database registration failed.")
+        original_path=original_key,
+        modified_path=modified_key,
+        edit_type=edit_type,
+    ):
+        print("[SERVICE ERROR] Image record could not be saved.")
         return None
 
-    print("[SERVICE SUCCESS] Image pipeline completed cleanly. Data committed to S3 and DB.")
-    
-    # Return structured tracking details to the caller
     return {
-        "OriginalFilePath": original_s3_key,
-        "ModifiedFilePath": modified_s3_key,
-        "EditType": edit_type
+        "OriginalFilePath": original_key,
+        "ModifiedFilePath": modified_key,
+        "EditType": edit_type,
     }
 
+
 def delete_image_transaction(image_id, user_id):
-    """
-    Removes DB record, then cleans up both raw and processed images from Amazon S3.
-    """
-    # 1. Delete from DB and retrieve keys
-    deleted_paths = delete_image_record(image_id, user_id)
-    if not deleted_paths:
+    """Delete an image record and its S3 files."""
+    paths = delete_image_record(image_id, user_id)
+    if not paths:
         return False
 
-    # 2. Delete corresponding objects from S3
-    if deleted_paths.get("OriginalFilePath"):
-        delete_s3_object(deleted_paths["OriginalFilePath"])
-        
-    if deleted_paths.get("ModifiedFilePath"):
-        delete_s3_object(deleted_paths["ModifiedFilePath"])
-
+    for key in (paths.get("OriginalFilePath"), paths.get("ModifiedFilePath")):
+        if key:
+            delete_s3_object(key)
     return True
 
+
+def is_uuid_hex(value):
+    """Check the UUID format used in older object keys."""
+    return len(value) == 32 and all(
+        character in "0123456789abcdef" for character in value.lower()
+    )
+
+
+def get_original_filename(path):
+    """Remove the UUID added to an uploaded filename."""
+    filename = os.path.basename(path)
+    stem, extension = os.path.splitext(filename)
+
+    parts = stem.rsplit("-", 1)
+    if len(parts) == 2 and is_uuid_hex(parts[1]):
+        return parts[0] + extension
+
+    parts = filename.split("_", 1)
+    if len(parts) == 2 and is_uuid_hex(parts[0]):
+        return parts[1]
+
+    return filename
+
+
 def fetch_formatted_user_gallery(user_id):
-    """
-    Retrieves a user's gallery records and converts all relative 
-    S3 keys into full, browser-ready HTTPS URLs.
-    """
-    raw_records = get_user_gallery(user_id)
-    if not raw_records:
-        return []
+    """Return gallery records with browser-ready image URLs."""
+    records = get_user_gallery(user_id)
+    gallery = []
 
-    formatted_gallery = []
-    for record in raw_records:
-        original_filename = os.path.basename(record["OriginalFilePath"])
-        filename_stem, filename_extension = os.path.splitext(original_filename)
-        filename_parts = filename_stem.rsplit("-", 1)
-        uuid_suffix = filename_parts[1] if len(filename_parts) == 2 else ""
+    for record in records:
+        original_filename = get_original_filename(record["OriginalFilePath"])
+        modified_url = None
+        if record["ModifiedFilePath"]:
+            modified_url = get_full_s3_url(record["ModifiedFilePath"])
 
-        if len(uuid_suffix) == 32 and all(
-            character in "0123456789abcdef" for character in uuid_suffix.lower()
-        ):
-            original_filename = filename_parts[0] + filename_extension
-        else:
-            filename_parts = original_filename.split("_", 1)
-            uuid_prefix = filename_parts[0] if len(filename_parts) == 2 else ""
-            if len(uuid_prefix) == 32 and all(
-                character in "0123456789abcdef" for character in uuid_prefix.lower()
-            ):
-                original_filename = filename_parts[1]
+        gallery.append(
+            {
+                "image_id": record["ImageID"],
+                "file_name": original_filename,
+                "edit_type": record["EditType"],
+                "upload_date": record["UploadDate"],
+                "original_url": get_full_s3_url(record["OriginalFilePath"]),
+                "modified_url": modified_url,
+            }
+        )
 
-        formatted_gallery.append({
-            "image_id": record["ImageID"],
-            "file_name": original_filename,
-            "edit_type": record["EditType"],
-            "upload_date": record["UploadDate"],
-            "original_url": get_full_s3_url(record["OriginalFilePath"]),
-            "modified_url": get_full_s3_url(record["ModifiedFilePath"]) if record["ModifiedFilePath"] else None
-        })
-
-    return formatted_gallery
+    return gallery

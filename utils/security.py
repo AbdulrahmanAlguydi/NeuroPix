@@ -1,16 +1,11 @@
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 
 def hash_password(plain_password):
-    """
-    Converts a plain-text password into a secure one-way hash.
-    """
+    """Return a one-way hash for a password."""
     return generate_password_hash(plain_password)
 
 
 def verify_password(plain_password, password_hash):
-    """
-    Checks a plain-text password against a previously stored hash.
-    Returns True if they match, False otherwise.
-    """
+    """Check a password against its stored hash."""
     return check_password_hash(password_hash, plain_password)

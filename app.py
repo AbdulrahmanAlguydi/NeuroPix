@@ -20,30 +20,23 @@ from utils.security import hash_password, verify_password
 
 load_dotenv()
 
-# static_folder points Flask at our frontend folder so it can serve the
-# HTML/CSS/JS files, and static_url_path="" means we don't need "/static"
-# in front of every file (so "login.html" works instead of "/static/login.html").
+# Serve the frontend files directly (for example, /login.html).
 app = Flask(__name__, static_folder="frontend", static_url_path="")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "neuropix_secret_key_123")
 
-# Folder used to hold uploaded images temporarily, before any edit
-# decides whether they need to be saved permanently to S3/MySQL.
+# Uploaded files stay here until processing saves them to S3 and MySQL.
 UPLOAD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "neuropix_uploads")
 os.makedirs(UPLOAD_TEMP_DIR, exist_ok=True)
 
 ALLOWED_UPLOAD_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
-# The 1080p limit is orientation-aware: a landscape image may be as wide
-# as 1920x1080, while a portrait image may be as tall as 1080x1920.
+# Keep the 1080p limit while allowing either orientation.
 MAX_LANDSCAPE_SIZE = (1920, 1080)
 MAX_PORTRAIT_SIZE = (1080, 1920)
 
 
 def login_required(f):
-    """
-    Route decorator that blocks access unless the current session
-    belongs to a logged-in user.
-    """
+    """Allow a route only for logged-in users."""
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -56,7 +49,6 @@ def login_required(f):
 
 @app.route("/")
 def home():
-    # Show the landing page when someone visits the site.
     return app.send_static_file("index.html")
 
 
@@ -105,8 +97,7 @@ def login():
         session["username"] = user["Username"]
         return {"message": "Login successful"}, 200
 
-    # Same generic message whether the username doesn't exist or the
-    # password is wrong, so we never reveal which usernames are registered.
+    # Use one message for both invalid usernames and passwords.
     return {"error": "Invalid username or password"}, 401
 
 
@@ -162,22 +153,22 @@ def upload():
     except Exception:
         return {"error": "Invalid or corrupted image file."}, 400
 
-    max_width, max_height = MAX_LANDSCAPE_SIZE if width >= height else MAX_PORTRAIT_SIZE
+    if width >= height:
+        max_width, max_height = MAX_LANDSCAPE_SIZE
+    else:
+        max_width, max_height = MAX_PORTRAIT_SIZE
     if width > max_width or height > max_height:
         return {
             "error": "Image resolution exceeds the 1080p limit (1920x1080 landscape or 1080x1920 portrait)."
         }, 400
-    file.seek(0)  # Image.open advanced the stream; rewind before saving the full file
+    file.seek(0)  # Image.open moved the stream; rewind before saving it.
 
     original_stem = os.path.splitext(original_filename)[0]
     temp_filename = f"{original_stem}-{uuid.uuid4().hex}{file_extension}"
     temp_path = os.path.join(UPLOAD_TEMP_DIR, temp_filename)
     file.save(temp_path)
 
-    # Just stage the file locally for now. It only gets uploaded to S3 and
-    # logged in the database once it has actually been processed, in
-    # /api/process, since one Images row is meant to hold the original AND
-    # the processed result together.
+    # Keep the upload local until /api/process creates the database record.
     session["uploaded_image_path"] = temp_path
     session["uploaded_image_name"] = original_filename
     session.pop("processed_image_path", None)
@@ -219,8 +210,7 @@ def process_image():
     except Exception:
         return {"error": "Could not process this image."}, 400
 
-    # Upload both the original and the processed image to S3, and log
-    # the edit as one row in the database.
+    # Save both files and log the edit as one database row.
     saved_record = save_image_transaction(
         user_id=session["user_id"],
         local_raw_path=raw_image_path,
@@ -234,7 +224,7 @@ def process_image():
     session["processed_image_path"] = processed_path
     session["processed_edit_mode"] = edit_mode
 
-    # Turn the S3 keys into full URLs the frontend can put in an <img> tag.
+    # Return browser-ready URLs.
     result = {
         "originalUrl": get_full_s3_url(saved_record["OriginalFilePath"]),
         "processedUrl": get_full_s3_url(saved_record["ModifiedFilePath"]),
@@ -252,7 +242,9 @@ def download_processed_image():
     if not processed_path or not os.path.exists(processed_path):
         return {"error": "No processed image is available."}, 404
 
-    extension = "png" if session.get("processed_edit_mode") == "ai" else "jpg"
+    extension = "jpg"
+    if session.get("processed_edit_mode") == "ai":
+        extension = "png"
     original_filename = session.get("uploaded_image_name", "neuropix")
     original_stem = os.path.splitext(os.path.basename(original_filename))[0]
 
