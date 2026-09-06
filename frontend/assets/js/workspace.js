@@ -2,6 +2,7 @@
 const state = {
 	imageFile: null,
 	originalUrl: "",
+	processedUrl: "",
 	editMode: "standard",
 };
 
@@ -98,9 +99,13 @@ function handleImage(file) {
 
     state.imageFile = file;
     state.originalUrl = imageUrl;
+	state.processedUrl = "";
 
-    // Displays information about the selected image.
-    getElement("#originalPreview").src = imageUrl;
+	// Displays information about the selected image.
+	getElement("#originalPreview").src = imageUrl;
+	getElement("#processedPreview").removeAttribute("src");
+	getElement("#downloadBtn").removeAttribute("href");
+	getElement("#processedArea").classList.add("hidden");
     getElement("#fileName").textContent = file.name;
     getElement("#imageInfo").textContent =
       image.width + " x " + image.height;
@@ -201,9 +206,14 @@ async function processImage() {
 		return;
 	}
 
-	// Show the processed image the backend sent back.
+	// Show the processed image separately from the original preview.
 	if (data.result && data.result.processedUrl) {
-		getElement("#originalPreview").src = data.result.processedUrl;
+		state.processedUrl = data.result.processedUrl;
+		getElement("#processedPreview").src = state.processedUrl;
+		getElement("#downloadBtn").href = "/api/download";
+		getElement("#downloadBtn").download =
+			"neuropix-processed." + (state.editMode === "ai" ? "png" : "jpg");
+		getElement("#processedArea").classList.remove("hidden");
 	}
 
 	getElement("#status").textContent = "Image processed successfully!";
@@ -272,6 +282,41 @@ getElement("#aiBtn").addEventListener("click", function () {
 
 // Prepares the selected settings for processing.
 getElement("#processBtn").addEventListener("click", processImage);
+
+// Opens the original image, with a comparison slider when a result exists.
+function showImageComparison() {
+	if (!state.originalUrl) {
+		return;
+	}
+
+	openComparison(
+		state.processedUrl ? "Image comparison" : "Selected image",
+		state.originalUrl,
+		state.processedUrl,
+		state.processedUrl ? state.editMode : ""
+	);
+}
+
+getElement("#originalPreviewButton").addEventListener("click", showImageComparison);
+getElement("#processedPreviewButton").addEventListener("click", showImageComparison);
+
+// Starts the download and opens the processed image in a new tab.
+getElement("#downloadBtn").addEventListener("click", function (event) {
+	if (!state.processedUrl) {
+		event.preventDefault();
+		return;
+	}
+
+	event.preventDefault();
+	window.open(state.processedUrl, "_blank", "noopener,noreferrer");
+
+	const downloadLink = document.createElement("a");
+	downloadLink.href = "/api/download";
+	downloadLink.download = getElement("#downloadBtn").download;
+	document.body.appendChild(downloadLink);
+	downloadLink.click();
+	downloadLink.remove();
+});
 
 // Connects each slider to the value shown beside it.
 connectRange("#cropWidth", "#cropWidthValue", "%");

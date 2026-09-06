@@ -79,17 +79,34 @@
          <div id="uploadError" class="upload-error hidden" role="alert">
   <strong id="uploadErrorTitle">Upload error</strong>
   <p id="uploadErrorMessage"></p>
-</div> 
+         </div>
          <div id="previewArea" class="preview-area hidden">
-            <img id="originalPreview" alt="Selected image">
+            <button id="originalPreviewButton" class="preview-image-button" type="button"
+               aria-label="Compare original and processed images">
+               <img id="originalPreview" alt="Selected image">
+            </button>
 
             <div>
                <strong id="fileName">Selected image</strong>
                <p id="imageInfo"></p>
 
-               <button id="replaceBtn" class="btn btn-secondary">
+               <button id="replaceBtn" class="btn btn-accent">
                   Replace Image
                </button>
+            </div>
+         </div>
+
+         <div id="processedArea" class="processed-area hidden">
+            <button id="processedPreviewButton" class="preview-image-button" type="button"
+               aria-label="Compare original and processed images">
+               <img id="processedPreview" alt="Processed image">
+            </button>
+
+            <div>
+               <span class="eyebrow">PROCESSED IMAGE</span>
+               <h3>Edited result</h3>
+               <p>Click the image to compare it with the original.</p>
+               <a id="downloadBtn" class="btn btn-accent" href="#" download>Download image</a>
             </div>
          </div>
       </section>
@@ -215,8 +232,8 @@
                <small>Choose an enlargement level.</small>
 
                <select id="upscale">
-                  <option value="1">1×</option>
-                  <option value="2" selected>2×</option>
+                  <option value="1" selected>1×</option>
+                  <option value="2">2×</option>
                   <option value="3">3×</option>
                   <option value="4">4×</option>
                </select>
@@ -250,6 +267,35 @@
 
    </main>
 
+   <div id="modal" class="modal hidden">
+      <div class="modal-card">
+         <button id="closeModal" class="modal-close" aria-label="Close">×</button>
+         <span class="eyebrow large-eyebrow">BEFORE / AFTER</span>
+         <div class="modal-title-row">
+            <h2 id="modalTitle">Image Comparison</h2>
+            <span id="modalAiSign" class="modal-ai-sign hidden" title="AI edit" aria-label="AI edit">✦</span>
+         </div>
+         <div id="comparisonBox" class="comparison-box">
+            <img id="beforeLayer" class="before-layer comparison-image" src="assets/images/forest-path.png"
+               alt="Original image" draggable="false">
+            <div id="afterLayer" class="after-layer">
+               <img id="afterImage" class="comparison-image" src="assets/images/forest-path-after-ai.png"
+                  alt="After image" draggable="false">
+            </div>
+            <div id="compareLine" class="compare-line">
+               <span class="compare-handle" aria-hidden="true">
+                  <span class="handle-arrow">‹</span>
+                  <span class="handle-arrow">›</span>
+               </span>
+            </div>
+            <span class="compare-tag compare-before">Before</span>
+            <span class="compare-tag compare-after">After</span>
+         </div>
+         <p class="comparison-help">Drag across the image to compare the before and after result.</p>
+      </div>
+   </div>
+
+   <script src="assets/js/gallery.js"></script>
    <script src="assets/js/workspace.js"></script>
 
 </body>

@@ -4,7 +4,7 @@ import uuid
 from functools import wraps
 
 from dotenv import load_dotenv
-from flask import Flask, request, session
+from flask import Flask, request, send_file, session
 from PIL import Image
 
 from database.queries import get_user_by_username, register_user
@@ -177,6 +177,8 @@ def upload():
     # /api/process, since one Images row is meant to hold the original AND
     # the processed result together.
     session["uploaded_image_path"] = temp_path
+    session.pop("processed_image_path", None)
+    session.pop("processed_edit_mode", None)
 
     return {"message": "Image uploaded successfully"}, 200
 
@@ -224,6 +226,9 @@ def process_image():
     if not saved_record:
         return {"error": "Could not save the processed image. Please try again."}, 500
 
+    session["processed_image_path"] = processed_path
+    session["processed_edit_mode"] = edit_mode
+
     # Turn the S3 keys into full URLs the frontend can put in an <img> tag.
     result = {
         "originalUrl": get_full_s3_url(saved_record["OriginalFilePath"]),
@@ -232,6 +237,23 @@ def process_image():
     }
 
     return {"message": "Image processed successfully", "result": result}, 200
+
+
+@app.route("/api/download")
+@login_required
+def download_processed_image():
+    processed_path = session.get("processed_image_path")
+
+    if not processed_path or not os.path.exists(processed_path):
+        return {"error": "No processed image is available."}, 404
+
+    extension = "png" if session.get("processed_edit_mode") == "ai" else "jpg"
+
+    return send_file(
+        processed_path,
+        as_attachment=True,
+        download_name=f"neuropix-processed.{extension}",
+    )
 
 
 if __name__ == "__main__":

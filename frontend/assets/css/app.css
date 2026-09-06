@@ -775,6 +775,34 @@ textarea {
 .preview-area p {
 	color: var(--muted);
 }
+.processed-area {
+	margin-top: 22px;
+	padding-top: 22px;
+	border-top: 1px solid var(--line);
+	display: grid;
+	grid-template-columns: 220px 1fr;
+	gap: 20px;
+	align-items: center;
+}
+.preview-image-button {
+	padding: 0;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+}
+.processed-area img {
+	width: 220px;
+	max-height: 180px;
+	object-fit: contain;
+	border-radius: 12px;
+	background: #eee;
+}
+.preview-image-button:hover img {
+	opacity: 0.85;
+}
+.processed-area p {
+	color: var(--muted);
+}
 .mode-toggle {
 	position: relative;
 	display: grid;
@@ -992,6 +1020,10 @@ textarea {
 .comparison-box:active {
 	cursor: grabbing;
 }
+.comparison-box.single-image,
+.comparison-box.single-image:active {
+	cursor: default;
+}
 .comparison-image {
 	width: 100%;
 	height: 100%;
@@ -1152,6 +1184,9 @@ textarea {
 		display: none;
 	}
 	.preview-area {
+		grid-template-columns: 1fr;
+	}
+	.processed-area {
 		grid-template-columns: 1fr;
 	}
 	.app-main {
