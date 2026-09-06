@@ -10,6 +10,12 @@ const state = {
 function getElement(selector) {
 	return document.querySelector(selector);
 }
+function getProcessedFileName() {
+	const originalName = state.imageFile ? state.imageFile.name : "neuropix";
+	const originalStem = originalName.replace(/\.[^/.]+$/, "");
+	const extension = state.editMode === "ai" ? "png" : "jpg";
+	return originalStem + "-processed." + extension;
+}
 function showUploadError(title, message) {
   getElement("#uploadErrorTitle").textContent = title;
   getElement("#uploadErrorMessage").textContent = message;
@@ -79,13 +85,17 @@ function handleImage(file) {
 
   image.onload = async function () {
 
-    // Checks if the image resolution is larger than 1920 x 1080.
-    if (image.width > 1920 || image.height > 1080) {
+    // Checks the orientation-aware 1080p resolution limit.
+    const isLandscape = image.width >= image.height;
+    const maxWidth = isLandscape ? 1920 : 1080;
+    const maxHeight = isLandscape ? 1080 : 1920;
+
+    if (image.width > maxWidth || image.height > maxHeight) {
       URL.revokeObjectURL(imageUrl);
 
       showUploadError(
         "Image resolution is too large.",
-        "Maximum allowed resolution is 1920 × 1080 pixels."
+        "Maximum allowed resolution is 1920 × 1080 for landscape images or 1080 × 1920 for portrait images."
       );
 
       getElement("#status").textContent = "";
@@ -141,7 +151,7 @@ function setEditMode(mode) {
 	getElement("#aiBtn").classList.toggle("active", !standardMode);
 }
 
-// Collects Standard parameters for a future backend request.
+// Collects Standard parameters for the backend request.
 function getStandardSettings() {
 	return {
 		cropWidth: getElement("#cropWidth").value,
@@ -211,8 +221,7 @@ async function processImage() {
 		state.processedUrl = data.result.processedUrl;
 		getElement("#processedPreview").src = state.processedUrl;
 		getElement("#downloadBtn").href = "/api/download";
-		getElement("#downloadBtn").download =
-			"neuropix-processed." + (state.editMode === "ai" ? "png" : "jpg");
+		getElement("#downloadBtn").download = getProcessedFileName();
 		getElement("#processedArea").classList.remove("hidden");
 	}
 

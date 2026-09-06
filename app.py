@@ -150,7 +150,8 @@ def upload():
     if not file or not file.filename:
         return {"error": "No image file provided"}, 400
 
-    file_extension = os.path.splitext(file.filename)[1].lower()
+    original_filename = os.path.basename(file.filename)
+    file_extension = os.path.splitext(original_filename)[1].lower()
     if file_extension not in ALLOWED_UPLOAD_EXTENSIONS:
         return {
             "error": "Unsupported file format. Only JPG and PNG images are allowed."
@@ -168,7 +169,8 @@ def upload():
         }, 400
     file.seek(0)  # Image.open advanced the stream; rewind before saving the full file
 
-    temp_filename = f"{uuid.uuid4().hex}_{file.filename}"
+    original_stem = os.path.splitext(original_filename)[0]
+    temp_filename = f"{original_stem}-{uuid.uuid4().hex}{file_extension}"
     temp_path = os.path.join(UPLOAD_TEMP_DIR, temp_filename)
     file.save(temp_path)
 
@@ -177,6 +179,7 @@ def upload():
     # /api/process, since one Images row is meant to hold the original AND
     # the processed result together.
     session["uploaded_image_path"] = temp_path
+    session["uploaded_image_name"] = original_filename
     session.pop("processed_image_path", None)
     session.pop("processed_edit_mode", None)
 
@@ -197,17 +200,19 @@ def process_image():
         return {"error": "Unknown editing mode"}, 400
 
     settings = data.get("settings", {})
+    original_filename = session.get("uploaded_image_name", os.path.basename(raw_image_path))
+    original_stem = os.path.splitext(original_filename)[0]
 
     try:
         if edit_mode == "standard":
             original_image = Image.open(raw_image_path)
             edited_image = apply_standard_edits(original_image, settings)
-            processed_filename = f"{uuid.uuid4().hex}_processed.jpg"
+            processed_filename = f"{original_stem}-processed-{uuid.uuid4().hex}.jpg"
             processed_path = os.path.join(UPLOAD_TEMP_DIR, processed_filename)
             edited_image.save(processed_path, "JPEG")
         else:
             edited_bytes = apply_ai_edits(raw_image_path, settings)
-            processed_filename = f"{uuid.uuid4().hex}_processed.png"
+            processed_filename = f"{original_stem}-processed-{uuid.uuid4().hex}.png"
             processed_path = os.path.join(UPLOAD_TEMP_DIR, processed_filename)
             with open(processed_path, "wb") as processed_file:
                 processed_file.write(edited_bytes)
@@ -248,11 +253,13 @@ def download_processed_image():
         return {"error": "No processed image is available."}, 404
 
     extension = "png" if session.get("processed_edit_mode") == "ai" else "jpg"
+    original_filename = session.get("uploaded_image_name", "neuropix")
+    original_stem = os.path.splitext(os.path.basename(original_filename))[0]
 
     return send_file(
         processed_path,
         as_attachment=True,
-        download_name=f"neuropix-processed.{extension}",
+        download_name=f"{original_stem}-processed.{extension}",
     )
 
 
