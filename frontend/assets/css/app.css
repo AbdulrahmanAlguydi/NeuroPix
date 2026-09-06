@@ -61,12 +61,6 @@ button {
 	background: #fff;
 	color: var(--dark);
 }
-.small-logo {
-	width: 38px;
-	height: 38px;
-	border-radius: 11px;
-	font-size: 20px;
-}
 .public-nav {
 	position: sticky;
 	top: 0;
@@ -124,14 +118,6 @@ select:focus,
 textarea:focus {
 	outline: 2px solid var(--accent2);
 	outline-offset: 2px;
-}
-.btn-primary {
-	background: var(--dark);
-	border-color: var(--dark);
-	color: #fff;
-}
-.btn-secondary {
-	background: #fff;
 }
 .btn-accent {
 	color: #fff;
@@ -197,44 +183,6 @@ textarea:focus {
 	border-radius: 16px;
 	position: relative;
 	background: #d9dde5;
-}
-.scene {
-	position: absolute;
-	inset: 0;
-}
-.scene-before {
-	background: linear-gradient(180deg, #ccd1dd 0 55%, #98a1af 55%);
-}
-.scene-before::before,
-.scene-after::before {
-	content: "";
-	position: absolute;
-	left: 10%;
-	right: 10%;
-	bottom: 21%;
-	height: 42%;
-	clip-path: polygon(
-		0 100%,
-		24% 42%,
-		39% 68%,
-		56% 15%,
-		78% 61%,
-		100% 35%,
-		100% 100%
-	);
-}
-.scene-before::before {
-	background: #818996;
-	filter: grayscale(1);
-}
-.scene-after {
-	left: 50%;
-	background: linear-gradient(180deg, #9ed7ff 0 55%, #4e83ad 55%);
-}
-.scene-after::before {
-	left: -80%;
-	right: 20%;
-	background: linear-gradient(135deg, #315d49, #6da05f);
 }
 .before-tag,
 .after-tag,
@@ -392,26 +340,6 @@ textarea:focus {
 	background: linear-gradient(90deg, #d6d9e1 0 50%, #7c70eb 50%);
 	color: #fff;
 }
-.public-footer {
-	min-height: 92px;
-	padding: 20px 6%;
-	background: #fff;
-	border-top: 1px solid var(--line);
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-.footer-links {
-	display: flex;
-	align-items: center;
-	gap: 22px;
-	color: var(--muted);
-	font-size: 14px;
-}
-.footer-links a:hover {
-	color: var(--accent);
-}
-
 /* Login and register */
 .auth-body {
 	min-height: 100vh;
@@ -509,12 +437,6 @@ textarea {
 .responsibility-card strong {
 	font-size: 19px;
 }
-.team-note {
-	color: var(--muted);
-	font-size: 14px;
-	margin-top: 16px;
-}
-
 /* App sidebar */
 .app-body {
 	min-height: 100vh;
@@ -599,14 +521,6 @@ textarea {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
-}
-.side-about {
-	padding: 4px 15px;
-	color: #9fa6b4;
-	font-size: 13px;
-}
-.side-about:hover {
-	color: #fff;
 }
 .logout-link {
 	border: 1px solid #c54b4b;
@@ -1309,14 +1223,6 @@ textarea {
 	.comparison-box {
 		height: clamp(220px, 55vh, 420px);
 	}
-	.public-footer {
-		align-items: flex-start;
-		gap: 20px;
-		flex-direction: column;
-	}
-	.footer-links {
-		flex-wrap: wrap;
-	}
 }
 
 /* Homepage logo comparison */
@@ -1340,14 +1246,6 @@ textarea {
 	box-shadow: 0 14px 30px rgba(50, 43, 120, 0.2);
 	z-index: 2;
 }
-.hero-divider {
-	z-index: 4;
-}
-.before-tag,
-.after-tag {
-	z-index: 5;
-}
-
 /* Website footer */
 .site-footer {
 	background: #171a21;
@@ -1414,20 +1312,6 @@ textarea {
 	}
 }
 
-/* Small AI symbol used for AI gallery examples */
-.ai-sign {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 26px;
-	height: 26px;
-	border: 1px solid var(--accent);
-	border-radius: 8px;
-	color: var(--accent);
-	background: #fff;
-	font-size: 16px;
-}
-
 .modal-title-row {
 	display: flex;
 	align-items: center;
@@ -1455,7 +1339,6 @@ textarea {
 	display: none;
 }
 
-/* Before and After use the same label style */
 .compare-before,
 .compare-after {
 	background: #fff;
@@ -1463,12 +1346,11 @@ textarea {
 }
 
 .responsibility-card .member-name {
-  margin: 7px 0 10px;
-  color: #6c5cff;
-  font-weight: 600;
+	margin: 7px 0 10px;
+	color: #6c5cff;
+	font-weight: 600;
 }
 
-/* AI icon on AI edited gallery image */
 .gallery-ai-icon {
 	position: absolute;
 	top: 12px;
@@ -1487,22 +1369,21 @@ textarea {
 	line-height: 1;
 	padding-top: 2px;
 }
-/* Upload validation message */
 .upload-error {
-  margin-top: 12px;
-  padding: 14px 16px;
-  border: 1px solid #d94b4b;
-  border-radius: 10px;
-  background: #fff3f3;
-  color: #9f2525;
+	margin-top: 12px;
+	padding: 14px 16px;
+	border: 1px solid #d94b4b;
+	border-radius: 10px;
+	background: #fff3f3;
+	color: #9f2525;
 }
 
 .upload-error strong {
-  display: block;
-  margin-bottom: 4px;
+	display: block;
+	margin-bottom: 4px;
 }
 
 .upload-error p {
-  margin: 0;
-  color: #6f2b2b;
+	margin: 0;
+	color: #6f2b2b;
 }

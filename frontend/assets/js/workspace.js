@@ -1,4 +1,4 @@
-// Stores the selected image and current editing mode.
+// Keep the current image and processing mode in one small state object.
 const state = {
 	imageFile: null,
 	originalUrl: "",
@@ -6,152 +6,143 @@ const state = {
 	editMode: "standard",
 };
 
-// Finds an element on the page using a CSS selector.
 function getElement(selector) {
 	return document.querySelector(selector);
 }
+
 function getProcessedFileName() {
-	const originalName = state.imageFile ? state.imageFile.name : "neuropix";
-	const originalStem = originalName.replace(/\.[^/.]+$/, "");
-	const extension = state.editMode === "ai" ? "png" : "jpg";
-	return originalStem + "-processed." + extension;
+	let name = "neuropix";
+	if (state.imageFile) {
+		name = state.imageFile.name;
+	}
+
+	const stem = name.replace(/\.[^/.]+$/, "");
+	let extension = "jpg";
+	if (state.editMode === "ai") {
+		extension = "png";
+	}
+
+	return stem + "-processed." + extension;
 }
+
 function showUploadError(title, message) {
-  getElement("#uploadErrorTitle").textContent = title;
-  getElement("#uploadErrorMessage").textContent = message;
-  getElement("#uploadError").classList.remove("hidden");
+	getElement("#uploadErrorTitle").textContent = title;
+	getElement("#uploadErrorMessage").textContent = message;
+	getElement("#uploadError").classList.remove("hidden");
+	getElement("#status").textContent = "";
 }
 
 function clearUploadError() {
-  getElement("#uploadError").classList.add("hidden");
+	getElement("#uploadError").classList.add("hidden");
 }
 
-// Sends the image file to the backend so it can be staged for processing.
+function requireLogin() {
+	alert("Please log in first.");
+	window.location.href = "login.html";
+}
+
 async function uploadToBackend(file) {
-  const formData = new FormData();
-  formData.append("image", file);
+	const formData = new FormData();
+	formData.append("image", file);
 
-  const response = await fetch("/api/upload", {
-    method: "POST",
-    body: formData,
-  });
+	const response = await fetch("/api/upload", {
+		method: "POST",
+		body: formData,
+	});
+	const data = await response.json();
 
-  const data = await response.json();
+	if (response.ok) {
+		return true;
+	}
+	if (response.status === 401) {
+		requireLogin();
+		return false;
+	}
 
-  if (response.ok) {
-    return true;
-  }
-
-  if (response.status === 401) {
-    alert("Please log in first.");
-    window.location.href = "login.html";
-    return false;
-  }
-
-  showUploadError("Upload failed.", data.error || "Please try again.");
-  return false;
+	let message = data.error;
+	if (!message) {
+		message = "Please try again.";
+	}
+	showUploadError("Upload failed.", message);
+	return false;
 }
 
-// Validates and displays the selected image.
 function handleImage(file) {
-  if (!file) return;
+	if (!file) {
+		return;
+	}
 
-  clearUploadError();
+	clearUploadError();
 
-  // Checks if the file is JPG or PNG.
-  if (file.type !== "image/jpeg" && file.type !== "image/png") {
-    showUploadError(
-      "File type is not supported.",
-      "Only JPG and PNG images are allowed."
-    );
+	if (file.type !== "image/jpeg" && file.type !== "image/png") {
+		showUploadError("File type is not supported.", "Only JPG and PNG images are allowed.");
+		return;
+	}
 
-    getElement("#status").textContent = "";
-    return;
-  }
+	if (file.size > 5 * 1024 * 1024) {
+		showUploadError("File is too large.", "Maximum file size is 5 MB.");
+		return;
+	}
 
-  // Checks if the file is larger than 5 MB.
-  if (file.size > 5 * 1024 * 1024) {
-    showUploadError(
-      "File is too large.",
-      "Maximum file size is 5 MB."
-    );
+	const imageUrl = URL.createObjectURL(file);
+	const image = new Image();
 
-    getElement("#status").textContent = "";
-    return;
-  }
+	image.onload = async function () {
+		let maxWidth = 1920;
+		let maxHeight = 1080;
+		if (image.width < image.height) {
+			maxWidth = 1080;
+			maxHeight = 1920;
+		}
 
-  const imageUrl = URL.createObjectURL(file);
-  const image = new Image();
+		if (image.width > maxWidth || image.height > maxHeight) {
+			URL.revokeObjectURL(imageUrl);
+			showUploadError(
+				"Image resolution is too large.",
+				"Maximum allowed resolution is 1920 × 1080 for landscape images or 1080 × 1920 for portrait images."
+			);
+			return;
+		}
 
-  image.onload = async function () {
+		if (state.originalUrl) {
+			URL.revokeObjectURL(state.originalUrl);
+		}
 
-    // Checks the orientation-aware 1080p resolution limit.
-    const isLandscape = image.width >= image.height;
-    const maxWidth = isLandscape ? 1920 : 1080;
-    const maxHeight = isLandscape ? 1080 : 1920;
+		state.imageFile = file;
+		state.originalUrl = imageUrl;
+		state.processedUrl = "";
+		getElement("#originalPreview").src = imageUrl;
+		getElement("#processedPreview").removeAttribute("src");
+		getElement("#downloadBtn").removeAttribute("href");
+		getElement("#processedArea").classList.add("hidden");
+		getElement("#fileName").textContent = file.name;
+		getElement("#imageInfo").textContent = image.width + " x " + image.height;
+		getElement("#uploadZone").classList.add("hidden");
+		getElement("#previewArea").classList.remove("hidden");
 
-    if (image.width > maxWidth || image.height > maxHeight) {
-      URL.revokeObjectURL(imageUrl);
+		getElement("#status").textContent = "Uploading...";
+		const uploaded = await uploadToBackend(file);
+		if (uploaded) {
+			getElement("#status").textContent = "Image ready.";
+		} else {
+			getElement("#status").textContent = "";
+		}
+	};
 
-      showUploadError(
-        "Image resolution is too large.",
-        "Maximum allowed resolution is 1920 × 1080 for landscape images or 1080 × 1920 for portrait images."
-      );
-
-      getElement("#status").textContent = "";
-      return;
-    }
-
-    // Removes the old image URL if another image was selected before.
-    if (state.originalUrl) {
-      URL.revokeObjectURL(state.originalUrl);
-    }
-
-    state.imageFile = file;
-    state.originalUrl = imageUrl;
-	state.processedUrl = "";
-
-	// Displays information about the selected image.
-	getElement("#originalPreview").src = imageUrl;
-	getElement("#processedPreview").removeAttribute("src");
-	getElement("#downloadBtn").removeAttribute("href");
-	getElement("#processedArea").classList.add("hidden");
-    getElement("#fileName").textContent = file.name;
-    getElement("#imageInfo").textContent =
-      image.width + " x " + image.height;
-
-    // Hides the upload box and shows the image preview.
-    getElement("#uploadZone").classList.add("hidden");
-    getElement("#previewArea").classList.remove("hidden");
-
-    clearUploadError();
-    getElement("#status").textContent = "Uploading...";
-
-    // Send the file to the backend so it's ready to be processed.
-    const uploaded = await uploadToBackend(file);
-    getElement("#status").textContent = uploaded ? "Image ready." : "";
-  };
-
-  image.src = imageUrl;
+	image.src = imageUrl;
 }
-// Switches between Standard and AI controls.
+
 function setEditMode(mode) {
 	state.editMode = mode;
+	const standard = mode === "standard";
 
-	const standardMode = mode === "standard";
-
-	getElement(".mode-toggle").classList.toggle("ai-selected", !standardMode);
-
-	getElement("#standardControls").classList.toggle("hidden", !standardMode);
-
-	getElement("#aiControls").classList.toggle("hidden", standardMode);
-
-	getElement("#standardBtn").classList.toggle("active", standardMode);
-
-	getElement("#aiBtn").classList.toggle("active", !standardMode);
+	getElement(".mode-toggle").classList.toggle("ai-selected", !standard);
+	getElement("#standardControls").classList.toggle("hidden", !standard);
+	getElement("#aiControls").classList.toggle("hidden", standard);
+	getElement("#standardBtn").classList.toggle("active", standard);
+	getElement("#aiBtn").classList.toggle("active", !standard);
 }
 
-// Collects Standard parameters for the backend request.
 function getStandardSettings() {
 	return {
 		cropWidth: getElement("#cropWidth").value,
@@ -167,20 +158,15 @@ function getStandardSettings() {
 	};
 }
 
-// Collects AI parameters for the backend request.
 function getAiSettings() {
 	return {
 		generativeModification: getElement("#generatePrompt").value.trim(),
-
 		backgroundManipulation: getElement("#backgroundPrompt").value.trim(),
-
 		enhancement: getElement("#enhancePrompt").value.trim(),
-
 		upscaling: getElement("#upscale").value,
 	};
 }
 
-// Sends the current settings to the backend and applies them to the image.
 async function processImage() {
 	if (!state.imageFile) {
 		getElement("#status").textContent = "Choose an image first.";
@@ -188,13 +174,11 @@ async function processImage() {
 	}
 
 	let settings;
-
 	if (state.editMode === "standard") {
 		settings = getStandardSettings();
 	} else {
 		settings = getAiSettings();
 	}
-
 	getElement("#status").textContent = "Processing...";
 
 	const response = await fetch("/api/process", {
@@ -202,21 +186,21 @@ async function processImage() {
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ editMode: state.editMode, settings: settings }),
 	});
-
 	const data = await response.json();
 
 	if (!response.ok) {
 		if (response.status === 401) {
-			alert("Please log in first.");
-			window.location.href = "login.html";
+			requireLogin();
 			return;
 		}
-
-		getElement("#status").textContent = data.error || "Processing failed.";
+		let message = data.error;
+		if (!message) {
+			message = "Processing failed.";
+		}
+		getElement("#status").textContent = message;
 		return;
 	}
 
-	// Show the processed image separately from the original preview.
 	if (data.result && data.result.processedUrl) {
 		state.processedUrl = data.result.processedUrl;
 		getElement("#processedPreview").src = state.processedUrl;
@@ -228,7 +212,6 @@ async function processImage() {
 	getElement("#status").textContent = "Image processed successfully!";
 }
 
-// Shows the current value beside a slider.
 function connectRange(inputId, valueId, suffix) {
 	const input = getElement(inputId);
 	const output = getElement(valueId);
@@ -241,75 +224,64 @@ function connectRange(inputId, valueId, suffix) {
 	updateValue();
 }
 
-// Gets the main upload elements.
 const uploadZone = getElement("#uploadZone");
 const fileInput = getElement("#fileInput");
 
-// Opens the file picker when Choose Image is clicked.
 getElement("#chooseFileBtn").addEventListener("click", function () {
 	fileInput.click();
 });
 
-// Opens the file picker when Replace Image is clicked.
 getElement("#replaceBtn").addEventListener("click", function () {
 	fileInput.click();
 });
 
-// Handles an image selected from the file picker.
 fileInput.addEventListener("change", function (event) {
 	handleImage(event.target.files[0]);
 });
 
-// Allows an image to be dragged over the upload area.
 uploadZone.addEventListener("dragover", function (event) {
 	event.preventDefault();
 	uploadZone.classList.add("dragging");
 });
 
-// Removes the drag effect when the image leaves the area.
 uploadZone.addEventListener("dragleave", function () {
 	uploadZone.classList.remove("dragging");
 });
 
-// Handles an image dropped into the upload area.
 uploadZone.addEventListener("drop", function (event) {
 	event.preventDefault();
-
 	uploadZone.classList.remove("dragging");
 	handleImage(event.dataTransfer.files[0]);
 });
 
-// Switches to Standard editing mode.
 getElement("#standardBtn").addEventListener("click", function () {
 	setEditMode("standard");
 });
 
-// Switches to AI editing mode.
 getElement("#aiBtn").addEventListener("click", function () {
 	setEditMode("ai");
 });
 
-// Prepares the selected settings for processing.
 getElement("#processBtn").addEventListener("click", processImage);
 
-// Opens the original image, with a comparison slider when a result exists.
 function showImageComparison() {
 	if (!state.originalUrl) {
 		return;
 	}
 
-	openComparison(
-		state.processedUrl ? "Image comparison" : "Selected image",
-		state.originalUrl,
-		state.processedUrl,
-		state.processedUrl ? state.editMode : ""
-	);
+	let title = "Selected image";
+	let editType = "";
+	if (state.processedUrl) {
+		title = "Image comparison";
+		editType = state.editMode;
+	}
+
+	openComparison(title, state.originalUrl, state.processedUrl, editType);
 }
 
 getElement("#originalPreviewButton").addEventListener("click", showImageComparison);
 getElement("#processedPreviewButton").addEventListener("click", showImageComparison);
 
-// Starts the download and opens the processed image in a new tab.
 getElement("#downloadBtn").addEventListener("click", function (event) {
 	if (!state.processedUrl) {
 		event.preventDefault();
@@ -327,7 +299,6 @@ getElement("#downloadBtn").addEventListener("click", function (event) {
 	downloadLink.remove();
 });
 
-// Connects each slider to the value shown beside it.
 connectRange("#cropWidth", "#cropWidthValue", "%");
 connectRange("#cropHeight", "#cropHeightValue", "%");
 connectRange("#brightness", "#brightnessValue", "%");
