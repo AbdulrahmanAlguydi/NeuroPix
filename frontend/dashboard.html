@@ -16,6 +16,11 @@
          <span class="brand-name">NeuroPix</span>
       </a>
 
+      <div class="sidebar-user">
+         <span class="sidebar-user-label">SIGNED IN AS</span>
+         <strong id="sidebarUsername">Loading...</strong>
+      </div>
+
       <nav class="side-nav">
          <a class="active" href="dashboard.html">
             <span>⌂</span>
@@ -73,7 +78,7 @@
             <span>✎</span>
             <div>
                <small>Standard Edits</small>
-               <strong>Available</strong>
+               <strong id="standardEditCount">0</strong>
             </div>
          </article>
 
@@ -81,7 +86,7 @@
             <span>✦</span>
             <div>
                <small>AI Edits</small>
-               <strong>Available</strong>
+               <strong id="aiEditCount">0</strong>
             </div>
          </article>
       </section>
@@ -112,12 +117,9 @@
 
          <article class="panel dashboard-panel">
             <span class="eyebrow">RECENT ACTIVITY</span>
-            <h2>No activity yet</h2>
-
-            <p>
-               When backend integration is complete, your latest processed
-               images can appear here for quick access.
-            </p>
+            <h2 id="recentActivityTitle">No activity yet</h2>
+            <p id="recentActivityMessage">Your latest processed images will appear here.</p>
+            <div id="recentActivityList" class="recent-activity-list"></div>
 
             <a class="text-link" href="gallery.html">
                Open Gallery →
@@ -127,6 +129,9 @@
       </section>
 
    </main>
+
+   <script src="assets/js/sidebar.js"></script>
+   <script src="assets/js/dashboard.js"></script>
 
 </body>
 

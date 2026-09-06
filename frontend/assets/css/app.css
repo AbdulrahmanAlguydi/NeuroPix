@@ -533,8 +533,30 @@ textarea {
 	flex-direction: column;
 }
 .side-brand {
-	margin: 0 8px 30px;
+	margin: 0 8px 20px;
 	font-size: 21px;
+}
+.sidebar-user {
+	margin: 0 8px 20px;
+	padding: 10px 12px;
+	border-radius: 10px;
+	background: #292d36;
+	color: #fff;
+	overflow: hidden;
+}
+.sidebar-user-label {
+	display: block;
+	color: #9fa6b4;
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+}
+.sidebar-user strong {
+	display: block;
+	margin-top: 4px;
+	font-size: 18px;
+	line-height: 1.3;
+	overflow-wrap: anywhere;
 }
 .side-nav {
 	display: flex;
@@ -581,7 +603,15 @@ textarea {
 	color: #fff;
 }
 .logout-link {
-	border: 1px solid #363b46;
+	border: 1px solid #c54b4b;
+	background: transparent;
+	color: #c54b4b;
+	transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.logout-link:hover {
+	border-color: #c54b4b;
+	background: #c54b4b;
+	color: #fff;
 }
 .app-main {
 	padding: 26px 4% 70px;
@@ -690,6 +720,37 @@ textarea {
 }
 .workflow-steps p {
 	margin: 0;
+}
+.recent-activity-list {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 10px;
+	margin: 16px 0;
+}
+.recent-activity-item {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 6px;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	transition: 0.2s;
+}
+.recent-activity-item:hover {
+	border-color: var(--accent);
+	background: var(--soft);
+}
+.recent-activity-item img {
+	width: 100%;
+	height: 105px;
+	border-radius: 7px;
+	object-fit: cover;
+}
+.recent-activity-item small {
+	display: block;
+}
+.recent-activity-meta {
+	justify-content: center;
 }
 
 /* Workspace */
@@ -931,13 +992,7 @@ textarea {
 	gap: 20px;
 	margin-top: 25px;
 }
-.gallery-grid-two {
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	max-width: 1050px;
-}
 .gallery-card {
-	padding: 0;
-	text-align: left;
 	background: #fff;
 	border: 1px solid var(--line);
 	border-radius: 16px;
@@ -948,11 +1003,25 @@ textarea {
 	transform: translateY(-3px);
 	box-shadow: 0 10px 25px rgba(20, 24, 35, 0.1);
 }
+.gallery-card-preview {
+	display: block;
+	width: 100%;
+	padding: 0;
+	text-align: left;
+	background: #fff;
+	border: 0;
+}
+.gallery-card-preview:focus-visible,
+.gallery-delete:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: -2px;
+}
 .gallery-thumb {
 	height: 260px;
 	position: relative;
 	overflow: hidden;
 	background: #e9ebf0;
+	border-bottom: 2px solid var(--accent);
 }
 .gallery-thumb img {
 	width: 100%;
@@ -963,10 +1032,23 @@ textarea {
 .gallery-info {
 	padding: 16px;
 }
-.gallery-info > div {
+.gallery-title {
+	display: block;
+	line-height: 1.3;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.gallery-info-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: 10px;
+}
+.gallery-chips {
 	display: flex;
 	gap: 7px;
-	margin-top: 10px;
 	flex-wrap: wrap;
 }
 .chip {
@@ -980,6 +1062,30 @@ textarea {
 	background: var(--soft);
 	color: var(--accent);
 }
+.gallery-delete {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	padding: 0;
+	border: 1px solid #c54b4b;
+	border-radius: 10px;
+	background: #fff;
+	color: #c54b4b;
+	white-space: nowrap;
+	transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.gallery-delete:hover {
+	border-color: #c54b4b;
+	background: #c54b4b;
+	color: #fff;
+}
+.trash-icon {
+	display: block;
+	width: 16px;
+	height: 16px;
+}
 
 /* Before and after modal */
 .modal {
@@ -992,11 +1098,13 @@ textarea {
 	background: rgba(12, 15, 22, 0.72);
 }
 .modal-card {
-	width: min(900px, 95%);
+	width: min(1200px, 95vw);
+	max-height: calc(100vh - 40px);
 	padding: 25px;
 	background: #fff;
 	border-radius: 20px;
 	position: relative;
+	overflow-y: auto;
 }
 .modal-close {
 	position: absolute;
@@ -1007,7 +1115,7 @@ textarea {
 	font-size: 30px;
 }
 .comparison-box {
-	height: 500px;
+	height: clamp(300px, 65vh, 720px);
 	position: relative;
 	overflow: hidden;
 	border-radius: 14px;
@@ -1193,10 +1301,7 @@ textarea {
 		padding: 20px;
 	}
 	.comparison-box {
-		height: 300px;
-	}
-	.gallery-grid-two {
-		grid-template-columns: 1fr;
+		height: clamp(220px, 55vh, 420px);
 	}
 	.public-footer {
 		align-items: flex-start;

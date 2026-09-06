@@ -1,3 +1,5 @@
+import os
+
 from utils.s3 import upload_original_image, upload_processed_image, delete_s3_object, get_full_s3_url
 from database.queries import log_image_edit, delete_image_record, get_user_gallery
 
@@ -83,8 +85,26 @@ def fetch_formatted_user_gallery(user_id):
 
     formatted_gallery = []
     for record in raw_records:
+        original_filename = os.path.basename(record["OriginalFilePath"])
+        filename_stem, filename_extension = os.path.splitext(original_filename)
+        filename_parts = filename_stem.rsplit("-", 1)
+        uuid_suffix = filename_parts[1] if len(filename_parts) == 2 else ""
+
+        if len(uuid_suffix) == 32 and all(
+            character in "0123456789abcdef" for character in uuid_suffix.lower()
+        ):
+            original_filename = filename_parts[0] + filename_extension
+        else:
+            filename_parts = original_filename.split("_", 1)
+            uuid_prefix = filename_parts[0] if len(filename_parts) == 2 else ""
+            if len(uuid_prefix) == 32 and all(
+                character in "0123456789abcdef" for character in uuid_prefix.lower()
+            ):
+                original_filename = filename_parts[1]
+
         formatted_gallery.append({
             "image_id": record["ImageID"],
+            "file_name": original_filename,
             "edit_type": record["EditType"],
             "upload_date": record["UploadDate"],
             "original_url": get_full_s3_url(record["OriginalFilePath"]),

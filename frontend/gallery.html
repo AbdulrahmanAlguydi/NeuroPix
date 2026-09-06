@@ -12,6 +12,10 @@
    <aside class="sidebar">
       <a class="brand side-brand" href="dashboard.html"><span class="logo-mark">N</span><span
             class="brand-name">NeuroPix</span></a>
+      <div class="sidebar-user">
+         <span class="sidebar-user-label">SIGNED IN AS</span>
+         <strong id="sidebarUsername">Loading...</strong>
+      </div>
       <nav class="side-nav">
          <a href="dashboard.html"><span>⌂</span>Dashboard</a>
          <a href="workspace.html"><span>▣</span>Studio</a>
@@ -30,29 +34,9 @@
          </div>
          <a class="btn btn-accent" href="workspace.html">New Image</a>
       </header>
-      <p class="page-note">Edited images and metadata will be loaded from the backend/database when connected.</p>
+      <p id="galleryStatus" class="page-note" aria-live="polite">Loading gallery...</p>
 
-      <section class="gallery-grid gallery-grid-two">
-         <button class="gallery-card" data-title="Forest Path" data-type="ai"
-            data-before="assets/images/forest-path.png" data-after="assets/images/forest-path-after-ai.png">
-            <div class="gallery-thumb">
-               <img src="assets/images/forest-path.png" alt="Forest Path">
-               <span class="gallery-ai-icon" title="AI edited" aria-label="AI edited">✦</span>
-            </div>
-            <div class="gallery-info">
-               <strong>Forest Path</strong>
-               <div><span class="chip ai-chip">AI Edited</span><span class="chip">Example Date</span></div>
-            </div>
-         </button>
-
-         <button class="gallery-card" data-title="City Lights" data-type="standard"
-            data-before="assets/images/city-lights.png" data-after="assets/images/city-lights-after-standard.png">
-            <div class="gallery-thumb"><img src="assets/images/city-lights.png" alt="City Lights"></div>
-            <div class="gallery-info">
-               <strong>City Lights</strong>
-               <div><span class="chip">Standard Edit</span><span class="chip">Example Date</span></div>
-            </div>
-         </button>
+      <section id="galleryGrid" class="gallery-grid">
       </section>
    </main>
 
@@ -80,6 +64,7 @@
       </div>
    </div>
    <script src="assets/js/gallery.js"></script>
+   <script src="assets/js/sidebar.js"></script>
 </body>
 
 </html>
