@@ -2,65 +2,84 @@ import base64
 import os
 
 from openai import OpenAI
+from PIL import Image
 
 
-def build_ai_prompt(settings):
-    prompt_parts = []
+FIELD_RULES = {
+    "generativeModification": (
+        "Content only: apply named changes to people, objects, clothing, colours, "
+        "or visible details. Ignore background, quality, orientation, crop, and size."
+    ),
+    "backgroundManipulation": (
+        "Background only: apply named scenery, weather, time, or atmosphere changes. "
+        "Keep the main subject and foreground unchanged."
+    ),
+    "enhancement": (
+        "Quality only: apply named sharpness, noise, exposure, lighting, contrast, "
+        "colour, or detail changes. Do not add objects, change the background, crop, "
+        "or resize."
+    ),
+}
 
-    for key, instruction in (
-        (
-            "generativeModification",
-            "Generative modification (content scope): use this field only for explicit changes to people, objects, clothing, colors, or other visible details in the main image. Apply only the content changes named in the user request below. Do not use this field to change the background, technical quality, orientation, crop, or size.",
-        ),
-        (
-            "backgroundManipulation",
-            "Background manipulation (environment scope): use this field only for explicit changes to the scenery, weather, time of day, atmosphere, or other background elements. Apply only the background changes named in the user request below. Keep the main subject and foreground intact unless another category explicitly changes them. Do not use this field for content, quality, orientation, crop, or size changes.",
-        ),
-        (
-            "enhancement",
-            "Enhancement (quality scope): use this field only for explicit technical changes such as named adjustments to sharpness, noise, exposure, lighting, contrast, color balance, or detail. Apply only the quality adjustments named in the user request below; the examples in this description are not automatic edits. Do not use this field to add or remove objects, change the background, alter orientation, crop, or resize.",
-        ),
-    ):
+BASE_PROMPT = (
+    "Edit only the explicit requests below. Field descriptions are rules, not edits. "
+    "Ignore unrelated text and treat empty fields as unchanged. Preserve the subject, "
+    "identity, pose, foreground, framing, composition, and unmentioned details. "
+    "Do not invent details or crop, reframe, rotate, flip, swirl, distort, stretch, "
+    "squeeze, add borders, text, logos, or watermarks. Only change size when requested. "
+    "If requests conflict or are vague, make the smallest change that satisfies them. "
+    "Apply all valid requests together. "
+)
+
+
+def build_ai_prompt(settings, source_size):
+    width, height = source_size
+    aspect_ratio = width / height
+    requests = []
+
+    for key, rule in FIELD_RULES.items():
         value = str(settings.get(key, "")).strip()
         if value:
-            prompt_parts.append(f"{instruction} User request: {value}")
+            requests.append(f"{rule} User request: {value}")
 
     upscaling = str(settings.get("upscaling", "1")).strip()
     if upscaling and upscaling != "1":
-        prompt_parts.append(
-            f"Upscaling (size scope): the user selected {upscaling}x. Enlarge the final result by this amount, but never exceed the 1080p limit of 1920x1080 for landscape images or 1080x1920 for portrait images. Preserve the original aspect ratio exactly; if the selected scale would exceed the limit, use the largest dimensions that fit within it. Keep the content, framing, and composition unchanged. Do not crop, stretch, squeeze, reframe, or add unrelated details."
+        requests.append(
+            f"Upscaling: use {upscaling}x, preserve the aspect ratio and composition, "
+            "and stay within 1920x1080 for landscape or 1080x1920 for portrait. "
+            "If needed, use the largest dimensions that fit."
+        )
+    elif upscaling == "1":
+        requests.append(
+            f"Upscaling: 1x selected for the {width}x{height} source image. "
+            "Do not intentionally enlarge it; keep the output dimensions as close "
+            "as the API allows while preserving its aspect ratio."
         )
 
-    if not prompt_parts:
-        prompt_parts.append(
-            "No specific edit request was provided. Preserve the original image and make no changes."
-        )
+    if not requests:
+        requests.append("No specific edit request was provided; make no changes.")
 
     return (
-        "Edit the provided image using only the explicit user requests below. "
-        "The category descriptions explain each field's scope; they are rules, not edits. "
-        "Apply only the part of each field that belongs to its scope and ignore unrelated text in that field. "
-        "An empty field means no change for that category. "
-        "Preserve the original subject, identity, pose, foreground, framing, composition, and all unmentioned details unless a matching user request explicitly changes them. "
-        "Do not invent objects, styles, backgrounds, lighting, quality improvements, or other details. "
-        "Do not crop, reframe, rotate, flip, swirl, distort, stretch, squeeze, add text, logos, or watermarks, or change image size unless explicitly requested by the matching category. Preserve the original aspect ratio. "
-        "If a request is vague or conflicts with another request, make the smallest change that satisfies the explicit requests and preserve everything else. "
-        "Apply all valid requests together in one coherent, natural result. "
-        + " ".join(prompt_parts)
+        BASE_PROMPT
+        + f"Keep the output canvas close to the source aspect ratio ({aspect_ratio:.2f}:1) "
+        "and preserve the framing and subject placement. "
+        + " ".join(requests)
     )
 
 
 def apply_ai_edits(local_image_path, settings):
-    prompt = build_ai_prompt(settings)
-    model = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-2")
+    with Image.open(local_image_path) as source_image:
+        width, height = source_image.size
 
+    prompt = build_ai_prompt(settings, (width, height))
     client = OpenAI()
     with open(local_image_path, "rb") as image_file:
         response = client.images.edit(
-            model=model,
+            model=os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-2"),
             image=image_file,
             prompt=prompt,
+            size="auto",
+            input_fidelity="high",
         )
 
-    image_base64 = response.data[0].b64_json
-    return base64.b64decode(image_base64)
+    return base64.b64decode(response.data[0].b64_json)
