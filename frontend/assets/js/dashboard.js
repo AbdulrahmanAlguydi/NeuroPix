@@ -99,6 +99,7 @@ function renderDashboard(images) {
 }
 
 async function loadDashboard() {
+	// Render cached data first so navigation does not show an empty dashboard.
 	const cachedValue = localStorage.getItem(GALLERY_CACHE_KEY);
 	let cachedGallery = null;
 	if (cachedValue) {
@@ -110,6 +111,7 @@ async function loadDashboard() {
 	}
 
 	try {
+		// The API request refreshes the cache with the account's current gallery.
 		const response = await fetch("/api/gallery");
 		if (response.status === 401) {
 			localStorage.removeItem(GALLERY_CACHE_KEY);

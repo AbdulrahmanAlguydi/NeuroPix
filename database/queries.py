@@ -5,6 +5,7 @@ from database.database import get_db_connection
 
 def register_user(username, password_hash):
     """Insert a new user."""
+    # The %s values keep user input separate from the SQL statement.
     query = """
         INSERT INTO Users (Username, PasswordHash) 
         VALUES (%s, %s);
@@ -49,6 +50,7 @@ def get_user_by_username(username):
 
 def log_image_edit(user_id, original_path, modified_path, edit_type):
     """Record an original/processed image pair."""
+    # One row links both S3 objects to the user who created the edit.
     query = """
         INSERT INTO Images (UserID, OriginalFilePath, ModifiedFilePath, EditType) 
         VALUES (%s, %s, %s, %s);
@@ -71,6 +73,7 @@ def log_image_edit(user_id, original_path, modified_path, edit_type):
 
 def get_user_gallery(user_id):
     """Return a user's images, newest first."""
+    # Filtering by UserID keeps one user's gallery separate from another user's.
     query = """
         SELECT ImageID, OriginalFilePath, ModifiedFilePath, EditType, UploadDate 
         FROM Images 
@@ -92,8 +95,31 @@ def get_user_gallery(user_id):
         connection.close()
 
 
+def get_gallery_image(image_id, user_id):
+    """Return one gallery image owned by the user."""
+    query = """
+        SELECT OriginalFilePath
+        FROM Images
+        WHERE ImageID = %s AND UserID = %s;
+    """
+    connection = get_db_connection()
+    if not connection:
+        return None
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute(query, (image_id, user_id))
+        return cursor.fetchone()
+    except Error as err:
+        print(f"Database Error during gallery image fetch: {err}")
+        return None
+    finally:
+        cursor.close()
+        connection.close()
+
+
 def delete_image_record(image_id, user_id):
     """Delete an owned image and return its S3 paths."""
+    # Fetch the paths first so the service can remove the matching S3 objects.
     conn = get_db_connection()
     if not conn:
         return None

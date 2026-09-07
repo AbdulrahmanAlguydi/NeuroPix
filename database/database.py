@@ -9,6 +9,7 @@ load_dotenv()
 
 def get_db_connection():
     """Return a MySQL connection, or None if the connection fails."""
+    # Connection details are kept in .env so they are not hard-coded in the app.
     try:
         connection = mysql.connector.connect(
             host=os.getenv("DB_HOST"),

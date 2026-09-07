@@ -11,6 +11,7 @@ function getElement(selector) {
 }
 
 function getProcessedFileName() {
+	// The browser download name follows the original name and selected edit mode.
 	let name = "neuropix";
 	if (state.imageFile) {
 		name = state.imageFile.name;
@@ -36,12 +37,31 @@ function clearUploadError() {
 	getElement("#uploadError").classList.add("hidden");
 }
 
+function showImagePreview(imageFile, imageUrl, width, height) {
+	if (state.originalUrl && state.originalUrl.startsWith("blob:")) {
+		URL.revokeObjectURL(state.originalUrl);
+	}
+
+	state.imageFile = imageFile;
+	state.originalUrl = imageUrl;
+	state.processedUrl = "";
+	getElement("#originalPreview").src = imageUrl;
+	getElement("#processedPreview").removeAttribute("src");
+	getElement("#downloadBtn").removeAttribute("href");
+	getElement("#processedArea").classList.add("hidden");
+	getElement("#fileName").textContent = imageFile.name;
+	getElement("#imageInfo").textContent = width + " x " + height;
+	getElement("#uploadZone").classList.add("hidden");
+	getElement("#previewArea").classList.remove("hidden");
+}
+
 function requireLogin() {
 	alert("Please log in first.");
 	window.location.href = "login.html";
 }
 
 async function uploadToBackend(file) {
+	// Uploading only stores the temporary source; processing creates the gallery row.
 	const formData = new FormData();
 	formData.append("image", file);
 
@@ -104,21 +124,8 @@ function handleImage(file) {
 			return;
 		}
 
-		if (state.originalUrl) {
-			URL.revokeObjectURL(state.originalUrl);
-		}
-
-		state.imageFile = file;
-		state.originalUrl = imageUrl;
-		state.processedUrl = "";
-		getElement("#originalPreview").src = imageUrl;
-		getElement("#processedPreview").removeAttribute("src");
-		getElement("#downloadBtn").removeAttribute("href");
-		getElement("#processedArea").classList.add("hidden");
-		getElement("#fileName").textContent = file.name;
-		getElement("#imageInfo").textContent = image.width + " x " + image.height;
-		getElement("#uploadZone").classList.add("hidden");
-		getElement("#previewArea").classList.remove("hidden");
+		// Store the file and reset the previous result when a new image is selected.
+		showImagePreview(file, imageUrl, image.width, image.height);
 
 		getElement("#status").textContent = "Uploading...";
 		const uploaded = await uploadToBackend(file);
@@ -173,6 +180,7 @@ async function processImage() {
 		return;
 	}
 
+	// Standard sliders and AI text fields use different settings objects.
 	let settings;
 	if (state.editMode === "standard") {
 		settings = getStandardSettings();
@@ -181,6 +189,7 @@ async function processImage() {
 	}
 	getElement("#status").textContent = "Processing...";
 
+	// The backend reads the uploaded temporary file from the current session.
 	const response = await fetch("/api/process", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
@@ -212,6 +221,42 @@ async function processImage() {
 	getElement("#status").textContent = "Image processed successfully!";
 }
 
+async function loadGalleryImage() {
+	const imageId = new URLSearchParams(window.location.search).get("imageId");
+	if (!imageId) {
+		return;
+	}
+
+	getElement("#status").textContent = "Loading image...";
+
+	try {
+		const response = await fetch(
+			"/api/gallery/" + encodeURIComponent(imageId) + "/load",
+			{ method: "POST" },
+		);
+		const data = await response.json();
+
+		if (response.status === 401) {
+			requireLogin();
+			return;
+		}
+		if (!response.ok) {
+			getElement("#status").textContent = data.error || "Could not load image.";
+			return;
+		}
+
+		showImagePreview(
+			{ name: data.fileName },
+			data.originalUrl,
+			data.width,
+			data.height,
+		);
+		getElement("#status").textContent = "Image ready.";
+	} catch (error) {
+		getElement("#status").textContent = "Could not load image.";
+	}
+}
+
 function connectRange(inputId, valueId, suffix) {
 	const input = getElement(inputId);
 	const output = getElement(valueId);
@@ -227,6 +272,7 @@ function connectRange(inputId, valueId, suffix) {
 const uploadZone = getElement("#uploadZone");
 const fileInput = getElement("#fileInput");
 
+// Both buttons use the same hidden file input for selecting or replacing an image.
 getElement("#chooseFileBtn").addEventListener("click", function () {
 	fileInput.click();
 });
@@ -254,6 +300,7 @@ uploadZone.addEventListener("drop", function (event) {
 	handleImage(event.dataTransfer.files[0]);
 });
 
+// Switch which group of controls is visible without losing the uploaded image.
 getElement("#standardBtn").addEventListener("click", function () {
 	setEditMode("standard");
 });
@@ -265,6 +312,7 @@ getElement("#aiBtn").addEventListener("click", function () {
 getElement("#processBtn").addEventListener("click", processImage);
 
 function showImageComparison() {
+	// The shared gallery modal can show either one image or a before/after pair.
 	if (!state.originalUrl) {
 		return;
 	}
@@ -283,6 +331,7 @@ getElement("#originalPreviewButton").addEventListener("click", showImageComparis
 getElement("#processedPreviewButton").addEventListener("click", showImageComparison);
 
 getElement("#downloadBtn").addEventListener("click", function (event) {
+	// Open the processed URL for viewing and request the backend download as well.
 	if (!state.processedUrl) {
 		event.preventDefault();
 		return;
@@ -308,3 +357,5 @@ connectRange("#saturation", "#saturationValue", "%");
 connectRange("#blur", "#blurValue", "");
 connectRange("#sharpness", "#sharpnessValue", "%");
 connectRange("#grayscale", "#grayscaleValue", "%");
+
+loadGalleryImage();

@@ -1,8 +1,11 @@
 from werkzeug.security import check_password_hash, generate_password_hash
 
+# Password helpers keep plain-text passwords out of the database.
+
 
 def hash_password(plain_password):
     """Return a one-way hash for a password."""
+    # Werkzeug creates a salted hash; the original password is not stored.
     return generate_password_hash(plain_password)
 
 

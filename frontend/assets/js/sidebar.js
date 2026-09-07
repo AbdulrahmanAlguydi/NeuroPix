@@ -2,6 +2,7 @@ const sidebarUsername = document.querySelector("#sidebarUsername");
 const logoutLink = document.querySelector(".logout-link");
 const savedUsername = localStorage.getItem("neuropixUsername");
 
+// Show the cached username immediately, then refresh it from the backend below.
 if (sidebarUsername && savedUsername) {
 	sidebarUsername.textContent = savedUsername;
 }
@@ -36,6 +37,7 @@ if (sidebarUsername) {
 if (logoutLink) {
 	logoutLink.addEventListener("click", async function (event) {
 		event.preventDefault();
+		// Clear cached page data so the next account cannot see old values.
 		localStorage.removeItem("neuropixUsername");
 		localStorage.removeItem("neuropixGallery");
 

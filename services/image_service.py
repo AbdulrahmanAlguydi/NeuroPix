@@ -1,8 +1,15 @@
 import os
+import uuid
 
-from database.queries import delete_image_record, get_user_gallery, log_image_edit
+from database.queries import (
+    delete_image_record,
+    get_gallery_image,
+    get_user_gallery,
+    log_image_edit,
+)
 from utils.s3 import (
     delete_s3_object,
+    download_s3_object,
     get_full_s3_url,
     upload_original_image,
     upload_processed_image,
@@ -11,6 +18,7 @@ from utils.s3 import (
 
 def save_image_transaction(user_id, local_raw_path, local_edited_path=None, edit_type=None):
     """Upload the image files and record their paths in the database."""
+    # Upload the original first because every gallery record needs it.
     original_key = upload_original_image(local_raw_path)
     if not original_key:
         print("[SERVICE ERROR] Original image upload failed.")
@@ -41,10 +49,12 @@ def save_image_transaction(user_id, local_raw_path, local_edited_path=None, edit
 
 def delete_image_transaction(image_id, user_id):
     """Delete an image record and its S3 files."""
+    # The query checks ownership before returning the paths to delete.
     paths = delete_image_record(image_id, user_id)
     if not paths:
         return False
 
+    # Remove the database row first, then remove its two optional S3 objects.
     for key in (paths.get("OriginalFilePath"), paths.get("ModifiedFilePath")):
         if key:
             delete_s3_object(key)
@@ -60,6 +70,7 @@ def is_uuid_hex(value):
 
 def get_original_filename(path):
     """Remove the UUID added to an uploaded filename."""
+    # New uploads use "name-uuid.ext"; the second pattern supports older records.
     filename = os.path.basename(path)
     stem, extension = os.path.splitext(filename)
 
@@ -76,6 +87,7 @@ def get_original_filename(path):
 
 def fetch_formatted_user_gallery(user_id):
     """Return gallery records with browser-ready image URLs."""
+    # Convert database column names into the smaller object expected by JavaScript.
     records = get_user_gallery(user_id)
     gallery = []
 
@@ -97,3 +109,23 @@ def fetch_formatted_user_gallery(user_id):
         )
 
     return gallery
+
+
+def stage_gallery_image(image_id, user_id, temp_dir):
+    """Download an owned original image for editing in the workspace."""
+    record = get_gallery_image(image_id, user_id)
+    if not record:
+        return None
+
+    original_key = record["OriginalFilePath"]
+    original_filename = os.path.basename(original_key)
+    temp_path = os.path.join(temp_dir, f"gallery-{uuid.uuid4().hex}-{original_filename}")
+
+    if not download_s3_object(original_key, temp_path):
+        return None
+
+    return {
+        "path": temp_path,
+        "file_name": get_original_filename(original_key),
+        "original_key": original_key,
+    }

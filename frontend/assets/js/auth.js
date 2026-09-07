@@ -1,6 +1,7 @@
 const loginForm = document.querySelector("#loginForm");
 const registerForm = document.querySelector("#registerForm");
 
+// Keep JSON requests in one helper so login and registration use the same format.
 async function postJson(url, body) {
 	const response = await fetch(url, {
 		method: "POST",
@@ -55,6 +56,7 @@ if (registerForm) {
 			return;
 		}
 
+		// The backend performs the final validation and saves the password hash.
 		const result = await postJson("/api/auth/register", {
 			username: username,
 			password: password,

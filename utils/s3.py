@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Create one S3 client using credentials supplied by the local environment.
 AWS_BUCKET_NAME = os.getenv("AWS_BUCKET_NAME")
 AWS_REGION = os.getenv("AWS_REGION")
 
@@ -24,9 +25,11 @@ def _execute_s3_upload(local_file_path, folder_prefix):
 
     filename = os.path.basename(local_file_path)
 
+    # Keep originals and processed files in separate folders in the bucket.
     object_key = f"{folder_prefix}/{filename}"
 
     try:
+        # S3 needs the correct type so browsers can display the returned image.
         content_type = "image/png"
         if filename.lower().endswith((".jpg", ".jpeg")):
             content_type = "image/jpeg"
@@ -60,6 +63,23 @@ def get_full_s3_url(object_key):
     if not object_key:
         return None
     return f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{object_key}"
+
+
+def download_s3_object(object_key, local_file_path):
+    """Download one S3 object to a local path."""
+    if not object_key:
+        return False
+
+    try:
+        s3_client.download_file(
+            Bucket=AWS_BUCKET_NAME,
+            Key=object_key,
+            Filename=local_file_path,
+        )
+        return True
+    except Exception as err:
+        print(f"[STORAGE ERROR] Download failed: {err}")
+        return False
 
 
 def delete_s3_object(object_key):

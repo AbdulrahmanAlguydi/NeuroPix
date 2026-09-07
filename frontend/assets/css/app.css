@@ -932,6 +932,7 @@ textarea {
 	border: 0;
 }
 .gallery-card-preview:focus-visible,
+.gallery-edit:focus-visible,
 .gallery-delete:focus-visible {
 	outline: 2px solid var(--accent);
 	outline-offset: -2px;
@@ -970,6 +971,29 @@ textarea {
 	display: flex;
 	gap: 7px;
 	flex-wrap: wrap;
+}
+.gallery-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.gallery-edit {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 34px;
+	padding: 0 12px;
+	border: 1px solid var(--accent);
+	border-radius: 10px;
+	color: var(--accent);
+	font-size: 12px;
+	font-weight: 700;
+	text-decoration: none;
+	transition: background-color 0.2s, color 0.2s;
+}
+.gallery-edit:hover {
+	background: var(--accent);
+	color: #fff;
 }
 .chip {
 	padding: 5px 8px;

@@ -6,6 +6,7 @@ from PIL import Image
 
 
 FIELD_RULES = {
+    # Each field limits the part of the picture that its text is allowed to change.
     "generativeModification": (
         "Content only: apply named changes to people, objects, clothing, colours, "
         "or visible details. Ignore background, quality, orientation, crop, and size."
@@ -22,6 +23,7 @@ FIELD_RULES = {
 }
 
 BASE_PROMPT = (
+    # Shared instructions keep unrelated text from changing other image properties.
     "Edit only the explicit requests below. Field descriptions are rules, not edits. "
     "Ignore unrelated text and treat empty fields as unchanged. Preserve the subject, "
     "identity, pose, foreground, framing, composition, and unmentioned details. "
@@ -33,11 +35,13 @@ BASE_PROMPT = (
 
 
 def build_ai_prompt(settings, source_size):
+    # Include the source ratio because the API chooses the final pixel dimensions.
     width, height = source_size
     aspect_ratio = width / height
     requests = []
 
     for key, rule in FIELD_RULES.items():
+        # Empty fields are skipped so they do not add accidental instructions.
         value = str(settings.get(key, "")).strip()
         if value:
             requests.append(f"{rule} User request: {value}")
@@ -68,10 +72,12 @@ def build_ai_prompt(settings, source_size):
 
 
 def apply_ai_edits(local_image_path, settings):
+    # Read the source size before sending the image so the prompt can mention its ratio.
     with Image.open(local_image_path) as source_image:
         width, height = source_image.size
 
     prompt = build_ai_prompt(settings, (width, height))
+    # The API key is read by the OpenAI client from OPENAI_API_KEY in .env.
     client = OpenAI()
     with open(local_image_path, "rb") as image_file:
         response = client.images.edit(

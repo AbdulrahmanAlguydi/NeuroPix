@@ -9,6 +9,7 @@ from database.database import get_db_connection
 
 
 def seed_database():
+    # This is a development-only reset: it removes existing test rows first.
     conn = get_db_connection()
     if not conn:
         print("Connection failed. Seed stopped.")
@@ -23,6 +24,7 @@ def seed_database():
         cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
 
         users_to_insert = [
+            # These are placeholder development accounts, not real users.
             ("main_dev", "mock_hash_xyz123"),
             ("second_editor", "mock_hash_abc789"),
             ("test_user", "mock_hash_qwert555")
@@ -37,6 +39,7 @@ def seed_database():
             user_ids.append(cursor.lastrowid)
 
         images_to_insert = [
+            # The paths are example S3 keys used to exercise database queries.
             (user_ids[0], "inputs/mock_sunset.jpg", "outputs/mock_sunset_ai.jpg", "ai"),
             (user_ids[0], "inputs/mock_profile.png", None, None),
             (user_ids[1], "inputs/mock_car.jpg", "outputs/mock_car_crop.jpg", "standard"),

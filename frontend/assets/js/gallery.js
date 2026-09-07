@@ -82,6 +82,7 @@ function formatGalleryDate(value) {
 }
 
 function getGalleryTitle(image) {
+	// Remove the extension because the card already identifies the item as an image.
 	let fileName = image.file_name;
 	if (!fileName) {
 		fileName = "Image #" + image.image_id;
@@ -165,6 +166,16 @@ function createGalleryCard(image) {
 	infoRow.className = "gallery-info-row";
 	infoRow.appendChild(chips);
 
+	const actions = document.createElement("div");
+	actions.className = "gallery-actions";
+
+	const editLink = document.createElement("a");
+	editLink.className = "gallery-edit";
+	editLink.href = "workspace.html?imageId=" + encodeURIComponent(image.image_id);
+	editLink.setAttribute("aria-label", "Edit " + title);
+	editLink.textContent = "Edit";
+	actions.appendChild(editLink);
+
 	const deleteButton = document.createElement("button");
 	deleteButton.className = "gallery-delete";
 	deleteButton.type = "button";
@@ -185,7 +196,8 @@ function createGalleryCard(image) {
 	deleteButton.addEventListener("click", function () {
 		deleteGalleryImage(image.image_id, card);
 	});
-	infoRow.appendChild(deleteButton);
+	actions.appendChild(deleteButton);
+	infoRow.appendChild(actions);
 
 	info.appendChild(infoRow);
 	previewButton.appendChild(thumb);
@@ -200,6 +212,7 @@ function createGalleryCard(image) {
 }
 
 async function deleteGalleryImage(imageId, card) {
+	// Ask for confirmation before removing both the database row and S3 files.
 	if (!window.confirm("Delete this image?")) {
 		return;
 	}
@@ -245,6 +258,7 @@ async function loadGallery() {
 		return;
 	}
 
+	// Show the last response immediately, then replace it with fresh data.
 	const cachedValue = localStorage.getItem(GALLERY_CACHE_KEY);
 	let cachedGallery = null;
 	if (cachedValue) {

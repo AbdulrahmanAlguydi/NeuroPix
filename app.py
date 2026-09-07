@@ -14,6 +14,7 @@ from services.image_service import (
     delete_image_transaction,
     fetch_formatted_user_gallery,
     save_image_transaction,
+    stage_gallery_image,
 )
 from utils.s3 import get_full_s3_url
 from utils.security import hash_password, verify_password
@@ -28,6 +29,7 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "neuropix_secret_key_123")
 UPLOAD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "neuropix_uploads")
 os.makedirs(UPLOAD_TEMP_DIR, exist_ok=True)
 
+# These checks are repeated by the backend even though the frontend checks them too.
 ALLOWED_UPLOAD_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
 # Keep the 1080p limit while allowing either orientation.
@@ -72,6 +74,7 @@ def register():
     if get_user_by_username(username):
         return {"error": "Username is already taken"}, 409
 
+    # Only the hash is saved; the plain password is never stored.
     password_hash = hash_password(password)
     was_saved = register_user(username, password_hash)
 
@@ -93,6 +96,7 @@ def login():
     user = get_user_by_username(username)
 
     if user and verify_password(password, user["PasswordHash"]):
+        # Flask uses this session data for all later protected requests.
         session["user_id"] = user["UserID"]
         session["username"] = user["Username"]
         return {"message": "Login successful"}, 200
@@ -118,6 +122,37 @@ def me():
 def gallery():
     images = fetch_formatted_user_gallery(session["user_id"])
     return images, 200
+
+
+@app.route("/api/gallery/<int:image_id>/load", methods=["POST"])
+@login_required
+def load_gallery_image(image_id):
+    loaded_image = stage_gallery_image(
+        image_id=image_id,
+        user_id=session["user_id"],
+        temp_dir=UPLOAD_TEMP_DIR,
+    )
+    if not loaded_image:
+        return {"error": "Image could not be loaded"}, 404
+
+    try:
+        with Image.open(loaded_image["path"]) as image:
+            width, height = image.size
+    except Exception:
+        return {"error": "Image could not be loaded"}, 500
+
+    # Treat the downloaded original like a fresh upload for /api/process.
+    session["uploaded_image_path"] = loaded_image["path"]
+    session["uploaded_image_name"] = loaded_image["file_name"]
+    session.pop("processed_image_path", None)
+    session.pop("processed_edit_mode", None)
+
+    return {
+        "originalUrl": get_full_s3_url(loaded_image["original_key"]),
+        "fileName": loaded_image["file_name"],
+        "width": width,
+        "height": height,
+    }, 200
 
 
 @app.route("/api/gallery/<int:image_id>", methods=["DELETE"])
@@ -163,6 +198,7 @@ def upload():
         }, 400
     file.seek(0)  # Image.open moved the stream; rewind before saving it.
 
+    # Add a UUID to avoid two uploads with the same name overwriting each other.
     original_stem = os.path.splitext(original_filename)[0]
     temp_filename = f"{original_stem}-{uuid.uuid4().hex}{file_extension}"
     temp_path = os.path.join(UPLOAD_TEMP_DIR, temp_filename)
@@ -180,6 +216,7 @@ def upload():
 @app.route("/api/process", methods=["POST"])
 @login_required
 def process_image():
+    # The upload route stores the temporary path in the signed session.
     raw_image_path = session.get("uploaded_image_path")
     if not raw_image_path or not os.path.exists(raw_image_path):
         return {"error": "No image has been uploaded yet."}, 400
@@ -196,12 +233,14 @@ def process_image():
 
     try:
         if edit_mode == "standard":
+            # Standard edits run locally with Pillow and are saved as JPEG.
             original_image = Image.open(raw_image_path)
             edited_image = apply_standard_edits(original_image, settings)
             processed_filename = f"{original_stem}-processed-{uuid.uuid4().hex}.jpg"
             processed_path = os.path.join(UPLOAD_TEMP_DIR, processed_filename)
             edited_image.save(processed_path, "JPEG")
         else:
+            # AI edits send the temporary image to the OpenAI image API.
             edited_bytes = apply_ai_edits(raw_image_path, settings)
             processed_filename = f"{original_stem}-processed-{uuid.uuid4().hex}.png"
             processed_path = os.path.join(UPLOAD_TEMP_DIR, processed_filename)
@@ -237,6 +276,7 @@ def process_image():
 @app.route("/api/download")
 @login_required
 def download_processed_image():
+    # The download button uses the most recent processed file in this session.
     processed_path = session.get("processed_image_path")
 
     if not processed_path or not os.path.exists(processed_path):
