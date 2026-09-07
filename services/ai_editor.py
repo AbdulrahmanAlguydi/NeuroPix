@@ -79,7 +79,6 @@ def apply_ai_edits(local_image_path, settings):
             image=image_file,
             prompt=prompt,
             size="auto",
-            input_fidelity="high",
         )
 
     return base64.b64decode(response.data[0].b64_json)
