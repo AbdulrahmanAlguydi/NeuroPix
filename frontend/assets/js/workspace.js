@@ -37,6 +37,15 @@ function clearUploadError() {
 	getElement("#uploadError").classList.add("hidden");
 }
 
+const processButton = getElement("#processBtn");
+
+function setProcessing(isProcessing) {
+	processButton.disabled = isProcessing;
+	processButton.classList.toggle("is-processing", isProcessing);
+	processButton.setAttribute("aria-busy", String(isProcessing));
+	processButton.textContent = isProcessing ? "Processing..." : "Process Image";
+}
+
 function showImagePreview(imageFile, imageUrl, width, height) {
 	if (state.originalUrl && state.originalUrl.startsWith("blob:")) {
 		URL.revokeObjectURL(state.originalUrl);
@@ -175,8 +184,10 @@ function getAiSettings() {
 }
 
 async function processImage() {
-	if (!state.imageFile) {
-		getElement("#status").textContent = "Choose an image first.";
+	if (!state.imageFile || processButton.disabled) {
+		if (!state.imageFile) {
+			getElement("#status").textContent = "Choose an image first.";
+		}
 		return;
 	}
 
@@ -188,37 +199,44 @@ async function processImage() {
 		settings = getAiSettings();
 	}
 	getElement("#status").textContent = "Processing...";
+	setProcessing(true);
 
-	// The backend reads the uploaded temporary file from the current session.
-	const response = await fetch("/api/process", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ editMode: state.editMode, settings: settings }),
-	});
-	const data = await response.json();
+	try {
+		// The backend reads the uploaded temporary file from the current session.
+		const response = await fetch("/api/process", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ editMode: state.editMode, settings: settings }),
+		});
+		const data = await response.json();
 
-	if (!response.ok) {
-		if (response.status === 401) {
-			requireLogin();
+		if (!response.ok) {
+			if (response.status === 401) {
+				requireLogin();
+				return;
+			}
+			let message = data.error;
+			if (!message) {
+				message = "Processing failed.";
+			}
+			getElement("#status").textContent = message;
 			return;
 		}
-		let message = data.error;
-		if (!message) {
-			message = "Processing failed.";
+
+		if (data.result && data.result.processedUrl) {
+			state.processedUrl = data.result.processedUrl;
+			getElement("#processedPreview").src = state.processedUrl;
+			getElement("#downloadBtn").href = "/api/download";
+			getElement("#downloadBtn").download = getProcessedFileName();
+			getElement("#processedArea").classList.remove("hidden");
 		}
-		getElement("#status").textContent = message;
-		return;
-	}
 
-	if (data.result && data.result.processedUrl) {
-		state.processedUrl = data.result.processedUrl;
-		getElement("#processedPreview").src = state.processedUrl;
-		getElement("#downloadBtn").href = "/api/download";
-		getElement("#downloadBtn").download = getProcessedFileName();
-		getElement("#processedArea").classList.remove("hidden");
+		getElement("#status").textContent = "Image processed successfully!";
+	} catch (error) {
+		getElement("#status").textContent = "Processing failed.";
+	} finally {
+		setProcessing(false);
 	}
-
-	getElement("#status").textContent = "Image processed successfully!";
 }
 
 async function loadGalleryImage() {

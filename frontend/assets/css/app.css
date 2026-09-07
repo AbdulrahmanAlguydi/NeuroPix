@@ -889,6 +889,32 @@ textarea {
 	text-align: center;
 	font-size: 16px;
 }
+.process-button.is-processing {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	cursor: wait;
+}
+.process-button.is-processing::before {
+	content: "";
+	width: 14px;
+	height: 14px;
+	border: 2px solid currentColor;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: process-spin 0.8s linear infinite;
+}
+.process-button:disabled {
+	opacity: 0.8;
+	transform: none;
+	box-shadow: none;
+}
+@keyframes process-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
 .processing-action p {
 	margin: 0;
 	color: var(--muted);
