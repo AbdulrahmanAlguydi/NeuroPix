@@ -72,6 +72,21 @@ def build_ai_prompt(settings, source_size):
     )
 
 
+def is_local_model_available():
+    """Check whether the configured local model endpoint can be reached."""
+    local_model_url = os.getenv("LOCAL_MODEL_URL", "").strip()
+    if not local_model_url:
+        return False
+
+    try:
+        response = requests.get(local_model_url, timeout=3)
+    except requests.RequestException:
+        return False
+
+    # The model endpoint accepts POST requests, so GET normally returns 405.
+    return response.status_code in {200, 405}
+
+
 def apply_ai_edits(local_image_path, settings):
     # Read the source size before sending the image so the prompt can mention its ratio.
     with Image.open(local_image_path) as source_image:

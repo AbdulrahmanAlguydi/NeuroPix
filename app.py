@@ -9,7 +9,7 @@ from flask import Flask, request, send_file, session
 from PIL import Image
 
 from database.queries import get_user_by_username, register_user
-from services.ai_editor import apply_ai_edits
+from services.ai_editor import apply_ai_edits, is_local_model_available
 from services.image_editor import apply_standard_edits
 from services.image_service import (
     delete_image_transaction,
@@ -131,6 +131,15 @@ def logout():
 @login_required
 def me():
     return {"user_id": session["user_id"], "username": session["username"]}, 200
+
+
+@app.route("/api/local-model/status")
+@login_required
+def local_model_status():
+    if is_local_model_available():
+        return {"available": True}, 200
+
+    return {"available": False}, 503
 
 
 @app.route("/api/gallery", methods=["GET"])

@@ -375,6 +375,16 @@ def test_process_requires_login(client):
     assert response.status_code == 401
 
 
+def test_local_model_status_unavailable(logged_in_client, monkeypatch):
+    """Test that the local model status reports an unavailable model."""
+    monkeypatch.setenv("LOCAL_MODEL_URL", "")
+
+    response = logged_in_client.get("/api/local-model/status")
+
+    assert response.status_code == 503
+    assert response.get_json()["available"] is False
+
+
 @patch("app.get_full_s3_url", side_effect=lambda key: f"https://fake-bucket.s3.amazonaws.com/{key}")
 @patch(
     "app.save_image_transaction",

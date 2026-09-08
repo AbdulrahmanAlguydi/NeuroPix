@@ -69,6 +69,24 @@ function requireLogin() {
 	window.location.href = "login.html";
 }
 
+async function checkLocalModel() {
+	try {
+		const response = await fetch("/api/local-model/status");
+		if (response.ok) {
+			return true;
+		}
+		if (response.status === 401) {
+			requireLogin();
+			return false;
+		}
+	} catch (error) {
+		// The alert below explains the same problem for network failures.
+	}
+
+	alert("The local model is unavailable. Start Docker and the SSH tunnel.");
+	return false;
+}
+
 async function uploadToBackend(file) {
 	// Uploading only stores the temporary source; processing creates the gallery row.
 	const formData = new FormData();
@@ -328,6 +346,12 @@ getElement("#standardBtn").addEventListener("click", function () {
 
 getElement("#aiBtn").addEventListener("click", function () {
 	setEditMode("ai");
+});
+
+getElement("#aiProvider").addEventListener("change", function () {
+	if (this.value === "local") {
+		checkLocalModel();
+	}
 });
 
 getElement("#processBtn").addEventListener("click", processImage);
