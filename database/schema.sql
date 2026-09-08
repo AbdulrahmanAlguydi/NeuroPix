@@ -1,10 +1,9 @@
--- Reset database for development environment
-DROP DATABASE IF EXISTS neuropix_db;
-CREATE DATABASE neuropix_db;
+-- Create the database and tables without deleting existing data.
+CREATE DATABASE IF NOT EXISTS neuropix_db;
 USE neuropix_db;
 
 -- 1. Users Table
-CREATE TABLE Users (
+CREATE TABLE IF NOT EXISTS Users (
     UserID INT AUTO_INCREMENT PRIMARY KEY,
     Username VARCHAR(50) NOT NULL UNIQUE,
     PasswordHash VARCHAR(255) NOT NULL,
@@ -13,7 +12,7 @@ CREATE TABLE Users (
 );
 
 -- 2. Images Table
-CREATE TABLE Images (
+CREATE TABLE IF NOT EXISTS Images (
     ImageID INT AUTO_INCREMENT PRIMARY KEY,
     UserID INT NOT NULL,
     OriginalFilePath VARCHAR(512) NOT NULL,
