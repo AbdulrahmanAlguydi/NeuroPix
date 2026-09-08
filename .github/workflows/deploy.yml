@@ -1,0 +1,20 @@
+name: Deploy NeuroPix
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Update and restart the app
+        run: |
+          cd /home/ec2-user/NeuroPix
+          git pull --ff-only origin main
+          python3 -m pip install --user -r requirements.txt
+          sudo -n systemctl restart neuropix
+          curl --fail --silent --show-error https://neuropix.me/health
