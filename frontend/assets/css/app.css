@@ -462,7 +462,12 @@ textarea {
 	margin: 0 8px 20px;
 	padding: 10px 12px;
 	border-radius: 10px;
-	background: #292d36;
+	background: linear-gradient(
+		135deg,
+		rgba(109, 93, 252, 0.28),
+		rgba(139, 127, 255, 0.12)
+	);
+	border: 1px solid rgba(139, 127, 255, 0.45);
 	color: #fff;
 	overflow: hidden;
 }
