@@ -409,6 +409,31 @@ def test_process_ai_mode_success(mock_ai, mock_save, mock_url, logged_in_client)
     mock_save.assert_called_once()
 
 
+@patch("services.ai_editor.requests.post")
+def test_local_model_prompt_uses_only_user_requests(mock_post, tmp_path, monkeypatch):
+    """Local model requests should not include OpenAI-only instructions."""
+    from services.ai_editor import apply_ai_edits
+
+    image_path = tmp_path / "source.png"
+    Image.new("RGB", (100, 50), color="blue").save(image_path)
+    monkeypatch.setenv("LOCAL_MODEL_URL", "http://local-model.test/predict")
+    mock_post.return_value.json.return_value = {"image": ""}
+
+    apply_ai_edits(
+        str(image_path),
+        {
+            "provider": "local",
+            "generativeModification": "change the strawberry to an apple",
+            "backgroundManipulation": "",
+            "enhancement": "",
+            "upscaling": "1",
+        },
+    )
+
+    sent_prompt = mock_post.call_args.kwargs["json"]["prompt"]
+    assert sent_prompt == "change the strawberry to an apple"
+
+
 @patch("app.save_image_transaction", return_value=None)
 def test_process_save_failure(mock_save, logged_in_client):
     """Test that a failed S3/database save returns a clear error."""

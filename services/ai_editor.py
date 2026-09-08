@@ -72,6 +72,18 @@ def build_ai_prompt(settings, source_size):
     )
 
 
+def build_local_prompt(settings):
+    """Return only the text entered in the AI edit fields."""
+    user_requests = []
+
+    for key in FIELD_RULES:
+        value = str(settings.get(key, "")).strip()
+        if value:
+            user_requests.append(value)
+
+    return " ".join(user_requests)
+
+
 def is_local_model_available():
     """Check whether the configured local model endpoint can be reached."""
     local_model_url = os.getenv("LOCAL_MODEL_URL", "").strip()
@@ -88,18 +100,13 @@ def is_local_model_available():
 
 
 def apply_ai_edits(local_image_path, settings):
-    # Read the source size before sending the image so the prompt can mention its ratio.
-    with Image.open(local_image_path) as source_image:
-        width, height = source_image.size
-
-    prompt = build_ai_prompt(settings, (width, height))
-
     provider = str(settings.get("provider", "openai")).strip().lower()
     if provider == "local":
         local_model_url = os.getenv("LOCAL_MODEL_URL", "").strip()
         if not local_model_url:
             raise ValueError("The local AI model is not configured.")
 
+        prompt = build_local_prompt(settings)
         with open(local_image_path, "rb") as image_file:
             encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
 
@@ -113,6 +120,11 @@ def apply_ai_edits(local_image_path, settings):
 
     if provider != "openai":
         raise ValueError("Unknown AI provider.")
+
+    # Read the source size so the OpenAI prompt can mention its ratio.
+    with Image.open(local_image_path) as source_image:
+        width, height = source_image.size
+    prompt = build_ai_prompt(settings, (width, height))
 
     # The API key is read by the OpenAI client from OPENAI_API_KEY in .env.
     client = OpenAI()
