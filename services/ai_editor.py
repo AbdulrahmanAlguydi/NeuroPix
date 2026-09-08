@@ -1,6 +1,7 @@
 import base64
 import os
 
+import requests
 from openai import OpenAI
 from PIL import Image
 
@@ -77,6 +78,27 @@ def apply_ai_edits(local_image_path, settings):
         width, height = source_image.size
 
     prompt = build_ai_prompt(settings, (width, height))
+
+    provider = str(settings.get("provider", "openai")).strip().lower()
+    if provider == "local":
+        local_model_url = os.getenv("LOCAL_MODEL_URL", "").strip()
+        if not local_model_url:
+            raise ValueError("The local AI model is not configured.")
+
+        with open(local_image_path, "rb") as image_file:
+            encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+
+        response = requests.post(
+            local_model_url,
+            json={"image": encoded_image, "prompt": prompt},
+            timeout=300,
+        )
+        response.raise_for_status()
+        return base64.b64decode(response.json()["image"])
+
+    if provider != "openai":
+        raise ValueError("Unknown AI provider.")
+
     # The API key is read by the OpenAI client from OPENAI_API_KEY in .env.
     client = OpenAI()
     with open(local_image_path, "rb") as image_file:

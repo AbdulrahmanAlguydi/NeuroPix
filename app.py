@@ -269,7 +269,7 @@ def process_image():
                 processed_path = os.path.join(UPLOAD_TEMP_DIR, processed_filename)
                 edited_image.save(processed_path, "JPEG")
         else:
-            # AI edits send the temporary image to the OpenAI image API.
+            # AI edits use the provider selected in the workspace.
             edited_bytes = apply_ai_edits(raw_image_path, settings)
             processed_filename = f"{original_stem}-processed-{uuid.uuid4().hex}.png"
             processed_path = os.path.join(UPLOAD_TEMP_DIR, processed_filename)

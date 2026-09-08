@@ -176,6 +176,7 @@ function getStandardSettings() {
 
 function getAiSettings() {
 	return {
+		provider: getElement("#aiProvider").value,
 		generativeModification: getElement("#generatePrompt").value.trim(),
 		backgroundManipulation: getElement("#backgroundPrompt").value.trim(),
 		enhancement: getElement("#enhancePrompt").value.trim(),

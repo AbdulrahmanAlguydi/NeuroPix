@@ -1,5 +1,10 @@
 # Databases & Private Credentials
 .env
+*.pem
+
+# Local model test outputs
+local_model/*-test-output.png
+local_model/integration-test.png
 
 # Python compilation files (auto-generated junk)
 __pycache__/

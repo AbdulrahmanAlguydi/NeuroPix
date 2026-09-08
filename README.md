@@ -30,7 +30,8 @@ docs/                          Project documents such as the SRS and HLD
 - Python 3.9 or newer
 - MySQL database
 - Amazon S3 bucket
-- OpenAI API key for AI editing
+- OpenAI API key for OpenAI AI editing (optional when using the local model)
+- Docker Desktop with WSL2 and an NVIDIA GPU for the local model (optional)
 
 ## Local setup
 
@@ -61,6 +62,30 @@ For detailed local error messages and automatic reloads, use Flask's development
 ```powershell
 python -m flask --app app run --debug
 ```
+
+## Optional local AI model
+
+The workspace uses OpenAI by default. To run the local Stable Diffusion model instead:
+
+1. Make sure Docker Desktop is running with WSL2 GPU support.
+2. From the project root, build and start the model server:
+
+   ```powershell
+   docker build -t neuropix-local-model .\local_model
+   docker run --rm --gpus all -p 8000:8000 --name neuropix-local-model -v "${env:USERPROFILE}\.cache\huggingface:/root/.cache/huggingface" neuropix-local-model
+   ```
+
+   The first start downloads the model files and can take a while. The mounted cache avoids downloading them again.
+
+3. Set this value in `.env`:
+
+   ```text
+   LOCAL_MODEL_URL=http://127.0.0.1:8000/predict
+   ```
+
+4. Start NeuroPix, choose AI editing, and select **Local Stable Diffusion** in the AI Model field.
+
+Stop the model server with `Ctrl+C` when you are finished. If you only want to use OpenAI, skip this section.
 
 ## Demo account
 
@@ -131,5 +156,6 @@ The EC2 `.env` file and GitHub runner credentials stay on the server and must ne
 
 ## Current project limits
 
-- AI editing is handled through the OpenAI API.
+- OpenAI is the default AI provider. Local Stable Diffusion 1.5 is optional and requires a local GPU and Docker server.
+- The local model uses image-to-image strength 1.0, so it may change more of the original image and cannot guarantee exact object replacements.
 - Images are limited to 1920 × 1080 landscape or 1080 × 1920 portrait dimensions.

@@ -209,41 +209,54 @@
 
          <div id="aiControls" class="ai-controls hidden">
 
-            <label>
-               <span>Generative Modifications</span>
-               <small>
-                  Describe what should change in the image.
-               </small>
-               <textarea id="generatePrompt" placeholder="Example: add soft evening lighting"></textarea>
-            </label>
-
-            <label>
-               <span>Background Manipulation</span>
-               <small>
-                  Describe the background you want.
-               </small>
-               <textarea id="backgroundPrompt" placeholder="Example: replace the background with a beach"></textarea>
-            </label>
-
-            <label>
-               <span>Enhancement</span>
-               <small>
-                  Describe the quality or detail improvement.
-               </small>
-               <textarea id="enhancePrompt" placeholder="Example: improve clarity and reduce noise"></textarea>
-            </label>
-
-            <label class="upscale-control">
-               <span>Upscaling</span>
-               <small>Choose an enlargement level.</small>
-
-               <select id="upscale">
-                  <option value="1" selected>1×</option>
-                  <option value="2">2×</option>
-                  <option value="3">3×</option>
-                  <option value="4">4×</option>
+            <div class="ai-provider-choice">
+               <div class="ai-provider-copy">
+                  <span>AI Model</span>
+                  <small>Choose which model should process this image.</small>
+               </div>
+               <select id="aiProvider">
+                  <option value="openai" selected>OpenAI</option>
+                  <option value="local">Local Stable Diffusion</option>
                </select>
-            </label>
+            </div>
+
+            <div class="ai-fields">
+               <label>
+                  <span>Generative Modifications</span>
+                  <small>
+                     Describe what should change in the image.
+                  </small>
+                  <textarea id="generatePrompt" placeholder="Example: add soft evening lighting"></textarea>
+               </label>
+
+               <label>
+                  <span>Background Manipulation</span>
+                  <small>
+                     Describe the background you want.
+                  </small>
+                  <textarea id="backgroundPrompt" placeholder="Example: replace the background with a beach"></textarea>
+               </label>
+
+               <label>
+                  <span>Enhancement</span>
+                  <small>
+                     Describe the quality or detail improvement.
+                  </small>
+                  <textarea id="enhancePrompt" placeholder="Example: improve clarity and reduce noise"></textarea>
+               </label>
+
+               <label class="upscale-control">
+                  <span>Upscaling</span>
+                  <small>Choose an enlargement level.</small>
+
+                  <select id="upscale">
+                     <option value="1" selected>1×</option>
+                     <option value="2">2×</option>
+                     <option value="3">3×</option>
+                     <option value="4">4×</option>
+                  </select>
+               </label>
+            </div>
 
          </div>
       </section>
