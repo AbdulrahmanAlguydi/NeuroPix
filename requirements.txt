@@ -1,4 +1,5 @@
 boto3
+distro==1.8.0
 mysql-connector-python
 python-dotenv
 Flask
