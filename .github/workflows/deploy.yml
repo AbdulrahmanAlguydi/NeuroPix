@@ -17,4 +17,4 @@ jobs:
           git pull --ff-only origin main
           python3 -m pip install --user -r requirements.txt
           sudo -n systemctl restart neuropix
-          curl --fail --silent --show-error https://neuropix.me/health
+          curl --fail --silent --show-error --retry 5 --retry-delay 2 --retry-connrefused https://neuropix.me/health
