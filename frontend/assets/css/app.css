@@ -450,6 +450,7 @@ textarea {
 	width: 230px;
 	padding: 24px 16px;
 	background: var(--dark);
+	border-right: 2px solid var(--accent);
 	color: #fff;
 	display: flex;
 	flex-direction: column;
@@ -1240,6 +1241,8 @@ textarea {
 		position: relative;
 		width: 100%;
 		min-height: auto;
+		border-right: 0;
+		border-bottom: 2px solid var(--accent);
 	}
 	.sidebar-bottom {
 		margin-top: 25px;
