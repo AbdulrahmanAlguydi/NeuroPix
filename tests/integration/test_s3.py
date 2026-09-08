@@ -1,4 +1,6 @@
 import os
+import sys
+import uuid
 
 import boto3
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
@@ -19,6 +21,10 @@ def run_tests():
     bucket_name = os.getenv("AWS_BUCKET_NAME")
     region_name = os.getenv("AWS_REGION")
 
+    s3 = None
+    test_file_key = f"integration-tests/s3-test-{uuid.uuid4().hex}.txt"
+    uploaded = False
+
     try:
         # Initialize the S3 client
         s3 = boto3.client(
@@ -35,14 +41,14 @@ def run_tests():
 
         # Test 2: Upload a dummy file to check write permissions
         print("Testing write permissions (uploading a test file)...")
-        test_file_name = "s3_test_connection.txt"
         s3.put_object(
             Bucket=bucket_name,
-            Key=test_file_name,
+            Key=test_file_key,
             Body="AWS S3 Connection test successful! The backend app can write to storage.",
             ContentType="text/plain",
         )
-        print(f"Success: Uploaded '{test_file_name}' to S3.")
+        uploaded = True
+        print(f"Success: Uploaded '{test_file_key}' to S3.")
 
         print("\n=========================================")
         print("ALL S3 STORAGE TESTS PASSED SUCCESSFULLY!")
@@ -50,10 +56,20 @@ def run_tests():
 
     except NoCredentialsError:
         print("Error: Missing AWS credentials in your .env file.")
+        sys.exit(1)
     except PartialCredentialsError:
         print("Error: Incomplete AWS credentials in your .env file.")
+        sys.exit(1)
     except Exception as e:
         print(f"Error connecting to S3: {e}")
+        sys.exit(1)
+    finally:
+        if uploaded and s3:
+            try:
+                s3.delete_object(Bucket=bucket_name, Key=test_file_key)
+                print(f"[CLEANUP] Removed '{test_file_key}' from S3.")
+            except Exception as error:
+                print(f"[WARNING] S3 cleanup failed: {error}")
 
 
 if __name__ == "__main__":
