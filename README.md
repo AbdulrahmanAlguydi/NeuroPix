@@ -101,6 +101,8 @@ python tests/integration/test_workflow.py
 
 The demo is hosted on an Amazon Linux 2023 EC2 instance. Nginx receives web traffic and forwards it to the Flask service on port 5000. Certbot provides HTTPS for `neuropix.me`.
 
+Open the deployed website at [https://neuropix.me/](https://neuropix.me/).
+
 The EC2 instance runs the app through the `neuropix` systemd service. A self-hosted GitHub Actions runner is also installed on the instance.
 
 After the deployment workflow has been set up, pushing to `main` deploys the latest version automatically:
