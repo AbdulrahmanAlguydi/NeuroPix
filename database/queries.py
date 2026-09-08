@@ -98,7 +98,7 @@ def get_user_gallery(user_id):
 def get_gallery_image(image_id, user_id):
     """Return one gallery image owned by the user."""
     query = """
-        SELECT OriginalFilePath
+        SELECT OriginalFilePath, ModifiedFilePath
         FROM Images
         WHERE ImageID = %s AND UserID = %s;
     """

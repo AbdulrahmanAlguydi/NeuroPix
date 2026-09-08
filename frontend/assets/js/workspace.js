@@ -246,12 +246,14 @@ async function loadGalleryImage() {
 	}
 
 	getElement("#status").textContent = "Loading image...";
+	const source = new URLSearchParams(window.location.search).get("source") || "original";
+	let loadUrl = "/api/gallery/" + encodeURIComponent(imageId) + "/load";
+	if (source === "edited") {
+		loadUrl += "?source=edited";
+	}
 
 	try {
-		const response = await fetch(
-			"/api/gallery/" + encodeURIComponent(imageId) + "/load",
-			{ method: "POST" },
-		);
+		const response = await fetch(loadUrl, { method: "POST" });
 		const data = await response.json();
 
 		if (response.status === 401) {

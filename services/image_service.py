@@ -111,21 +111,27 @@ def fetch_formatted_user_gallery(user_id):
     return gallery
 
 
-def stage_gallery_image(image_id, user_id, temp_dir):
-    """Download an owned original image for editing in the workspace."""
+def stage_gallery_image(image_id, user_id, temp_dir, source="original"):
+    """Download the selected version of an owned gallery image."""
     record = get_gallery_image(image_id, user_id)
     if not record:
         return None
 
-    original_key = record["OriginalFilePath"]
-    original_filename = os.path.basename(original_key)
-    temp_path = os.path.join(temp_dir, f"gallery-{uuid.uuid4().hex}-{original_filename}")
+    source_key = record["OriginalFilePath"]
+    if source == "edited":
+        source_key = record["ModifiedFilePath"]
 
-    if not download_s3_object(original_key, temp_path):
+    if not source_key:
+        return None
+
+    source_filename = os.path.basename(source_key)
+    temp_path = os.path.join(temp_dir, f"gallery-{uuid.uuid4().hex}-{source_filename}")
+
+    if not download_s3_object(source_key, temp_path):
         return None
 
     return {
         "path": temp_path,
-        "file_name": get_original_filename(original_key),
-        "original_key": original_key,
+        "file_name": get_original_filename(record["OriginalFilePath"]),
+        "source_key": source_key,
     }

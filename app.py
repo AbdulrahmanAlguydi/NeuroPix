@@ -127,10 +127,15 @@ def gallery():
 @app.route("/api/gallery/<int:image_id>/load", methods=["POST"])
 @login_required
 def load_gallery_image(image_id):
+    source = request.args.get("source", "original")
+    if source not in {"original", "edited"}:
+        return {"error": "Unknown image version"}, 400
+
     loaded_image = stage_gallery_image(
         image_id=image_id,
         user_id=session["user_id"],
         temp_dir=UPLOAD_TEMP_DIR,
+        source=source,
     )
     if not loaded_image:
         return {"error": "Image could not be loaded"}, 404
@@ -141,14 +146,14 @@ def load_gallery_image(image_id):
     except Exception:
         return {"error": "Image could not be loaded"}, 500
 
-    # Treat the downloaded original like a fresh upload for /api/process.
+    # Treat the selected gallery version like a fresh upload for /api/process.
     session["uploaded_image_path"] = loaded_image["path"]
     session["uploaded_image_name"] = loaded_image["file_name"]
     session.pop("processed_image_path", None)
     session.pop("processed_edit_mode", None)
 
     return {
-        "originalUrl": get_full_s3_url(loaded_image["original_key"]),
+        "originalUrl": get_full_s3_url(loaded_image["source_key"]),
         "fileName": loaded_image["file_name"],
         "width": width,
         "height": height,

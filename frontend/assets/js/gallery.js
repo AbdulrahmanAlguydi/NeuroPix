@@ -9,9 +9,15 @@ const compareTags = document.querySelectorAll(".compare-tag");
 const comparisonHelp = document.querySelector(".comparison-help");
 const galleryGrid = document.querySelector("#galleryGrid");
 const galleryStatus = document.querySelector("#galleryStatus");
+const editChoiceModal = document.querySelector("#editChoiceModal");
+const editChoiceTitle = document.querySelector("#editChoiceTitle");
+const closeEditChoiceModal = document.querySelector("#closeEditChoiceModal");
+const useOriginalButton = document.querySelector("#useOriginalButton");
+const useEditedButton = document.querySelector("#useEditedButton");
 const GALLERY_CACHE_KEY = "neuropixGallery";
 
 let dragging = false;
+let selectedGalleryImage = null;
 
 // Moves the divider and reveals the After image on the right side.
 function updateComparison(value) {
@@ -103,6 +109,39 @@ function getEditTypeLabel(editType) {
 	return "Original";
 }
 
+function getWorkspaceUrl(imageId, source) {
+	return (
+		"workspace.html?imageId=" +
+		encodeURIComponent(imageId) +
+		"&source=" +
+		encodeURIComponent(source)
+	);
+}
+
+function openEditChoice(image) {
+	if (!image.modified_url) {
+		window.location.href = getWorkspaceUrl(image.image_id, "original");
+		return;
+	}
+
+	selectedGalleryImage = image;
+	editChoiceTitle.textContent = "Choose a version of " + getGalleryTitle(image);
+	editChoiceModal.classList.remove("hidden");
+}
+
+function closeEditChoice() {
+	selectedGalleryImage = null;
+	editChoiceModal.classList.add("hidden");
+}
+
+function chooseEditSource(source) {
+	if (!selectedGalleryImage) {
+		return;
+	}
+
+	window.location.href = getWorkspaceUrl(selectedGalleryImage.image_id, source);
+}
+
 function createGalleryCard(image) {
 	const title = getGalleryTitle(image);
 	const card = document.createElement("article");
@@ -171,9 +210,13 @@ function createGalleryCard(image) {
 
 	const editLink = document.createElement("a");
 	editLink.className = "gallery-edit";
-	editLink.href = "workspace.html?imageId=" + encodeURIComponent(image.image_id);
+	editLink.href = getWorkspaceUrl(image.image_id, "original");
 	editLink.setAttribute("aria-label", "Edit " + title);
 	editLink.textContent = "Edit";
+	editLink.addEventListener("click", function (event) {
+		event.preventDefault();
+		openEditChoice(image);
+	});
 	actions.appendChild(editLink);
 
 	const deleteButton = document.createElement("button");
@@ -344,6 +387,21 @@ if (modal && comparisonBox) {
 	modal.addEventListener("click", function (event) {
 		if (event.target === modal) {
 			modal.classList.add("hidden");
+		}
+	});
+}
+
+if (editChoiceModal) {
+	closeEditChoiceModal.addEventListener("click", closeEditChoice);
+	useOriginalButton.addEventListener("click", function () {
+		chooseEditSource("original");
+	});
+	useEditedButton.addEventListener("click", function () {
+		chooseEditSource("edited");
+	});
+	editChoiceModal.addEventListener("click", function (event) {
+		if (event.target === editChoiceModal) {
+			closeEditChoice();
 		}
 	});
 }

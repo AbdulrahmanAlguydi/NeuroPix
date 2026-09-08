@@ -1189,6 +1189,22 @@ textarea {
 	text-align: center;
 	font-size: 13px;
 }
+.edit-choice-card {
+	width: min(460px, 95vw);
+}
+.edit-choice-card h2 {
+	margin: 8px 0;
+}
+.edit-choice-card p {
+	margin: 0;
+	color: var(--muted);
+}
+.edit-choice-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+	margin-top: 24px;
+}
 
 /* Tablet */
 
