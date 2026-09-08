@@ -2,6 +2,7 @@ import os
 import tempfile
 import uuid
 from functools import wraps
+from io import BytesIO
 
 from dotenv import load_dotenv
 from flask import Flask, request, send_file, session
@@ -25,7 +26,7 @@ load_dotenv()
 app = Flask(__name__, static_folder="frontend", static_url_path="")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "neuropix_secret_key_123")
 
-# Uploaded files stay here until processing saves them to S3 and MySQL.
+# Uploaded files stay here while the user edits them.
 UPLOAD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "neuropix_uploads")
 os.makedirs(UPLOAD_TEMP_DIR, exist_ok=True)
 
@@ -35,6 +36,19 @@ ALLOWED_UPLOAD_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 # Keep the 1080p limit while allowing either orientation.
 MAX_LANDSCAPE_SIZE = (1920, 1080)
 MAX_PORTRAIT_SIZE = (1080, 1920)
+
+
+def remove_temp_file(file_path):
+    """Delete a temporary upload file when it is no longer needed."""
+    if not file_path:
+        return
+
+    try:
+        os.remove(file_path)
+    except FileNotFoundError:
+        pass
+    except OSError as error:
+        print(f"[CLEANUP WARNING] Could not remove temporary file: {error}")
 
 
 def login_required(f):
@@ -107,6 +121,8 @@ def login():
 
 @app.route("/api/auth/logout", methods=["POST"])
 def logout():
+    remove_temp_file(session.get("uploaded_image_path"))
+    remove_temp_file(session.get("processed_image_path"))
     session.clear()
     return {"message": "Logged out successfully"}, 200
 
@@ -144,7 +160,11 @@ def load_gallery_image(image_id):
         with Image.open(loaded_image["path"]) as image:
             width, height = image.size
     except Exception:
+        remove_temp_file(loaded_image["path"])
         return {"error": "Image could not be loaded"}, 500
+
+    remove_temp_file(session.get("uploaded_image_path"))
+    remove_temp_file(session.get("processed_image_path"))
 
     # Treat the selected gallery version like a fresh upload for /api/process.
     session["uploaded_image_path"] = loaded_image["path"]
@@ -207,6 +227,8 @@ def upload():
     original_stem = os.path.splitext(original_filename)[0]
     temp_filename = f"{original_stem}-{uuid.uuid4().hex}{file_extension}"
     temp_path = os.path.join(UPLOAD_TEMP_DIR, temp_filename)
+    remove_temp_file(session.get("uploaded_image_path"))
+    remove_temp_file(session.get("processed_image_path"))
     file.save(temp_path)
 
     # Keep the upload local until /api/process creates the database record.
@@ -235,15 +257,17 @@ def process_image():
     settings = data.get("settings", {})
     original_filename = session.get("uploaded_image_name", os.path.basename(raw_image_path))
     original_stem = os.path.splitext(original_filename)[0]
+    previous_processed_path = session.get("processed_image_path")
+    processed_path = None
 
     try:
         if edit_mode == "standard":
             # Standard edits run locally with Pillow and are saved as JPEG.
-            original_image = Image.open(raw_image_path)
-            edited_image = apply_standard_edits(original_image, settings)
-            processed_filename = f"{original_stem}-processed-{uuid.uuid4().hex}.jpg"
-            processed_path = os.path.join(UPLOAD_TEMP_DIR, processed_filename)
-            edited_image.save(processed_path, "JPEG")
+            with Image.open(raw_image_path) as original_image:
+                edited_image = apply_standard_edits(original_image, settings)
+                processed_filename = f"{original_stem}-processed-{uuid.uuid4().hex}.jpg"
+                processed_path = os.path.join(UPLOAD_TEMP_DIR, processed_filename)
+                edited_image.save(processed_path, "JPEG")
         else:
             # AI edits send the temporary image to the OpenAI image API.
             edited_bytes = apply_ai_edits(raw_image_path, settings)
@@ -252,6 +276,7 @@ def process_image():
             with open(processed_path, "wb") as processed_file:
                 processed_file.write(edited_bytes)
     except Exception:
+        remove_temp_file(processed_path)
         return {"error": "Could not process this image."}, 400
 
     # Save both files and log the edit as one database row.
@@ -263,8 +288,11 @@ def process_image():
     )
 
     if not saved_record:
+        remove_temp_file(processed_path)
         return {"error": "Could not save the processed image. Please try again."}, 500
 
+    # Keep the original available if the user wants to try another edit.
+    remove_temp_file(previous_processed_path)
     session["processed_image_path"] = processed_path
     session["processed_edit_mode"] = edit_mode
 
@@ -293,8 +321,18 @@ def download_processed_image():
     original_filename = session.get("uploaded_image_name", "neuropix")
     original_stem = os.path.splitext(os.path.basename(original_filename))[0]
 
+    try:
+        with open(processed_path, "rb") as processed_file:
+            processed_bytes = processed_file.read()
+    except OSError:
+        return {"error": "The processed image could not be downloaded."}, 500
+
+    # The response keeps the bytes in memory, so the temporary file can be removed now.
+    remove_temp_file(processed_path)
+    session.pop("processed_image_path", None)
+    session.pop("processed_edit_mode", None)
     return send_file(
-        processed_path,
+        BytesIO(processed_bytes),
         as_attachment=True,
         download_name=f"{original_stem}-processed.{extension}",
     )
