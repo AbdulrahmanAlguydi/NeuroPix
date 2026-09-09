@@ -311,6 +311,11 @@ FAKE_PROCESSED_IMAGE = {
 }
 
 
+def fake_s3_url(key):
+    """Build a predictable S3 URL for API tests."""
+    return f"https://fake-bucket.s3.amazonaws.com/{key}"
+
+
 def upload_test_image(client, width=800, height=600):
     """Helper that uploads a test image and returns the upload response."""
     img_data = make_test_image(width, height, "JPEG")
@@ -321,7 +326,7 @@ def upload_test_image(client, width=800, height=600):
     )
 
 
-@patch("app.get_full_s3_url", side_effect=lambda key: f"https://fake-bucket.s3.amazonaws.com/{key}")
+@patch("app.get_full_s3_url", side_effect=fake_s3_url)
 @patch("app.save_image_transaction", return_value=FAKE_PROCESSED_IMAGE)
 def test_process_standard_edit_success(mock_save, mock_url, logged_in_client):
     """Test processing an uploaded image with Standard Edits settings."""
@@ -386,7 +391,7 @@ def test_local_model_status_unavailable(logged_in_client, monkeypatch):
     assert response.get_json()["available"] is False
 
 
-@patch("app.get_full_s3_url", side_effect=lambda key: f"https://fake-bucket.s3.amazonaws.com/{key}")
+@patch("app.get_full_s3_url", side_effect=fake_s3_url)
 @patch(
     "app.save_image_transaction",
     return_value={
@@ -489,20 +494,31 @@ def test_repeated_processing_uses_unique_original_keys(
     """Repeated edits of one upload should use different original names."""
     from services.image_service import save_image_transaction
 
-    for _ in range(2):
-        save_image_transaction(
-            user_id=5,
-            local_raw_path="/tmp/raw.jpg",
-            local_edited_path="/tmp/edit.jpg",
-            edit_type="ai",
-            original_filename="city-lights.jpg",
-        )
+    save_image_transaction(
+        user_id=5,
+        local_raw_path="/tmp/raw.jpg",
+        local_edited_path="/tmp/edit.jpg",
+        edit_type="ai",
+        original_filename="city-lights.jpg",
+    )
+    save_image_transaction(
+        user_id=5,
+        local_raw_path="/tmp/raw.jpg",
+        local_edited_path="/tmp/edit.jpg",
+        edit_type="ai",
+        original_filename="city-lights.jpg",
+    )
 
-    names = [call.kwargs["object_name"] for call in mock_up_raw.call_args_list]
+    names = []
+    for recorded_call in mock_up_raw.call_args_list:
+        names.append(recorded_call.kwargs["object_name"])
+
     assert len(names) == 2
     assert names[0] != names[1]
-    assert all(name.startswith("city-lights-") for name in names)
-    assert all(name.endswith(".jpg") for name in names)
+
+    for name in names:
+        assert name.startswith("city-lights-")
+        assert name.endswith(".jpg")
 
 
 if __name__ == "__main__":
