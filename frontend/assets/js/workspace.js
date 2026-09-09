@@ -43,7 +43,12 @@ function setProcessing(isProcessing) {
 	processButton.disabled = isProcessing;
 	processButton.classList.toggle("is-processing", isProcessing);
 	processButton.setAttribute("aria-busy", String(isProcessing));
-	processButton.textContent = isProcessing ? "Processing..." : "Process Image";
+
+	if (isProcessing) {
+		processButton.textContent = "Processing...";
+	} else {
+		processButton.textContent = "Process Image";
+	}
 }
 
 function showImagePreview(imageFile, imageUrl, width, height) {
@@ -265,7 +270,14 @@ async function loadGalleryImage() {
 	}
 
 	getElement("#status").textContent = "Loading image...";
-	const source = new URLSearchParams(window.location.search).get("source") || "original";
+	const query = new URLSearchParams(window.location.search);
+	const requestedSource = query.get("source");
+	let source;
+	if (requestedSource) {
+		source = requestedSource;
+	} else {
+		source = "original";
+	}
 	let loadUrl = "/api/gallery/" + encodeURIComponent(imageId) + "/load";
 	if (source === "edited") {
 		loadUrl += "?source=edited";
@@ -280,7 +292,13 @@ async function loadGalleryImage() {
 			return;
 		}
 		if (!response.ok) {
-			getElement("#status").textContent = data.error || "Could not load image.";
+			let message;
+			if (data.error) {
+				message = data.error;
+			} else {
+				message = "Could not load image.";
+			}
+			getElement("#status").textContent = message;
 			return;
 		}
 
