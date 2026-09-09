@@ -25,8 +25,11 @@ def save_image_transaction(
 ):
     """Upload the image files and record their paths in the database."""
     # Upload the original first because every gallery record needs it.
-    original_filename = original_filename or os.path.basename(local_raw_path)
-    original_filename = os.path.basename(original_filename)
+    if original_filename:
+        original_filename = os.path.basename(original_filename)
+    else:
+        original_filename = os.path.basename(local_raw_path)
+
     original_stem, original_extension = os.path.splitext(original_filename)
     unique_original_name = (
         f"{original_stem}-{uuid.uuid4().hex}{original_extension}"
@@ -77,9 +80,14 @@ def delete_image_transaction(image_id, user_id):
 
 def is_uuid_hex(value):
     """Check the UUID format used in older object keys."""
-    return len(value) == 32 and all(
-        character in "0123456789abcdef" for character in value.lower()
-    )
+    if len(value) != 32:
+        return False
+
+    for character in value.lower():
+        if character not in "0123456789abcdef":
+            return False
+
+    return True
 
 
 def get_original_filename(path):

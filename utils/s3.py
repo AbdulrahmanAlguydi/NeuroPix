@@ -23,7 +23,11 @@ def _execute_s3_upload(local_file_path, folder_prefix, object_name=None):
         print(f"[STORAGE ERROR] Local file not found: {local_file_path}")
         return None
 
-    filename = object_name or os.path.basename(local_file_path)
+    if object_name:
+        filename = object_name
+    else:
+        filename = os.path.basename(local_file_path)
+
     filename = os.path.basename(filename)
 
     # Keep originals and processed files in separate folders in the bucket.

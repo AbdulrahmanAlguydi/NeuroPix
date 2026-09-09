@@ -38,6 +38,15 @@ MAX_LANDSCAPE_SIZE = (1920, 1080)
 MAX_PORTRAIT_SIZE = (1080, 1920)
 
 
+def get_request_data():
+    """Return the JSON request body, or an empty dictionary if it is missing."""
+    data = request.get_json(silent=True)
+    if data:
+        return data
+
+    return {}
+
+
 def remove_temp_file(file_path):
     """Delete a temporary upload file when it is no longer needed."""
     if not file_path:
@@ -75,7 +84,7 @@ def health_check():
 
 @app.route("/api/auth/register", methods=["POST"])
 def register():
-    data = request.get_json(silent=True) or {}
+    data = get_request_data()
     username = data.get("username")
     password = data.get("password")
 
@@ -100,7 +109,7 @@ def register():
 
 @app.route("/api/auth/login", methods=["POST"])
 def login():
-    data = request.get_json(silent=True) or {}
+    data = get_request_data()
     username = data.get("username")
     password = data.get("password")
 
@@ -257,14 +266,19 @@ def process_image():
     if not raw_image_path or not os.path.exists(raw_image_path):
         return {"error": "No image has been uploaded yet."}, 400
 
-    data = request.get_json(silent=True) or {}
+    data = get_request_data()
     edit_mode = data.get("editMode", "standard")
 
     if edit_mode not in {"standard", "ai"}:
         return {"error": "Unknown editing mode"}, 400
 
     settings = data.get("settings", {})
-    original_filename = session.get("uploaded_image_name", os.path.basename(raw_image_path))
+    stored_filename = session.get("uploaded_image_name")
+    if stored_filename:
+        original_filename = stored_filename
+    else:
+        original_filename = os.path.basename(raw_image_path)
+
     original_stem = os.path.splitext(original_filename)[0]
     previous_processed_path = session.get("processed_image_path")
     processed_path = None
