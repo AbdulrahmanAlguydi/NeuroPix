@@ -48,17 +48,17 @@ def build_ai_prompt(settings, source_size):
             requests.append(f"{rule} User request: {value}")
 
     upscaling = str(settings.get("upscaling", "1")).strip()
-    if upscaling and upscaling != "1":
-        requests.append(
-            f"Upscaling: use {upscaling}x, preserve the aspect ratio and composition, "
-            "and stay within 1920x1080 for landscape or 1080x1920 for portrait. "
-            "If needed, use the largest dimensions that fit."
-        )
-    elif upscaling == "1":
+    if upscaling == "1":
         requests.append(
             f"Upscaling: 1x selected for the {width}x{height} source image. "
             "Do not intentionally enlarge it; keep the output dimensions as close "
             "as the API allows while preserving its aspect ratio."
+        )
+    elif upscaling:
+        requests.append(
+            f"Upscaling: use {upscaling}x, preserve the aspect ratio and composition, "
+            "and stay within 1920x1080 for landscape or 1080x1920 for portrait. "
+            "If needed, use the largest dimensions that fit."
         )
 
     if not requests:

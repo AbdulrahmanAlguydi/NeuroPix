@@ -12,7 +12,11 @@ MODEL_ID = "stable-diffusion-v1-5/stable-diffusion-v1-5"
 
 class ImageEditAPI(ls.LitAPI):
     def setup(self, device):
-        data_type = torch.float16 if str(device).startswith("cuda") else torch.float32
+        if str(device).startswith("cuda"):
+            data_type = torch.float16
+        else:
+            data_type = torch.float32
+
         self.pipe = StableDiffusionImg2ImgPipeline.from_pretrained(
             MODEL_ID,
             torch_dtype=data_type,
