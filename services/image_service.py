@@ -16,10 +16,24 @@ from utils.s3 import (
 )
 
 
-def save_image_transaction(user_id, local_raw_path, local_edited_path=None, edit_type=None):
+def save_image_transaction(
+    user_id,
+    local_raw_path,
+    local_edited_path=None,
+    edit_type=None,
+    original_filename=None,
+):
     """Upload the image files and record their paths in the database."""
     # Upload the original first because every gallery record needs it.
-    original_key = upload_original_image(local_raw_path)
+    original_filename = original_filename or os.path.basename(local_raw_path)
+    original_filename = os.path.basename(original_filename)
+    original_stem, original_extension = os.path.splitext(original_filename)
+    unique_original_name = (
+        f"{original_stem}-{uuid.uuid4().hex}{original_extension}"
+    )
+    original_key = upload_original_image(
+        local_raw_path, object_name=unique_original_name
+    )
     if not original_key:
         print("[SERVICE ERROR] Original image upload failed.")
         return None

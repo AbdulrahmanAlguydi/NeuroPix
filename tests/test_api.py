@@ -356,6 +356,7 @@ def test_process_standard_edit_success(mock_save, mock_url, logged_in_client):
         },
     }
     mock_save.assert_called_once()
+    assert mock_save.call_args.kwargs["original_filename"] == "test.jpg"
 
 
 def test_process_without_upload_first(logged_in_client):
@@ -467,7 +468,9 @@ def test_image_service_pipeline_mock(mock_log, mock_up_proc, mock_up_raw):
         "ModifiedFilePath": "outputs/edit123.jpg",
         "EditType": "ai",
     }
-    mock_up_raw.assert_called_once_with("/tmp/raw.jpg")
+    mock_up_raw.assert_called_once()
+    assert mock_up_raw.call_args.args[0] == "/tmp/raw.jpg"
+    assert mock_up_raw.call_args.kwargs["object_name"].endswith(".jpg")
     mock_up_proc.assert_called_once_with("/tmp/edit.jpg")
     mock_log.assert_called_once_with(
         user_id=5,
@@ -475,6 +478,31 @@ def test_image_service_pipeline_mock(mock_log, mock_up_proc, mock_up_raw):
         modified_path="outputs/edit123.jpg",
         edit_type="ai",
     )
+
+
+@patch("services.image_service.upload_original_image", return_value="inputs/fake.jpg")
+@patch("services.image_service.upload_processed_image", return_value="outputs/edit123.jpg")
+@patch("services.image_service.log_image_edit", return_value=True)
+def test_repeated_processing_uses_unique_original_keys(
+    mock_log, mock_up_proc, mock_up_raw
+):
+    """Repeated edits of one upload should use different original names."""
+    from services.image_service import save_image_transaction
+
+    for _ in range(2):
+        save_image_transaction(
+            user_id=5,
+            local_raw_path="/tmp/raw.jpg",
+            local_edited_path="/tmp/edit.jpg",
+            edit_type="ai",
+            original_filename="city-lights.jpg",
+        )
+
+    names = [call.kwargs["object_name"] for call in mock_up_raw.call_args_list]
+    assert len(names) == 2
+    assert names[0] != names[1]
+    assert all(name.startswith("city-lights-") for name in names)
+    assert all(name.endswith(".jpg") for name in names)
 
 
 if __name__ == "__main__":

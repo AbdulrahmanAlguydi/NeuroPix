@@ -17,13 +17,14 @@ s3_client = boto3.client(
 )
 
 
-def _execute_s3_upload(local_file_path, folder_prefix):
+def _execute_s3_upload(local_file_path, folder_prefix, object_name=None):
     """Upload a local image and return its S3 object key."""
     if not os.path.exists(local_file_path):
         print(f"[STORAGE ERROR] Local file not found: {local_file_path}")
         return None
 
-    filename = os.path.basename(local_file_path)
+    filename = object_name or os.path.basename(local_file_path)
+    filename = os.path.basename(filename)
 
     # Keep originals and processed files in separate folders in the bucket.
     object_key = f"{folder_prefix}/{filename}"
@@ -48,9 +49,11 @@ def _execute_s3_upload(local_file_path, folder_prefix):
         return None
 
 
-def upload_original_image(local_file_path):
+def upload_original_image(local_file_path, object_name=None):
     """Upload an original image to the inputs folder."""
-    return _execute_s3_upload(local_file_path, folder_prefix="inputs")
+    return _execute_s3_upload(
+        local_file_path, folder_prefix="inputs", object_name=object_name
+    )
 
 
 def upload_processed_image(local_file_path):

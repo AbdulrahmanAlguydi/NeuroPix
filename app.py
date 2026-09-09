@@ -294,6 +294,7 @@ def process_image():
         local_raw_path=raw_image_path,
         local_edited_path=processed_path,
         edit_type=edit_mode,
+        original_filename=original_filename,
     )
 
     if not saved_record:

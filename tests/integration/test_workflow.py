@@ -43,6 +43,7 @@ def run_integrated_workflow():
     print("==================================================")
 
     user_id = None
+    result = None
     unique_suffix = uuid.uuid4().hex[:8]
 
     with TemporaryDirectory(prefix="neuropix-integration-") as temp_dir:
@@ -95,9 +96,9 @@ def run_integrated_workflow():
                 )
                 sys.exit(1)
         finally:
-            # The service uses these names when it creates S3 object keys.
-            delete_s3_object(f"inputs/{os.path.basename(local_raw_path)}")
-            delete_s3_object(f"outputs/{os.path.basename(local_edited_path)}")
+            if result:
+                delete_s3_object(result.get("OriginalFilePath"))
+                delete_s3_object(result.get("ModifiedFilePath"))
             cleanup_database_user(user_id)
             print("\n[CLEANUP] Removed temporary workflow files and records.")
 
