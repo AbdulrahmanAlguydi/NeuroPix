@@ -1,4 +1,5 @@
 import base64
+from math import ceil
 import os
 
 import requests
@@ -54,7 +55,8 @@ def calculate_output_size(source_size, upscaling):
 
     # The API requires at least 655,360 pixels for a custom size.
     pixel_count = requested_width * requested_height
-    if pixel_count < MIN_CUSTOM_PIXELS:
+    needs_minimum_size = pixel_count < MIN_CUSTOM_PIXELS
+    if needs_minimum_size:
         minimum_scale = (MIN_CUSTOM_PIXELS / pixel_count) ** 0.5
         requested_width *= minimum_scale
         requested_height *= minimum_scale
@@ -73,9 +75,13 @@ def calculate_output_size(source_size, upscaling):
         requested_width *= limit_scale
         requested_height *= limit_scale
 
-    # GPT Image custom sizes must use multiples of 16.
-    requested_width = max(16, round(requested_width / 16) * 16)
-    requested_height = max(16, round(requested_height / 16) * 16)
+    if needs_minimum_size:
+        # Round small images up so rounding does not drop below the minimum.
+        requested_width = max(16, ceil(requested_width / 16) * 16)
+        requested_height = max(16, ceil(requested_height / 16) * 16)
+    else:
+        requested_width = max(16, round(requested_width / 16) * 16)
+        requested_height = max(16, round(requested_height / 16) * 16)
 
     # Rounding can push one edge over the cap, so adjust the other edge too.
     if requested_width > max_width:
