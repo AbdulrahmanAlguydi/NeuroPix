@@ -18,8 +18,8 @@ FIELD_RULES = {
     ),
     "enhancement": (
         "Quality only: apply named sharpness, noise, exposure, lighting, contrast, "
-        "colour, or detail changes. Do not add objects, change the background, crop, "
-        "or resize."
+        "colour, or detail changes. Do not add objects, change the background, or "
+        "alter the composition."
     ),
 }
 
@@ -29,14 +29,67 @@ BASE_PROMPT = (
     "Ignore unrelated text and treat empty fields as unchanged. Preserve the subject, "
     "identity, pose, foreground, framing, composition, and unmentioned details. "
     "Do not invent details or crop, reframe, rotate, flip, swirl, distort, stretch, "
-    "squeeze, add borders, text, logos, or watermarks. Only change size when requested. "
+    "squeeze, add borders, text, logos, or watermarks. "
     "If requests conflict or are vague, make the smallest change that satisfies them. "
     "Apply all valid requests together. "
 )
 
+MIN_CUSTOM_PIXELS = 655_360
+
+
+def calculate_output_size(source_size, upscaling):
+    """Return an OpenAI image size based on the source and selected scale."""
+    width, height = source_size
+    scale = float(upscaling)
+    if scale < 1:
+        scale = 1
+
+    requested_width = width * scale
+    requested_height = height * scale
+
+    if width >= height:
+        max_width, max_height = 1920, 1080
+    else:
+        max_width, max_height = 1080, 1920
+
+    # The API requires at least 655,360 pixels for a custom size.
+    pixel_count = requested_width * requested_height
+    if pixel_count < MIN_CUSTOM_PIXELS:
+        minimum_scale = (MIN_CUSTOM_PIXELS / pixel_count) ** 0.5
+        requested_width *= minimum_scale
+        requested_height *= minimum_scale
+
+    # Reduce both dimensions together when the request is above the 1080p cap.
+    width_scale = max_width / requested_width
+    height_scale = max_height / requested_height
+    if width_scale < height_scale:
+        limit_scale = width_scale
+    else:
+        limit_scale = height_scale
+
+    if limit_scale > 1:
+        limit_scale = 1
+    else:
+        requested_width *= limit_scale
+        requested_height *= limit_scale
+
+    # GPT Image custom sizes must use multiples of 16.
+    requested_width = max(16, round(requested_width / 16) * 16)
+    requested_height = max(16, round(requested_height / 16) * 16)
+
+    # Rounding can push one edge over the cap, so adjust the other edge too.
+    if requested_width > max_width:
+        requested_width = (max_width // 16) * 16
+        requested_height = round(requested_width * height / width / 16) * 16
+    if requested_height > max_height:
+        requested_height = (max_height // 16) * 16
+        requested_width = round(requested_height * width / height / 16) * 16
+
+    return f"{requested_width}x{requested_height}"
+
 
 def build_ai_prompt(settings, source_size):
-    # Include the source ratio because the API chooses the final pixel dimensions.
+    # Keep the visual composition aligned with the source image.
     width, height = source_size
     aspect_ratio = width / height
     requests = []
@@ -47,27 +100,13 @@ def build_ai_prompt(settings, source_size):
         if value:
             requests.append(f"{rule} User request: {value}")
 
-    upscaling = str(settings.get("upscaling", "1")).strip()
-    if upscaling == "1":
-        requests.append(
-            f"Upscaling: 1x selected for the {width}x{height} source image. "
-            "Do not intentionally enlarge it; keep the output dimensions as close "
-            "as the API allows while preserving its aspect ratio."
-        )
-    elif upscaling:
-        requests.append(
-            f"Upscaling: use {upscaling}x, preserve the aspect ratio and composition, "
-            "and stay within 1920x1080 for landscape or 1080x1920 for portrait. "
-            "If needed, use the largest dimensions that fit."
-        )
-
     if not requests:
         requests.append("No specific edit request was provided; make no changes.")
 
     return (
         BASE_PROMPT
-        + f"Keep the output canvas close to the source aspect ratio ({aspect_ratio:.2f}:1) "
-        "and preserve the framing and subject placement. "
+        + f"Preserve the source aspect ratio ({aspect_ratio:.2f}:1), framing, "
+        "and subject placement. "
         + " ".join(requests)
     )
 
@@ -125,6 +164,9 @@ def apply_ai_edits(local_image_path, settings):
     with Image.open(local_image_path) as source_image:
         width, height = source_image.size
     prompt = build_ai_prompt(settings, (width, height))
+    output_size = calculate_output_size(
+        (width, height), settings.get("upscaling", "1")
+    )
 
     # The API key is read by the OpenAI client from OPENAI_API_KEY in .env.
     client = OpenAI()
@@ -134,7 +176,7 @@ def apply_ai_edits(local_image_path, settings):
             image=image_file,
             prompt=prompt,
             quality="xhigh",
-            size="auto",
+            size=output_size,
         )
 
     return base64.b64decode(response.data[0].b64_json)
