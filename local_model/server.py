@@ -37,7 +37,7 @@ class ImageEditAPI(ls.LitAPI):
                 strength=1.0,
                 guidance_scale=7.5,
                 # Fewer steps make full-HD requests finish sooner at lower quality.
-                num_inference_steps=14,
+                num_inference_steps=10,
             )
         return result.images[0]
 
