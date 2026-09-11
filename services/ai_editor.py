@@ -130,9 +130,10 @@ def apply_ai_edits(local_image_path, settings):
     client = OpenAI()
     with open(local_image_path, "rb") as image_file:
         response = client.images.edit(
-            model=os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-2"),
+            model=os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-2.5-sunburst"),
             image=image_file,
             prompt=prompt,
+            quality="xhigh",
             size="auto",
         )
 
