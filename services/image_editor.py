@@ -22,17 +22,17 @@ def apply_standard_edits(image, settings):
     # Work in RGB so the filters below behave the same for JPG and PNG.
     edited = image.convert("RGB")
 
-    # 1. Rotate first, so the crop below uses the already-rotated image.
-    if rotation_degrees:
-        edited = edited.rotate(-rotation_degrees, expand=True)
-
-    # 2. Crop to the requested percentage of width/height, centered.
+    # 1. Crop to the requested percentage of the uploaded image, centered.
     original_width, original_height = edited.size
     new_width = max(1, int(original_width * crop_width_percent / 100))
     new_height = max(1, int(original_height * crop_height_percent / 100))
     left = (original_width - new_width) // 2
     top = (original_height - new_height) // 2
     edited = edited.crop((left, top, left + new_width, top + new_height))
+
+    # 2. Rotate after cropping so crop percentages keep the original orientation.
+    if rotation_degrees:
+        edited = edited.rotate(-rotation_degrees, expand=True)
 
     # 3. Brightness and exposure both make the image lighter or darker,
     #    so we combine them into a single brightness factor.
