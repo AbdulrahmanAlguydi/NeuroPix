@@ -1,0 +1,16 @@
+# Temporary document/export artifacts
+~$*
+.~lock.*#
+*.tmp
+*.bak
+*.xps
+
+# Generated QA and language caches
+qa/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
