@@ -43,30 +43,30 @@ Visual-selection rule:
 ### List of tables
 
 - Generate the list from Word table captions.
-- Use chapter-based numbering such as Table 3.1 and Table 6.2.
+- Use the containing section number alone when it has one table, such as Table 2.3. Where a section has multiple tables, add a sequence suffix, as in Table 3.1-1 and Table 3.1-2. Renumber the caption, List of Tables entry, and every in-text reference together.
 - Check that every listed table appears in the document and is referenced in the text.
 
 ### List of figures
 
 - Generate the list from Word figure captions.
 - Include diagrams, application screenshots, database models, and workflow figures.
-- Use chapter-based numbering such as Figure 4.1 and Figure 5.4.
+- Use the containing section number alone when it has one figure, such as Figure 4.2. Where a section has multiple figures, add a sequence suffix, as in Figure 4.10-1 and Figure 4.10-2. Renumber the caption, List of Figures entry, and every in-text reference together.
 
 ### Abstract
 
-- Keep the current 62-word abstract, explicitly accepted by the user. This supersedes the earlier approximate 50-word drafting target while preserving a concise, self-contained summary.
+- Keep the current 73-word abstract, approved during the final text review. This supersedes the earlier approximate 50-word drafting target while preserving a concise, self-contained summary.
 - State the image-editing problem addressed by NeuroPix.
 - Identify the browser-based purpose and connected editing workflow.
 - Summarize the dual editing approach: standard Pillow processing and AI-assisted editing.
 - Describe the approach briefly: conventional editing, hosted and local AI, and cloud-backed image management. Leave the detailed technology inventory to the body chapters.
 - State the main implemented outcome.
-- State only the high-level verified outcome. Keep exact test counts, timings, and execution conditions in Chapter 6.
+- End with the implemented workflow and its practical benefit. Keep testing statements, exact test counts, timings, and execution conditions in Chapter 6.
 - Keep the abstract self-contained and include no citations, unexplained abbreviations, figures, or tables.
 
 ### Keywords
 
 - Select four to six terms that directly represent the work.
-- Expected candidates include image processing, generative image editing, Flask, cloud storage, Stable Diffusion, and web application.
+- Use image processing, AI-assisted image editing, Flask, OpenAI, Stable Diffusion, and web application.
 - Final terms must match the wording used in the report.
 
 ### List of abbreviations
@@ -203,6 +203,7 @@ The table must distinguish verified facts from unavailable information. A blank 
 - Explain that users do not need to install a desktop editor or learn a complex multi-tool interface for the supported workflow.
 - Explain the advantage over using the general OpenAI website as a workflow advantage rather than a model-quality claim: NeuroPix separates the request into content, background, and enhancement fields, adds preservation rules and source-image context automatically, then stores the result for comparison, download, and gallery reuse.
 - Avoid claiming that the OpenAI website cannot edit images or that NeuroPix is more powerful. The advantage is the project's focused, repeatable, integrated workflow and reduced prompt-engineering burden.
+- Do not add a disclaimer about an unmeasured usability comparison. Avoid unsupported comparative claims without weakening the section with an unnecessary limitation statement.
 - Explain the separate standard and AI modes.
 - Explain the choice between hosted OpenAI editing and the implemented self-hosted Stable Diffusion service.
 - Explain the integrated comparison and gallery reload workflow.
@@ -381,6 +382,7 @@ Planned table:
 Planned figure:
 
 - One detailed processing-order flowchart showing input, RGB conversion, crop, rotation, combined brightness and exposure, contrast, saturation, blur, sharpness, grayscale blending, and JPEG output. Do not add a second component diagram that repeats this flow.
+- Approved Figure 4.5 styling: pale violet numbered step badges with left-aligned 16 px numbers, grey arrows, and neutral operation boxes. Preserve the current Word dimensions and crop.
 
 ### 4.6 AI editing component
 
@@ -537,6 +539,8 @@ Use three two-panel figures, each with its screenshots stacked in full-width row
 - Access and workspace: landing page, registration or login, dashboard, and empty Studio.
 - Editing interface: valid upload preview, Standard controls, AI fields and provider selector, and processing state.
 - Results and management: processed-result comparison, populated gallery, and re-edit or deletion state.
+
+Label the two panels `(a)` and `(b)` with short descriptions. The shared Figure caption below the pair supplies the figure number; do not repeat an old figure number in each panel label.
 
 Add a validation-error or responsive screenshot only if it demonstrates a distinct interface behavior not already visible in Chapter 6. Do not repeat all live-test screenshots here; these figures document the interface structure, while Chapter 6 screenshots document executed steps and observed results.
 
@@ -758,7 +762,7 @@ Frame this as the work the team would prioritize with another six months. Keep t
 
 ### 7.4 Final conclusion
 
-Keep the existing concise closing paragraph. Do not add a second results table or repeat test counts.
+Keep the existing concise closing paragraph focused on the implemented system and the constraints under which it was delivered. Do not repeat the future-work priorities from Section 7.3, add a second results table, or repeat test counts.
 
 ## References
 

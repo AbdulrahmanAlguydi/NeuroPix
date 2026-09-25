@@ -1,5 +1,7 @@
 # User's saved Word changes — visual record
 
+The figure and table numbers in this historical record describe the user's saved 19 September version. The final report later adopted section-based labels, with a sequence suffix only for multiple figures or tables in one section. The dimensions, crops, and formatting observations still apply to the corresponding items.
+
 Reviewed on 19 September 2026. This records the user's manual edits, not new edits made by the assistant. The Word master and submission PDF were not changed during this review.
 
 ## Comparison and authority
@@ -86,3 +88,9 @@ All nine references increased from 10.5 to 11 pt. This causes additional wrappin
 - Current PDF SHA-256: `e8873b4725591c7ef2de1b79d779c261d06daa342dbeb54714772e232fcb6716`.
 
 These identify the saved versions reviewed, not any unsaved work currently open in Word.
+
+## Subsequent Figure 4.5 styling revision — 22 September 2026
+
+The user approved pale violet step badges, grey connectors, and larger 16 px step numbers, retaining left alignment to match the other figures. Only `word/media/image8.png` was replaced in the latest saved DOCX; every other ZIP member remained byte-identical, preserving all text, styles, crops, and drawing dimensions. The diagram source and 2560 × 1269 PNG were updated together.
+
+A Word PDF re-export used a different renderer from the established LibreOffice PDF and changed rendering across the document, so that re-export was not retained. Instead, the matching image resource was replaced losslessly in the existing PDF. All 57 pages retained identical extracted text; pixel comparison found changes only within Figure 4.5 on PDF page 24. No commits or pushes were made.

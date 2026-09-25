@@ -18,14 +18,14 @@ Latest authority: the user's saved manual revision, visually documented in `user
 
 ## Confirmed pagination
 
-- Data-table cell padding: 4 pt top and bottom, with content-driven row heights. Table 1.1 retains 2.5 pt to keep its subsection and table together. Do not force equal row heights or shrink text to fit.
-- User-saved column grids (twips, 1,440 per inch): Table 2.1 = 1615 / 2250 / 2340 / 3011; Table 3.5 = 1255 / 2520 / 5441; Table 4.1 = 2425 / 1170 / 5621; Table 4.2 = 1345 / 3870 / 4001; Table 4.3 = 1728 / 2317 / 5171. Tables 6.2–6.8 retain 1.4 / 5.0 inches. Other grids remain unchanged. Total table width is 6.4 inches.
+- Data-table cell padding: 4 pt top and bottom, with content-driven row heights. Table 1.2.2 retains 2.5 pt to keep its subsection and table together. Do not force equal row heights or shrink text to fit.
+- User-saved column grids (twips, 1,440 per inch): Table 2.3 = 1615 / 2250 / 2340 / 3011; Table 3.5 = 1255 / 2520 / 5441; Table 4.4 = 2425 / 1170 / 5621; Table 4.9 = 1345 / 3870 / 4001; Table 4.12 = 1728 / 2317 / 5171. Tables 6.2 and 6.4–6.9 retain 1.4 / 5.0 inches. Other grids remain unchanged. Total table width is 6.4 inches.
 - Every paragraph using Word's `Heading 1` style starts on a new page.
 - Implement this through the style's `page break before` property rather than manually inserting blank paragraphs.
 - Avoid orphaned headings and prevent captions from becoming separated from their figures or tables when practical.
 - Keep complete data tables on one page where feasible. Assign widths according to the amount of text, avoiding overly wide short-value columns.
 - Current measured length is 57 pages. This is a verified result, not permission to reduce font size or weaken evidence to enforce a page limit.
-- Use single line spacing in diagram-only paragraphs so the inline image does not inherit extra body-line height. Keep introductions and captions attached. Preserve the user's individual non-destructive crops and displayed dimensions stored in the current Word master for all 20 diagrams. Figures 4.8 and 4.9 are approximately 6.42 and 6.41 inches wide and remain together on physical page 29. Figure 4.2 remains approximately 5.31 inches wide. Do not reset every image to one standard width.
+- Use single line spacing in diagram-only paragraphs so the inline image does not inherit extra body-line height. Keep introductions and captions attached. Preserve the user's individual non-destructive crops and displayed dimensions stored in the current Word master for all 20 diagrams. Figures 4.10-2 and 4.10-3 are approximately 6.42 and 6.41 inches wide. Figure 4.3 remains approximately 5.31 inches wide. Do not reset every image to one standard width.
 - Section 3.7 starts on physical page 20 with both data dictionaries; this intentional page break preserves grouping without adding a page.
 
 ## Final delivery format
@@ -65,10 +65,12 @@ Latest authority: the user's saved manual revision, visually documented in `user
 - Keep the shared numbered figure caption with the final screenshot. Keep each individual screenshot and its label together.
 - Insert the full-resolution screenshots into Word and resize them only through their displayed dimensions. Use Word's non-destructive crop controls for unused browser chrome and empty margins.
 - Enable `Do not compress images in file` and select `High fidelity` for the Word master. Preserve the embedded image's original pixel dimensions.
-- Evidence groups may span pages, but no screenshot or attached label may split. Chapter 5 uses three two-panel figures with one full-width screenshot per row; each pair, introduction, and shared caption stays on one page.
+- Evidence groups may span pages, but no screenshot or attached label may split. Chapter 5 uses three two-panel figures with one full-width screenshot per row; each pair, introduction, and shared caption stays on one page. Chapter 5 panel labels use `(a)` and `(b)` with short descriptions because the shared caption supplies the current figure number.
 - Inspect every screenshot at normal page view for readable controls, prompts, messages, and results.
 - Repeat this legibility check on the final exported PDF at normal page view and when zoomed because PDF conversion may resample images or change spacing.
 
 ## Template priority
+
+Figure 4.5 uses pale violet step-number badges (`#6D5DFC` at 9% fill opacity), violet borders and left-aligned 16 px numbers, with grey (`#555B68`) connectors. This approved treatment replaces the earlier accent arrows. Retain the 2560 × 1269 full-resolution image and the existing Word drawing dimensions and crop.
 
 The official cover page remains the authority for the cover layout. The supervisor guideline and sample guide the report structure. These explicit typography and pagination requirements apply to the report body and take precedence when the supplied examples differ.
