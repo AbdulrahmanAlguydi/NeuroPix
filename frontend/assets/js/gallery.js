@@ -119,20 +119,30 @@ function getWorkspaceUrl(imageId, source) {
 	);
 }
 
-function openEditChoice(image, action = "edit") {
-	if (!image.modified_url && action === "edit") {
-		window.location.href = getWorkspaceUrl(image.image_id, "original");
-		return;
+function openVersionChoice(image, action) {
+	if (!image.modified_url) {
+		if (action === "edit") {
+			window.location.href = getWorkspaceUrl(image.image_id, "original");
+			return;
+		}
 	}
 
 	selectedGalleryImage = image;
 	galleryAction = action;
-	editChoiceModal.querySelector(".eyebrow").textContent = action === "download" ? "DOWNLOAD IMAGE" : "EDIT IMAGE";
-	editChoiceModal.querySelector("p").textContent = action === "download"
-		? "Download the original upload or the saved edited result."
-		: "Select which version you want to continue editing in Studio.";
-	useOriginalButton.textContent = action === "download" ? "Download original" : "Use original";
-	useEditedButton.textContent = action === "download" ? "Download edited" : "Use edited";
+	const popupLabel = editChoiceModal.querySelector(".eyebrow");
+	const popupDescription = editChoiceModal.querySelector("p");
+
+	if (action === "download") {
+		popupLabel.textContent = "DOWNLOAD IMAGE";
+		popupDescription.textContent = "Download the original upload or the saved edited result.";
+		useOriginalButton.textContent = "Download original";
+		useEditedButton.textContent = "Download edited";
+	} else {
+		popupLabel.textContent = "EDIT IMAGE";
+		popupDescription.textContent = "Select which version you want to continue editing in Studio.";
+		useOriginalButton.textContent = "Use original";
+		useEditedButton.textContent = "Use edited";
+	}
 	useEditedButton.disabled = !image.modified_url;
 	editChoiceTitle.textContent = "Choose a version of " + getGalleryTitle(image);
 	editChoiceModal.classList.remove("hidden");
@@ -229,7 +239,7 @@ function createGalleryCard(image) {
 	editLink.textContent = "Edit";
 	editLink.addEventListener("click", function (event) {
 		event.preventDefault();
-		openEditChoice(image);
+		openVersionChoice(image, "edit");
 	});
 	actions.appendChild(editLink);
 
@@ -242,7 +252,7 @@ function createGalleryCard(image) {
 		'<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
 		'<path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4"></path></svg>';
 	downloadButton.addEventListener("click", function () {
-		openEditChoice(image, "download");
+		openVersionChoice(image, "download");
 	});
 	actions.appendChild(downloadButton);
 
