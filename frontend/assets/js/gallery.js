@@ -18,6 +18,7 @@ const GALLERY_CACHE_KEY = "neuropixGallery";
 
 let dragging = false;
 let selectedGalleryImage = null;
+let galleryAction = "edit";
 
 // Moves the divider and reveals the After image on the right side.
 function updateComparison(value) {
@@ -118,13 +119,21 @@ function getWorkspaceUrl(imageId, source) {
 	);
 }
 
-function openEditChoice(image) {
-	if (!image.modified_url) {
+function openEditChoice(image, action = "edit") {
+	if (!image.modified_url && action === "edit") {
 		window.location.href = getWorkspaceUrl(image.image_id, "original");
 		return;
 	}
 
 	selectedGalleryImage = image;
+	galleryAction = action;
+	editChoiceModal.querySelector(".eyebrow").textContent = action === "download" ? "DOWNLOAD IMAGE" : "EDIT IMAGE";
+	editChoiceModal.querySelector("p").textContent = action === "download"
+		? "Download the original upload or the saved edited result."
+		: "Select which version you want to continue editing in Studio.";
+	useOriginalButton.textContent = action === "download" ? "Download original" : "Use original";
+	useEditedButton.textContent = action === "download" ? "Download edited" : "Use edited";
+	useEditedButton.disabled = !image.modified_url;
 	editChoiceTitle.textContent = "Choose a version of " + getGalleryTitle(image);
 	editChoiceModal.classList.remove("hidden");
 }
@@ -139,7 +148,12 @@ function chooseEditSource(source) {
 		return;
 	}
 
-	window.location.href = getWorkspaceUrl(selectedGalleryImage.image_id, source);
+	if (galleryAction === "download") {
+		window.location.href = "/api/gallery/" + selectedGalleryImage.image_id + "/download?source=" + source;
+		closeEditChoice();
+	} else {
+		window.location.href = getWorkspaceUrl(selectedGalleryImage.image_id, source);
+	}
 }
 
 function createGalleryCard(image) {
@@ -218,6 +232,19 @@ function createGalleryCard(image) {
 		openEditChoice(image);
 	});
 	actions.appendChild(editLink);
+
+	const downloadButton = document.createElement("button");
+	downloadButton.className = "gallery-edit gallery-download";
+	downloadButton.type = "button";
+	downloadButton.setAttribute("aria-label", "Download " + title);
+	downloadButton.title = "Download " + title;
+	downloadButton.innerHTML =
+		'<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+		'<path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4"></path></svg>';
+	downloadButton.addEventListener("click", function () {
+		openEditChoice(image, "download");
+	});
+	actions.appendChild(downloadButton);
 
 	const deleteButton = document.createElement("button");
 	deleteButton.className = "gallery-delete";

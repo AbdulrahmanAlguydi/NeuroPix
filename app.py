@@ -209,6 +209,34 @@ def delete_gallery_image(image_id):
     return {"message": "Image deleted successfully"}, 200
 
 
+@app.route("/api/gallery/<int:image_id>/download", methods=["GET"])
+@login_required
+def download_gallery_image(image_id):
+    source = request.args.get("source", "edited")
+    if source not in {"original", "edited"}:
+        return {"error": "Unknown image version"}, 400
+
+    image = stage_gallery_image(image_id, session["user_id"], UPLOAD_TEMP_DIR, source)
+    if not image:
+        return {"error": "Image version could not be downloaded"}, 404
+
+    try:
+        with open(image["path"], "rb") as image_file:
+            image_bytes = image_file.read()
+        filename = image["file_name"]
+        if source == "edited":
+            stem = os.path.splitext(filename)[0]
+            extension = os.path.splitext(image["source_key"])[1]
+            filename = f"{stem}-edited{extension}"
+        return send_file(
+            BytesIO(image_bytes), as_attachment=True, download_name=filename
+        )
+    except OSError:
+        return {"error": "Image version could not be downloaded"}, 500
+    finally:
+        remove_temp_file(image["path"])
+
+
 @app.route("/api/upload", methods=["POST"])
 @login_required
 def upload():

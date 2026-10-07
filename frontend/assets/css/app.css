@@ -1027,6 +1027,7 @@ textarea {
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
+	flex-wrap: wrap;
 	margin-top: 10px;
 }
 .gallery-chips {
@@ -1038,6 +1039,7 @@ textarea {
 	display: flex;
 	align-items: center;
 	gap: 8px;
+	margin-left: auto;
 }
 .gallery-edit {
 	display: inline-flex;
@@ -1056,6 +1058,11 @@ textarea {
 .gallery-edit:hover {
 	background: var(--accent);
 	color: #fff;
+}
+.gallery-download {
+	width: 34px;
+	padding: 0;
+	background: #fff;
 }
 .chip {
 	padding: 5px 8px;
@@ -1229,7 +1236,7 @@ textarea {
 	font-size: 13px;
 }
 .edit-choice-card {
-	width: min(460px, 95vw);
+	width: min(460px, 100%);
 }
 .edit-choice-card h2 {
 	margin: 8px 0;
@@ -1240,6 +1247,7 @@ textarea {
 }
 .edit-choice-actions {
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: flex-end;
 	gap: 10px;
 	margin-top: 24px;
