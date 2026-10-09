@@ -26,3 +26,15 @@ Current IEEE numbering after the whole-report review: [1] repository, [2] SRS, [
 - Do not add separate citations for Namecheap, Camber Cloud, Lightning.ai, the direct-to-main workflow, or every software dependency when the report is describing the team's own experience.
 - Record the exact claim supported during drafting and verify each web page again before final submission.
 - Convert the working IDs to IEEE numbers in order of first appearance, and remove any source that is not cited.
+
+## Presentation asset notes
+
+The current presentation is `final-report/NeuroPix-Project-Presentation.pptx`; its matching PDF has the same basename. It contains 16 slides. Both replace the dated drafts and alternative decks.
+
+- Project content and original test images come from the final report, repository, and `evidence/use-case-tests/`. The gallery live case includes finding, downloading, and deleting images, as confirmed by the team.
+- The cover uses the team's supplied laptop mockup with the NeuroPix homepage and the same gallery cards used on Slide 9. The arrangement takes inspiration from [Product Design Review Feature Deck](https://www.figma.com/community/file/1542584763080422627/product-design-review-feature-deck-presentation-template). The current cover is a custom composition, not the rejected AI-generated mockup.
+- Icons use [Lucide](https://lucide.dev/) and provider artwork from [Lobe Icons](https://github.com/lobehub/lobe-icons). These are presentation asset sources, not additions to the report bibliography.
+- The current architecture source is `figures/source/presentation-architecture.svg`. It includes the corrected reverse-SSH arrowhead.
+- `evidence/presentation/ai-editing-prompts.png` is the browser-rendered screenshot used on Slide 6. Its prompt font was enlarged with temporary browser CSS; application source was not changed for the capture.
+- `evidence/presentation/local-sd-upscaled.png` is an AI-upscaled presentation crop of the saved local-model output. It is not a new model test or a recovered high-resolution original. Original test evidence remains unchanged.
+- All presentation images are embedded in the PPTX; it has no dependency on the removed build folders or the local archive.

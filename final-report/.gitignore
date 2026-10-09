@@ -11,6 +11,15 @@ qa/
 *.py[cod]
 .pytest_cache/
 
+# Presentation authoring and render outputs (final PPTX/PDF live at the folder root)
+.codex-presentation-finalizer-*/
+.presentation-redesign-build-*/
+.presentation-redesign-output-*/
+.codex-presentation-build-*/
+.presentation-*-build*/
+.presentation-slide-by-slide-build-*/
+.reimagined-presentation-build/
+
 # OS/editor noise
 .DS_Store
 Thumbs.db

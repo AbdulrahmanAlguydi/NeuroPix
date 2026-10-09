@@ -13,3 +13,7 @@ __pycache__/
 # Local IDE settings
 .vscode/
 .DS_Store
+
+# Local presentation validation and browser-session artifacts
+.codex-presentation-finalizer-*/
+.playwright-cli/

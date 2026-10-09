@@ -1,0 +1,204 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">NeuroPix application architecture with separate AWS storage and AI provider zones</title>
+  <desc id="desc">The browser connects through Nginx to a Flask application on AWS EC2. The application uses Pillow for standard edits, Amazon S3 and RDS for image and metadata storage, OpenAI as the default AI provider, and a reverse SSH tunnel to a local Stable Diffusion service.</desc>
+  <defs>
+    <marker id="arrow-gray" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#AAB3C5"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#9C8CFF"/>
+    </marker>
+    <marker id="arrow-gray-start" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M10,0 L0,5 L10,10 Z" fill="#AAB3C5"/>
+    </marker>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; }
+      .title { font-size: 48px; font-weight: 700; fill: #6D5DFC; }
+      .subtitle { font-size: 20px; fill: #596171; }
+      .zone { fill: #20232D; stroke: #505769; stroke-width: 1.5; stroke-dasharray: 7 6; }
+      .zone-label { font-size: 14px; font-weight: 700; letter-spacing: .3px; fill: #C8CDDA; }
+      .zone-label-accent { fill: #A99BFF; }
+      .card { fill: #292D39; stroke: #687187; stroke-width: 1.5; }
+      .card-accent { fill: #302C4A; stroke: #8B7BFF; stroke-width: 1.8; }
+      .node-title { font-size: 20px; font-weight: 700; fill: #F5F7FB; }
+      .node-title-accent { fill: #B0A3FF; }
+      .node-subtitle { font-size: 16px; fill: #CBD0DD; }
+      .icon { fill: none; stroke: #E3E7F0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+      .icon-accent { stroke: #A99BFF; }
+      .connector { fill: none; stroke: #AAB3C5; stroke-width: 2; marker-end: url(#arrow-gray); }
+      .connector-accent { fill: none; stroke: #9C8CFF; stroke-width: 2; marker-end: url(#arrow-purple); }
+      .connector-dashed { fill: none; stroke: #AAB3C5; stroke-width: 2; stroke-dasharray: 8 6; marker-start: url(#arrow-gray-start); marker-end: url(#arrow-gray); }
+      .label-bg { fill: #20232D; }
+      .edge-label { font-size: 13px; font-weight: 600; fill: #D5DAE6; }
+      .edge-label-accent { fill: #B0A3FF; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="720" fill="#F5F7FB"/>
+  <text class="title" x="66" y="72">Application Architecture</text>
+  <text class="subtitle" x="68" y="119">The EC2 application handles standard edits and connects to AWS storage and AI providers.</text>
+  <rect x="0" y="150" width="1280" height="4" fill="#6D5DFC"/>
+
+<rect x="0" y="154" width="1280" height="566" fill="#171922"/>
+<g transform="translate(0 30)">
+  <rect class="zone" x="20" y="169" width="204" height="477" rx="13"/>
+  <!-- The browser is the client entry point; deployment containers show the three service zones. -->
+  <rect class="zone" x="242" y="169" width="598" height="477" rx="13"/>
+  <text class="zone-label zone-label-accent" x="260" y="198">AWS EC2 APPLICATION</text>
+  <rect class="zone" x="856" y="169" width="403" height="187" rx="13"/>
+  <text class="zone-label" x="875" y="198">AWS STORAGE</text>
+  <rect class="zone" x="856" y="367" width="403" height="279" rx="13"/>
+  <text class="zone-label" x="875" y="390">AI PROVIDERS</text>
+  <text class="zone-label" x="40" y="198">CLIENT</text>
+
+  <!-- Connectors are drawn before nodes so arrow ends tuck neatly beneath card edges. -->
+  <path class="connector" d="M213 280 H269"/>
+  <path class="connector" d="M441 280 H518"/>
+  <path class="connector" d="M754 280 H909"/>
+  <path class="connector" d="M636 329 V416"/>
+  <path class="connector" d="M518 466 H442"/>
+  <path class="connector-accent" d="M754 466 H909"/>
+  <path class="connector-accent" d="M636 516 V548"/>
+  <path class="connector-dashed" d="M754 584 H909"/>
+
+  <!-- Connector labels sit on small white masks for legibility. -->
+  <rect class="label-bg" x="214" y="255" width="53" height="19" rx="4"/>
+  <text class="edge-label" x="220" y="269">HTTPS</text>
+  <rect class="label-bg" x="454" y="255" width="48" height="19" rx="4"/>
+  <text class="edge-label" x="462" y="269">proxy</text>
+  <rect class="label-bg" x="790" y="255" width="80" height="19" rx="4"/>
+  <text class="edge-label" x="797" y="269">store / load</text>
+  <rect class="label-bg" x="650" y="356" width="83" height="19" rx="4"/>
+  <text class="edge-label" x="663" y="370">edit request</text>
+  <rect class="label-bg" x="443" y="442" width="65" height="19" rx="4"/>
+  <text class="edge-label" x="450" y="456">standard</text>
+  <rect class="label-bg" x="786" y="442" width="78" height="19" rx="4"/>
+  <text class="edge-label edge-label-accent" x="799" y="456">AI request</text>
+  <rect class="label-bg" x="649" y="521" width="78" height="19" rx="4"/>
+  <text class="edge-label edge-label-accent" x="661" y="535">AI request</text>
+  <rect class="label-bg" x="758" y="558" width="136" height="19" rx="4"/>
+  <text class="edge-label" x="769" y="572">reverse SSH tunnel</text>
+
+  <!-- Browser UI -->
+  <g transform="translate(0 -18)">
+<g>
+    <rect class="card" x="42" y="249" width="171" height="99" rx="10"/>
+    <g class="icon" transform="translate(59 270)">
+      <rect x="0" y="0" width="18" height="13" rx="2"/>
+      <path d="M9 13v5M4 18h10"/>
+    </g>
+    <text class="node-title" x="91" y="286">Browser</text>
+    <text class="node-subtitle" x="60" y="322">Edit and compare</text>
+  </g>
+</g>
+
+  <!-- Nginx -->
+  <g transform="translate(0 -18)">
+<g>
+    <rect class="card" x="270" y="249" width="171" height="99" rx="10"/>
+    <g class="icon" transform="translate(287 270)">
+      <rect x="0" y="0" width="18" height="7" rx="1.5"/>
+      <rect x="0" y="11" width="18" height="7" rx="1.5"/>
+      <path d="M4 3.5h.1M4 14.5h.1"/>
+    </g>
+    <text class="node-title" x="318" y="286">Nginx</text>
+    <text class="node-subtitle" x="305" y="322">HTTPS proxy</text>
+  </g>
+</g>
+
+  <!-- Flask app -->
+  <g transform="translate(0 -18)">
+<g>
+    <rect class="card" x="519" y="249" width="235" height="99" rx="10"/>
+    <g class="icon" transform="translate(536 270)">
+      <rect x="0" y="0" width="18" height="18" rx="3"/>
+      <path d="M4 5h10M4 9h10M4 13h6"/>
+    </g>
+    <text class="node-title" x="567" y="286">Flask app</text>
+    <text class="node-subtitle" x="568" y="322">Routes + sessions</text>
+  </g>
+</g>
+
+  <!-- Combined AWS storage node -->
+  <g transform="translate(0 -18)">
+<g>
+    <rect class="card" x="910" y="249" width="314" height="99" rx="10"/>
+    <g class="icon" transform="translate(928 272)">
+      <ellipse cx="9" cy="3" rx="8" ry="3"/>
+      <path d="M1 3v15c0 1.7 3.6 3 8 3s8-1.3 8-3V3M1 10c0 1.7 3.6 3 8 3s8-1.3 8-3"/>
+    </g>
+    <text class="node-title" x="958" y="286">Amazon S3 + RDS</text>
+    <text class="node-subtitle" x="1000" y="322">Images + MySQL</text>
+  </g>
+</g>
+
+  <!-- Pillow standard editing -->
+  <g transform="translate(0 18)">
+<g>
+    <rect class="card" x="270" y="399" width="171" height="99" rx="10"/>
+    <g class="icon" transform="translate(287 420)">
+      <rect x="0" y="0" width="18" height="18" rx="2"/>
+      <circle cx="5" cy="5" r="1.4"/>
+      <path d="M2 15l5-5 3 3 3-4 3 6"/>
+    </g>
+    <text class="node-title" x="318" y="436">Pillow</text>
+    <text class="node-subtitle" x="300" y="472">Standard edits</text>
+  </g>
+</g>
+
+  <!-- Editing services -->
+  <g transform="translate(0 18)">
+<g>
+    <rect class="card-accent" x="519" y="399" width="235" height="99" rx="10"/>
+    <g class="icon icon-accent" transform="translate(536 420)">
+      <path d="M3 15L15 3M2 7l3-3 3 3-3 3zM12 15l3-3 3 3-3 3z"/>
+      <path d="M13 2v3M11.5 3.5h3M4 13v3M2.5 14.5h3"/>
+    </g>
+    <text class="node-title node-title-accent" x="568" y="436">Edit routing</text>
+    <text class="node-subtitle" x="584" y="472">Standard + AI</text>
+  </g>
+</g>
+
+  <!-- OpenAI provider -->
+  <g transform="translate(0 18)">
+<g>
+    <rect class="card-accent" x="910" y="399" width="314" height="99" rx="10"/>
+    <g class="icon icon-accent" transform="translate(928 422)">
+      <path d="M9 0.5l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>
+      <path d="M17 14l1 2.5 2.5 1-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z"/>
+    </g>
+    <text class="node-title node-title-accent" x="958" y="436">OpenAI API</text>
+    <text class="node-subtitle" x="997" y="472">Default AI provider</text>
+  </g>
+</g>
+
+  <!-- Tunnel endpoint -->
+  <g transform="translate(0 18)">
+<g>
+    <rect class="card" x="519" y="531" width="235" height="71" rx="10"/>
+    <g class="icon" transform="translate(536 550)">
+      <rect x="0" y="0" width="17" height="7" rx="1.5"/>
+      <rect x="0" y="11" width="17" height="7" rx="1.5"/>
+      <path d="M8.5 7v4M4 18v3M13 18v3"/>
+    </g>
+    <text class="node-title" x="568" y="560">Tunnel endpoint</text>
+    <text class="node-subtitle" x="602" y="585">Port 8001</text>
+  </g>
+</g>
+
+  <!-- Local Stable Diffusion provider -->
+  <g transform="translate(0 18)">
+<g>
+    <rect class="card-accent" x="910" y="531" width="314" height="71" rx="10"/>
+    <g class="icon icon-accent" transform="translate(928 550)">
+      <rect x="2" y="1" width="15" height="17" rx="2"/>
+      <path d="M6 5h7M6 9h7M6 13h7M-1 5h3M-1 9h3M-1 13h3M17 5h3M17 9h3M17 13h3"/>
+    </g>
+    <text class="node-title node-title-accent" x="958" y="560">Stable Diffusion</text>
+    <text class="node-subtitle" x="982" y="585">Self-hosted on local PC</text>
+  </g>
+</g>
+
+
+</g>
+</svg>
