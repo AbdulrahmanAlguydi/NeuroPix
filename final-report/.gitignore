@@ -23,3 +23,12 @@ qa/
 # OS/editor noise
 .DS_Store
 Thumbs.db
+
+# Disposable report previews, renders, and backup copies
+working/full-layout-qa/
+working/report-diagram-qa/
+working/sequence-previews/
+working/*-preview.html
+working/*-preview.png
+working/sequence-preview-index.html
+working/pre-*.docx

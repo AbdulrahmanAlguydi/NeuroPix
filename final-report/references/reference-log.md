@@ -1,6 +1,6 @@
 # IEEE reference ledger
 
-This ledger fixes the intentionally small source set for the report. Working IDs are used here because final IEEE numbers will follow first appearance in the completed report.
+This ledger records the report's sources. The supervisor's October review requires at least 20 relevant references, each cited in the text. Working IDs remain stable; IEEE numbers follow first appearance.
 
 Internal verification dates below are research records, not report bibliography text. Per the user's decision, omit `[Accessed: ...]` suffixes from the Word references while retaining publication dates and URLs.
 
@@ -18,9 +18,29 @@ Current IEEE numbering after the whole-report review: [1] repository, [2] SRS, [
 | SRC-08 | Adobe | Generative AI features in Photoshop | Official product documentation | `https://helpx.adobe.com/photoshop/desktop/generative-ai/generative-ai-features-overview.html` | 2026-09-18 | Adobe Photoshop related-system analysis | Yes |
 | SRC-09 | Canva | Edit photos with Canva photo editor | Official product documentation | `https://www.canva.com/en_gb/help/image-editor/` | 2026-09-18 | Canva related-system analysis | Yes |
 
+## October supervisor revision: additional sources
+
+Verified on 9 October 2026. These IEEE entries support specific claims in Sections 5.2–5.6; configuration choices remain attributed to the project repository.
+
+- [10] Pallets, “Security helpers,” Werkzeug documentation. [Online]. Available: https://werkzeug.palletsprojects.com/en/stable/utils/#security-helpers.
+- [11] Pallets, “Sessions,” Flask documentation. [Online]. Available: https://flask.palletsprojects.com/en/stable/quickstart/#sessions.
+- [12] CompVis and Runway, “Stable Diffusion v1-5 model card,” Hugging Face. [Online]. Available: https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5.
+- [13] Hugging Face, “Image-to-image,” Diffusers documentation. [Online]. Available: https://huggingface.co/docs/diffusers/api/pipelines/stable_diffusion/img2img.
+- [14] Amazon Web Services, “What is Amazon S3?” Amazon S3 User Guide. [Online]. Available: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html.
+- [15] F5, “NGINX reverse proxy,” NGINX documentation. [Online]. Available: https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/.
+- [16] Electronic Frontier Foundation, “User guide,” Certbot documentation. [Online]. Available: https://eff-certbot.readthedocs.io/en/stable/using.html.
+- [17] Amazon Web Services, “What is Amazon EC2?” Amazon EC2 User Guide. [Online]. Available: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html.
+- [18] GitHub, “Self-hosted runners,” GitHub Docs. [Online]. Available: https://docs.github.com/en/actions/concepts/runners/self-hosted-runners.
+- [19] Docker, “GPU support in Docker Desktop for Windows,” Docker Docs. [Online]. Available: https://docs.docker.com/desktop/features/gpu/.
+- [20] OpenBSD, “ssh(1): OpenSSH remote login client,” OpenBSD manual pages. [Online]. Available: https://man.openbsd.org/ssh#R.
+
 ## Source rules
 
-- Keep this nine-source set unless a specific unsupported claim requires one additional primary source.
+Final IEEE check, 9 October 2026: all 20 sources are cited in first-use numerical order. The report's 17 online entries now include Accessed dates using the verification records above (18 September for the original sources, 9 October for the added sources), followed by [Online]. Available: and the URL without a terminal period. The report bibliography is the authoritative formatted list; the older working entries above retain their historical wording.
+
+Claim-level audit, 9 October 2026: read all cited passages and checked each reference against its linked primary source or local project document/code. Separated current implementation from historical SRS/HLD claims, paired general service/library citations with the repository where a sentence describes NeuroPix, narrowed the latent-diffusion claim to the research paper's finding, separated S3 object-key semantics from the project's original/processed storage split, and added the password-verification source to the login claim. Reference [12] now attributes the linked model-card mirror to stable-diffusion-v1-5 rather than implying the organization is CompVis/Runway. All 20 sources remain in first-use order. Details: [citation audit](citation-claim-audit.md). Word/PDF refreshed; visually checked affected PDF pages 10, 13, 26, 34–36 and 58. The report remains 58 pages. No live infrastructure test was performed.
+
+- Retain the 20 cited sources verified for the October supervisor text revision. Add further sources only for specific claims that need support.
 - Use the repository, SRS, and HLD for project-specific facts, with the current code taking precedence over older documents.
 - Use official documentation and the primary paper only for background or current product facts.
 - Do not add separate citations for Namecheap, Camber Cloud, Lightning.ai, the direct-to-main workflow, or every software dependency when the report is describing the team's own experience.

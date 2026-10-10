@@ -14,7 +14,6 @@ const editChoiceTitle = document.querySelector("#editChoiceTitle");
 const closeEditChoiceModal = document.querySelector("#closeEditChoiceModal");
 const useOriginalButton = document.querySelector("#useOriginalButton");
 const useEditedButton = document.querySelector("#useEditedButton");
-const GALLERY_CACHE_KEY = "neuropixGallery";
 
 let dragging = false;
 let selectedGalleryImage = null;
@@ -71,45 +70,6 @@ function openComparison(title, beforeUrl, afterUrl, type) {
 	}
 }
 
-function formatGalleryDate(value) {
-	if (!value) {
-		return "Unknown date";
-	}
-
-	const date = new Date(value);
-	if (Number.isNaN(date.getTime())) {
-		return value;
-	}
-
-	return date.toLocaleDateString("en-GB", {
-		day: "2-digit",
-		month: "2-digit",
-		year: "numeric",
-	});
-}
-
-function getGalleryTitle(image) {
-	// Remove the extension because the card already identifies the item as an image.
-	let fileName = image.file_name;
-	if (!fileName) {
-		fileName = "Image #" + image.image_id;
-	}
-
-	return fileName.replace(/\.(png|jpe?g)$/i, "");
-}
-
-function getEditTypeLabel(editType) {
-	if (editType === "ai") {
-		return "AI Edited";
-	}
-
-	if (editType === "standard") {
-		return "Standard Edit";
-	}
-
-	return "Original";
-}
-
 function getWorkspaceUrl(imageId, source) {
 	return (
 		"workspace.html?imageId=" +
@@ -144,7 +104,7 @@ function openVersionChoice(image, action) {
 		useEditedButton.textContent = "Use edited";
 	}
 	useEditedButton.disabled = !image.modified_url;
-	editChoiceTitle.textContent = "Choose a version of " + getGalleryTitle(image);
+	editChoiceTitle.textContent = "Choose a version of " + image.title;
 	editChoiceModal.classList.remove("hidden");
 }
 
@@ -166,130 +126,30 @@ function chooseEditSource(source) {
 	}
 }
 
-function createGalleryCard(image) {
-	const title = getGalleryTitle(image);
-	const card = document.createElement("article");
-	card.className = "gallery-card";
+// Flask renders the cards; JavaScript connects their actions.
+document.querySelectorAll(".gallery-card").forEach(function (card) {
+	const image = {
+		image_id: card.dataset.imageId,
+		title: card.dataset.title,
+		original_url: card.dataset.originalUrl,
+		modified_url: card.dataset.modifiedUrl,
+		edit_type: card.dataset.editType,
+	};
 
-	const previewButton = document.createElement("button");
-	previewButton.className = "gallery-card-preview";
-	previewButton.type = "button";
-	previewButton.setAttribute("aria-label", "Open " + title);
-
-	const thumb = document.createElement("div");
-	thumb.className = "gallery-thumb";
-
-	const imageElement = document.createElement("img");
-	let imageUrl = image.modified_url;
-	if (!imageUrl) {
-		imageUrl = image.original_url;
-	}
-	imageElement.src = imageUrl;
-	imageElement.alt = title;
-	thumb.appendChild(imageElement);
-
-	if (image.edit_type === "ai") {
-		const aiSign = document.createElement("span");
-		aiSign.className = "gallery-ai-icon";
-		aiSign.title = "AI edited";
-		aiSign.setAttribute("aria-label", "AI edited");
-		aiSign.textContent = "✦";
-		thumb.appendChild(aiSign);
-	}
-
-	const info = document.createElement("div");
-	info.className = "gallery-info";
-
-	const titleElement = document.createElement("strong");
-	titleElement.className = "gallery-title";
-	titleElement.textContent = title;
-	if (image.file_name) {
-		titleElement.title = image.file_name;
-	} else {
-		titleElement.title = title;
-	}
-	info.appendChild(titleElement);
-
-	const chips = document.createElement("div");
-	chips.className = "gallery-chips";
-	const typeChip = document.createElement("span");
-	typeChip.className = "chip";
-	if (image.edit_type === "ai") {
-		typeChip.className = "chip ai-chip";
-	}
-	typeChip.textContent = getEditTypeLabel(image.edit_type);
-	chips.appendChild(typeChip);
-
-	const dateChip = document.createElement("span");
-	dateChip.className = "chip";
-	dateChip.textContent = formatGalleryDate(image.upload_date);
-	chips.appendChild(dateChip);
-
-	const infoRow = document.createElement("div");
-	infoRow.className = "gallery-info-row";
-	infoRow.appendChild(chips);
-
-	const actions = document.createElement("div");
-	actions.className = "gallery-actions";
-
-	const editLink = document.createElement("a");
-	editLink.className = "gallery-edit";
-	editLink.href = getWorkspaceUrl(image.image_id, "original");
-	editLink.setAttribute("aria-label", "Edit " + title);
-	editLink.textContent = "Edit";
-	editLink.addEventListener("click", function (event) {
+	card.querySelector(".gallery-card-preview").addEventListener("click", function () {
+		openComparison(image.title, image.original_url, image.modified_url, image.edit_type);
+	});
+	card.querySelector(".gallery-edit").addEventListener("click", function (event) {
 		event.preventDefault();
 		openVersionChoice(image, "edit");
 	});
-	actions.appendChild(editLink);
-
-	const downloadButton = document.createElement("button");
-	downloadButton.className = "gallery-edit gallery-download";
-	downloadButton.type = "button";
-	downloadButton.setAttribute("aria-label", "Download " + title);
-	downloadButton.title = "Download " + title;
-	downloadButton.innerHTML =
-		'<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-		'<path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4"></path></svg>';
-	downloadButton.addEventListener("click", function () {
+	card.querySelector(".gallery-download").addEventListener("click", function () {
 		openVersionChoice(image, "download");
 	});
-	actions.appendChild(downloadButton);
-
-	const deleteButton = document.createElement("button");
-	deleteButton.className = "gallery-delete";
-	deleteButton.type = "button";
-	deleteButton.setAttribute("aria-label", "Delete " + title);
-	deleteButton.title = "Delete " + title;
-	const trashIcon = document.createElement("span");
-	trashIcon.className = "trash-icon";
-	trashIcon.setAttribute("aria-hidden", "true");
-	trashIcon.innerHTML =
-		'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-		'<path d="M3 6h18"></path>' +
-		'<path d="M8 6V4h8v2"></path>' +
-		'<path d="M19 6l-1 14H6L5 6"></path>' +
-		'<path d="M10 11v5"></path>' +
-		'<path d="M14 11v5"></path>' +
-		"</svg>";
-	deleteButton.appendChild(trashIcon);
-	deleteButton.addEventListener("click", function () {
+	card.querySelector(".gallery-delete").addEventListener("click", function () {
 		deleteGalleryImage(image.image_id, card);
 	});
-	actions.appendChild(deleteButton);
-	infoRow.appendChild(actions);
-
-	info.appendChild(infoRow);
-	previewButton.appendChild(thumb);
-
-	previewButton.addEventListener("click", function () {
-		openComparison(title, image.original_url, image.modified_url, image.edit_type);
-	});
-
-	card.appendChild(previewButton);
-	card.appendChild(info);
-	return card;
-}
+});
 
 async function deleteGalleryImage(imageId, card) {
 	// Ask for confirmation before removing both the database row and S3 files.
@@ -312,63 +172,9 @@ async function deleteGalleryImage(imageId, card) {
 	}
 
 	card.remove();
-	localStorage.removeItem(GALLERY_CACHE_KEY);
 
 	if (galleryGrid && galleryGrid.children.length === 0 && galleryStatus) {
 		galleryStatus.textContent = "No images yet. Process an image in Studio to see it here.";
-	}
-}
-
-function renderGallery(images) {
-	galleryGrid.replaceChildren();
-
-	if (!images.length) {
-		galleryStatus.textContent = "No images yet. Process an image in Studio to see it here.";
-		return;
-	}
-
-	images.forEach(function (image) {
-		galleryGrid.appendChild(createGalleryCard(image));
-	});
-	galleryStatus.textContent = "Your saved images.";
-}
-
-async function loadGallery() {
-	if (!galleryGrid) {
-		return;
-	}
-
-	// Show the last response immediately, then replace it with fresh data.
-	const cachedValue = localStorage.getItem(GALLERY_CACHE_KEY);
-	let cachedGallery = null;
-	if (cachedValue) {
-		cachedGallery = JSON.parse(cachedValue);
-	}
-
-	if (cachedGallery) {
-		renderGallery(cachedGallery);
-	}
-
-	try {
-		const response = await fetch("/api/gallery");
-
-		if (response.status === 401) {
-			localStorage.removeItem(GALLERY_CACHE_KEY);
-			window.location.href = "login.html";
-			return;
-		}
-
-		if (!response.ok) {
-			throw new Error("Gallery request failed");
-		}
-
-		const images = await response.json();
-		localStorage.setItem(GALLERY_CACHE_KEY, JSON.stringify(images));
-		renderGallery(images);
-	} catch (error) {
-		if (!cachedGallery) {
-			galleryStatus.textContent = "Could not load the gallery.";
-		}
 	}
 }
 
@@ -442,5 +248,3 @@ if (editChoiceModal) {
 		}
 	});
 }
-
-loadGallery();

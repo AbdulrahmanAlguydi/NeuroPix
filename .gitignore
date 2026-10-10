@@ -17,3 +17,5 @@ __pycache__/
 # Local presentation validation and browser-session artifacts
 .codex-presentation-finalizer-*/
 .playwright-cli/
+.pytest_cache/
+.ruff_cache/

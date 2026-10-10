@@ -5,7 +5,7 @@ from functools import wraps
 from io import BytesIO
 
 from dotenv import load_dotenv
-from flask import Flask, request, send_file, session
+from flask import Flask, redirect, render_template, request, send_file, session
 from PIL import Image
 
 from database.queries import get_user_by_username, register_user
@@ -22,7 +22,7 @@ from utils.security import hash_password, verify_password
 
 load_dotenv()
 
-# Serve the frontend files directly (for example, /login.html).
+# Serve public pages and assets directly; signed-in pages use Jinja templates.
 app = Flask(__name__, static_folder="frontend", static_url_path="")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "neuropix_secret_key_123")
 
@@ -156,6 +156,45 @@ def local_model_status():
 def gallery():
     images = fetch_formatted_user_gallery(session["user_id"])
     return images, 200
+
+
+@app.route("/gallery.html")
+def gallery_page():
+    if "user_id" not in session:
+        return redirect("/login.html")
+
+    images = fetch_formatted_user_gallery(session["user_id"])
+    for image in images:
+        image["title"] = os.path.splitext(image["file_name"])[0]
+
+    return render_template("gallery.html", images=images)
+
+
+@app.route("/dashboard.html")
+def dashboard_page():
+    if "user_id" not in session:
+        return redirect("/login.html")
+
+    images = fetch_formatted_user_gallery(session["user_id"])
+    standard_count = 0
+    ai_count = 0
+    for image in images:
+        if image["edit_type"] == "standard":
+            standard_count += 1
+        elif image["edit_type"] == "ai":
+            ai_count += 1
+
+    return render_template(
+        "dashboard.html", images=images, standard_count=standard_count, ai_count=ai_count
+    )
+
+
+@app.route("/workspace.html")
+def workspace_page():
+    if "user_id" not in session:
+        return redirect("/login.html")
+
+    return render_template("workspace.html")
 
 
 @app.route("/api/gallery/<int:image_id>/load", methods=["POST"])

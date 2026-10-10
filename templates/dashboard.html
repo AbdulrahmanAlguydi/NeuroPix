@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="icon" type="image/png" href="assets/images/website-icon.png">
+   <link rel="stylesheet" href="assets/css/app.css">
+   <title>Dashboard | NeuroPix</title>
+</head>
+
+<body class="app-body">
+
+   {% include "sidebar.html" %}
+
+   <main class="app-main">
+
+      <header class="app-header">
+         <div>
+            <span class="eyebrow large-eyebrow">OVERVIEW</span>
+            <h1>Dashboard</h1>
+         </div>
+      </header>
+
+      <section class="dashboard-hero">
+         <div>
+            <span class="eyebrow">NEUROPIX STUDIO</span>
+            <h2>Ready to process an image?</h2>
+
+            <p>
+               Upload an image, choose an editing mode, and prepare the
+               settings for backend processing.
+            </p>
+
+            <a class="btn btn-accent" href="workspace.html">
+               Open Studio
+            </a>
+         </div>
+
+         <div class="dashboard-logo">N</div>
+      </section>
+
+      <section class="stats-grid">
+         <article>
+            <span>✎</span>
+            <div>
+               <small>Standard Edits</small>
+               <strong id="standardEditCount">{{ standard_count }}</strong>
+            </div>
+         </article>
+
+         <article>
+            <span>✦</span>
+            <div>
+               <small>AI Edits</small>
+               <strong id="aiEditCount">{{ ai_count }}</strong>
+            </div>
+         </article>
+      </section>
+
+      <section class="dashboard-grid">
+
+         <article class="panel dashboard-panel">
+            <span class="eyebrow">WORKFLOW</span>
+            <h2>How the studio works</h2>
+
+            <div class="workflow-steps">
+               <span>1</span>
+               <p>Upload an image.</p>
+
+               <span>2</span>
+               <p>Select Standard or AI mode.</p>
+
+               <span>3</span>
+               <p>Configure parameters.</p>
+
+               <span>4</span>
+               <p>Send the request to the backend.</p>
+
+               <span>5</span>
+               <p>Compare the returned result.</p>
+            </div>
+         </article>
+
+         <article class="panel dashboard-panel">
+            <span class="eyebrow">RECENT ACTIVITY</span>
+            {% if images %}
+            <h2 id="recentActivityTitle">Latest edits</h2>
+            <p id="recentActivityMessage">Your three most recent processed images.</p>
+            {% else %}
+            <h2 id="recentActivityTitle">No activity yet</h2>
+            <p id="recentActivityMessage">Process an image in Studio to see it here.</p>
+            {% endif %}
+            <div id="recentActivityList" class="recent-activity-list">
+               {% for image in images[:3] %}
+               <a class="recent-activity-item" href="gallery.html" aria-label="Open {{ image.file_name }} in Gallery">
+                  <img src="{{ image.modified_url or image.original_url }}" alt="{{ image.file_name }}">
+                  <div class="gallery-chips recent-activity-meta">
+                     {% if image.edit_type == 'ai' %}
+                     <span class="chip ai-chip">AI Edited</span>
+                     {% elif image.edit_type == 'standard' %}
+                     <span class="chip">Standard Edit</span>
+                     {% else %}
+                     <span class="chip">Original</span>
+                     {% endif %}
+                     <span class="chip">{{ image.upload_date.strftime('%d/%m/%Y') if image.upload_date else 'Unknown date' }}</span>
+                  </div>
+               </a>
+               {% endfor %}
+            </div>
+
+            <a class="text-link" href="gallery.html">
+               Open Gallery →
+            </a>
+         </article>
+
+      </section>
+
+   </main>
+
+   <script src="assets/js/sidebar.js"></script>
+
+</body>
+
+</html>

@@ -18,8 +18,9 @@ app.py                         Flask routes and application setup
 database/                      MySQL connection, queries, and schema
 services/                      Standard editing, AI editing, and image storage logic
 utils/                         Shared security and S3 helpers
-frontend/                      HTML pages, CSS, JavaScript, and image assets
-tests/                         Automated API and security checks
+frontend/                      Public HTML pages, CSS, JavaScript, and image assets
+templates/                     Jinja Dashboard, Studio, Gallery, and shared sidebar
+tests/                         Automated API, security, and page checks
 tests/integration/             Real database, S3, and workflow checks
 docs/                          Project documents such as the SRS and HLD
 .github/workflows/deploy.yml   Automatic EC2 deployment workflow

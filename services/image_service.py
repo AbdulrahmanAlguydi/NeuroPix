@@ -109,7 +109,7 @@ def get_original_filename(path):
 
 def fetch_formatted_user_gallery(user_id):
     """Return gallery records with browser-ready image URLs."""
-    # Convert database column names into the smaller object expected by JavaScript.
+    # Use the same image fields in the Jinja pages and the JSON API.
     records = get_user_gallery(user_id)
     gallery = []
 

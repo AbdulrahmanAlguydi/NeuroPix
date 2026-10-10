@@ -57,10 +57,6 @@ button {
 	color: #fff;
 	font-size: 24px;
 }
-.logo-mark.light {
-	background: #fff;
-	color: var(--dark);
-}
 .public-nav {
 	position: sticky;
 	top: 0;

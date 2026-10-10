@@ -8,6 +8,8 @@ Finalized revision overlay, 19 September 2026: all 20 approved diagrams are inco
 
 Visual-selection rule:
 
+October supervisor revision: Figure 4.3 explicitly returns original/edited gallery reload to Studio. Figure 4.7 names the AWS-hosted Amazon RDS/MySQL metadata database and Amazon S3 image-file storage. Figure 4.11 identifies the EC2 Linux virtual machine and the team member's physical Windows/GPU host. Preserve these distinctions in future revisions. Page count is not a fixed limit; full layout review is deferred until content is locked in.
+
 - Use a diagram when the reader needs to understand an invisible process, relationship, decision, or data flow.
 - Use a screenshot when the visual appearance or an observed interface state is the evidence.
 - Use a table for repeated fields or direct comparison.
@@ -517,7 +519,7 @@ Visual choice:
 
 Dashboard:
 
-- Explain how owned records are summarized into edit counts and recent activity; mention cached data only if it materially affects observed behavior.
+- Explain how Flask supplies owned-record edit counts and recent activity to the Dashboard Jinja template. The signed-in pages share one sidebar template, with no browser gallery cache or initial identity request.
 
 Gallery:
 
@@ -583,8 +585,7 @@ The live use cases remain the focus of the chapter. The unit-testing material be
 Keep this subsection to approximately one third to one half of a page.
 
 - Describe the repository's automated tests as unit and API-level tests because `tests/test_api.py` uses Flask's test client and mocks external database, storage, and AI boundaries, while `tests/test_security.py` checks password-security behavior.
-- Run only `python -m pytest -q tests/test_api.py tests/test_security.py` for the reported unit-test result.
-- Preserve the recorded execution: 28 tests passed in 3.97 seconds on 18 September 2026. Editorial reviews do not constitute new executions.
+- Current automated execution: `python -m pytest tests/test_api.py tests/test_security.py tests/test_gallery_download.py tests/test_gallery_page.py tests/test_signed_in_pages.py -q` passed all 35 tests on 10 October 2026. Keep the historical six live use-case tests dated 18 September 2026. A separate local browser check used real database/S3 services for upload, Standard processing, downloads, reload, and test-image deletion.
 - Use one compact aggregate result row with the command and outcome. Brief surrounding prose explains scope and mocked boundaries; do not add a file-by-file test inventory.
 - Cover health, registration and authentication validation, session behavior, upload validation, Standard and AI processing paths, local-provider prompt handling, save failures, mocked persistence orchestration, repeated object-key generation, and password hashing where the tests actually assert them.
 - Do not reproduce individual test cases, terminal screenshots, or code excerpts.
@@ -769,10 +770,10 @@ Keep the existing concise closing paragraph focused on the implemented system an
 - Use IEEE numerical citations in order of first appearance.
 - Begin with the NeuroPix GitHub repository, SRS, and HLD as the three project references.
 - Add only sources needed for claims that the repository, SRS, and HLD cannot support.
-- Use a minimal external set: the Stable Diffusion or latent-diffusion primary source, official OpenAI image-model documentation, Pillow documentation, official Amazon RDS for MySQL documentation, and one official source for each selected related system.
+- Include at least 20 relevant references, following the supervisor's October review. Cite official documentation for authentication, model pipelines, storage, deployment, GPU access, and tunneling alongside the existing project, research, and related-system sources.
 - Do not add separate references for Namecheap, Camber, Lightning.ai, or every software dependency when the report is only describing the team's own development experience or implemented configuration.
 - Prefer official documentation and original research papers for the small external set.
-- Record authors or organizations, title, publication, date, URL, and access date.
+- Record authors or organizations, title, publication, publication date where available, and URL. Keep verification dates in the working ledger, not access-date suffixes in the report.
 - Verify every URL immediately before finalization.
 - Do not cite search-result pages or unsupported AI summaries.
 
@@ -785,6 +786,10 @@ Keep the existing concise closing paragraph focused on the implemented system an
 - Add an appendix only if the supervisor later requests a specific supporting item.
 
 ## Cross-document quality requirements
+
+Current gallery follow-up (9 October 2026): document downloading the original upload or saved edited image from each Gallery card, in addition to reload and deletion. Figure 4.3 shows separate Gallery action nodes; only reload navigates to Studio. Include the ownership-checked gallery download endpoint in the API table without extending the historical six live-test cases.
+
+Signed-in rendering follow-up (10 October 2026): Flask renders Dashboard, Studio, and Gallery through Jinja and checks the session before returning their HTML. The shared sidebar displays the session username. Dashboard counts/recent images and Gallery cards come from owned records. JavaScript handles interactive actions. The JSON gallery API remains available but is no longer used to populate these pages. The login sequence shows the Dashboard HTML request and owned-image query.
 
 - Maintain an editable DOCX master for drafting, comments, automatic fields, captions, and revision history; deliver the final report as PDF.
 - Use Calibri 12 pt as the default body font.
