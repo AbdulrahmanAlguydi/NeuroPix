@@ -1,6 +1,7 @@
 import base64
 from math import ceil
 import os
+import time
 
 import requests
 from openai import OpenAI
@@ -135,13 +136,21 @@ def is_local_model_available():
     if not local_model_url:
         return False
 
-    try:
-        response = requests.get(local_model_url, timeout=3)
-    except requests.RequestException:
-        return False
+    # Check LitServe directly so the model may be unloaded while still available.
+    health_url = local_model_url.rsplit("/", 1)[0] + "/health"
 
-    # The model endpoint accepts POST requests, so GET normally returns 405.
-    return response.status_code in {200, 405}
+    for attempt in range(2):
+        try:
+            response = requests.get(health_url, timeout=3)
+            if response.status_code == 200:
+                return True
+        except requests.RequestException:
+            pass
+
+        if attempt == 0:
+            time.sleep(1)
+
+    return False
 
 
 def apply_ai_edits(local_image_path, settings):
