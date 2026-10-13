@@ -117,7 +117,7 @@ Edit `.env` with your own values:
 | `OPENAI_API_KEY`, `OPENAI_IMAGE_MODEL` | OpenAI credentials and an image-editing model available to your account |
 | `LOCAL_MODEL_URL` | Optional local model's `/predict` endpoint |
 
-The example file contains placeholders, including a project-specific OpenAI model setting. Replace them; the original team's credentials and model access are not supplied. Keep `.env` out of Git.
+The example file contains placeholders, including the OpenAI model name. Replace them with your own values; the original team's credentials and model access are not supplied. Keep `.env` out of Git.
 
 The current preview code constructs public S3 object URLs. Your bucket configuration must allow the browser to retrieve those images; upload permission alone is not enough. Use non-sensitive test images. Gallery ownership checks do not make the S3 objects private.
 
