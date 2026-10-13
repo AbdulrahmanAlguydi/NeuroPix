@@ -36,7 +36,17 @@ Standard edits use Pillow rather than an AI provider. This example shows a rotat
 - Compare the original and result, download images, and reload a saved version for another edit.
 - View saved images in the Gallery, download either version, or delete a saved image pair.
 
-## My role: Abdulrahman Alguydi
+## Team and responsibilities
+
+| Team member | Main responsibilities |
+|---|---|
+| [Abdulrahman Alguydi](https://github.com/AbdulrahmanAlguydi) | Project leadership and documentation, database and S3 storage, AI-provider integration, local-model setup, and deployment. |
+| [Mohammed Dafterdar](https://github.com/M123731) | Frontend pages and styling, editing controls, browser-side interactions, image comparison, and Gallery interface. |
+| [Saud Al-mansour](https://github.com/Artig3nce) | Flask backend and API routes, authentication, upload validation, standard image processing with Pillow, connecting the interface to backend services, and backend tests. |
+
+These describe the main areas of responsibility. Integration and later revisions involved shared work across those areas.
+
+### Abdulrahman's contributions
 
 I led the project and handled its documentation and presentation preparation. I organized the work, tracked teammates' deadlines, arranged meetings, and produced the final report, presentation, and individual speaking scripts. I also coordinated in-person rehearsal reservations with other teams and gathered feedback before the presentation.
 
