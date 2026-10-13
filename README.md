@@ -44,7 +44,7 @@ Standard edits use Pillow rather than an AI provider. This example shows a rotat
 | [Mohammed Dafterdar](https://github.com/M123731) | Frontend pages and styling, editing controls, browser-side interactions, image comparison, and Gallery interface. |
 | [Saud Al-mansour](https://github.com/Artig3nce) | Flask backend and API routes, authentication, upload validation, standard image processing with Pillow, connecting the interface to backend services, and backend tests. |
 
-These describe the main areas of responsibility. Integration and later revisions involved shared work across those areas. Development and documentation used AI coding and writing tools alongside the team's work.
+These describe the main areas of responsibility. Integration and later revisions involved shared work across those areas.
 
 ## Stack and data flow
 
