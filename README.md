@@ -40,7 +40,7 @@ Standard edits use Pillow rather than an AI provider. This example shows a rotat
 
 | Team member | Main responsibilities |
 |---|---|
-| [Abdulrahman Alguydi](https://github.com/AbdulrahmanAlguydi) | Project leadership, deadline tracking, meetings and rehearsals; documentation, final report, presentation, and speaking scripts. MySQL and S3 storage, AI integration, local-model setup, and deployment. Also contributed backend fixes and UI testing, reviewed teammates' work, and provided implementation and design feedback. |
+| [Abdulrahman Alguydi](https://github.com/AbdulrahmanAlguydi) | Project leadership, deadline tracking, meetings and rehearsals; project documentation, including the SRS, high-level design, and final report, plus the presentation and speaking scripts. MySQL and S3 storage, AI integration, local-model setup, and deployment. Also contributed backend fixes and UI testing, reviewed teammates' work, and provided implementation and design feedback. |
 | [Mohammed Dafterdar](https://github.com/M123731) | Frontend pages and styling, editing controls, browser-side interactions, image comparison, and Gallery interface. |
 | [Saud Al-mansour](https://github.com/Artig3nce) | Flask backend and API routes, authentication, upload validation, standard image processing with Pillow, connecting the interface to backend services, and backend tests. |
 
