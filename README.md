@@ -40,19 +40,11 @@ Standard edits use Pillow rather than an AI provider. This example shows a rotat
 
 | Team member | Main responsibilities |
 |---|---|
-| [Abdulrahman Alguydi](https://github.com/AbdulrahmanAlguydi) | Project leadership and documentation, database and S3 storage, AI-provider integration, local-model setup, and deployment. |
+| [Abdulrahman Alguydi](https://github.com/AbdulrahmanAlguydi) | Project leadership, deadline tracking, meetings and rehearsals; documentation, final report, presentation, and speaking scripts. MySQL and S3 storage, AI integration, local-model setup, and deployment. Also contributed backend fixes and UI testing, reviewed teammates' work, and provided implementation and design feedback. |
 | [Mohammed Dafterdar](https://github.com/M123731) | Frontend pages and styling, editing controls, browser-side interactions, image comparison, and Gallery interface. |
 | [Saud Al-mansour](https://github.com/Artig3nce) | Flask backend and API routes, authentication, upload validation, standard image processing with Pillow, connecting the interface to backend services, and backend tests. |
 
-These describe the main areas of responsibility. Integration and later revisions involved shared work across those areas.
-
-### Abdulrahman's contributions
-
-I led the project and handled its documentation and presentation preparation. I organized the work, tracked teammates' deadlines, arranged meetings, and produced the final report, presentation, and individual speaking scripts. I also coordinated in-person rehearsal reservations with other teams and gathered feedback before the presentation.
-
-My technical work covered the MySQL schema and queries, image storage in S3, and the connection between stored files and database records. I also worked on the OpenAI integration and pre-prompt rules, the local Stable Diffusion service and reverse SSH connection, and the AWS deployment workflow. The relevant code is in [database](database/), [S3 helpers](utils/s3.py), [image storage service](services/image_service.py), [AI editing service](services/ai_editor.py), [local model](local_model/), and [deployment workflow](.github/workflows/deploy.yml).
-
-NeuroPix was a team project. The frontend, Flask routes, standard image processing, Jinja pages, and Gallery include teammates' work and shared revisions. We used AI coding and writing tools during development and documentation; the commit history includes those assisted revisions as well as individual contributions.
+These describe the main areas of responsibility. Integration and later revisions involved shared work across those areas. Development and documentation used AI coding and writing tools alongside the team's work.
 
 ## Stack and data flow
 
